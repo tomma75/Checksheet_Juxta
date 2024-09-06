@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>체크시트 페이지</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"> <!-- Font Awesome 추가 -->
+    <style>
+        body, input, button, select {
+            font-size: 20px;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            color: #333;
+            display: flex;
+            transition: margin-right 0.5s;
+        }
+        h1 {
+            color: #0056b3;
+        }
+        form {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        select, input[type="text"] {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            margin-bottom: 20px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        button:active {
+            background-color: #3e8c43;
+            transform: scale(0.98);
+        }
+        canvas {
+            border: 1px solid #000000;
+            touch-action: none;
+
+        }
+        #error {
+            color: red;
+        }
+        #drawingCanvas {
+            cursor: url("{{ pen_cursor_url }}"), auto; /* 캔버스 위에서 마우스 커서를 펜 모양으로 변경 */
+        }
+        .sidebar {
+            height: 100vh;
+            width: 50px; /* 초기 너비 설정 */
+            position: fixed;
+            z-index: 1;
+            top: 0;
+            left: 0;
+            background-color: #111;
+            overflow-x: hidden;
+            transition: width 0.5s;
+            padding-top: 20px;
+        }
+        .sidebar a {
+            padding: 10px 15px;
+            text-decoration: none;
+            font-size: 25px;
+            color: white;
+            display: block;
+            transition: 0.3s;
+        }
+        .sidebar a:hover {
+            color: #f1f1f1;
+        }
+        .sidebar .closebtn {
+            position: absolute;
+            top: 0;
+            right: 25px;
+            font-size: 36px;
+            margin-left: 50px;
+        }
+        .link-text {
+            display: inline; /* 기본적으로 텍스트 표시 */
+        }
+
+        .sidebar.collapsed .link-text {
+            display: none; /* 축소된 상태에서는 텍스트 숨김 */
+        }
+
+        .sidebar:not(.collapsed) .link-text {
+            display: inline; /* 확장된 상태에서 텍스트 표시 */
+        }
+
+        .sidebar.collapsed {
+            width: 50px; /* 축소된 상태의 사이드바 너비 */
+        }
+
+        .sidebar:not(.collapsed) {
+            width: 250px; /* 확장된 상태의 사이드바 너비 */
+        }
+        .sidebar.collapsed + #main {
+            margin-left: 50px; /* 사이드바가 축소되었을 때의 marginLeft */
+        }
+
+        .sidebar:not(.collapsed) + #main {
+            margin-left: 250px; /* 사이드바가 확장되었을 때의 marginLeft */
+        }
+        #main {
+            transition: margin-right 0.5s, margin-left 0.5s ease;
+            padding: 16px;
+            flex-grow: 1;
+            margin-right: 50px; /* 초기 marginRight 설정 */
+        }
+        .openbtn {
+            font-size: 20px;
+            cursor: pointer;
+            background-color: #111;
+            color: white;
+            border: none;
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            width: 50px; /* 너비 조정 */
+            height: 50px; /* 높이 조정 */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .sidebar.collapsed .openbtn {
+            left: calc(50px - 50px / 2); /* 축소된 사이드바 중앙에 위치 */
+        }
+        .openbtn:hover {
+            background-color: #444;
+        }
+
+    </style>
+<body onload="focusOnBarcodeInput()">
+    <div id="mySidebar" class="sidebar">
+        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">×</a>
+        <a href="/login"><i class="fa fa-home"></i><span class="link-text"> 로그인</span></a>
+        <a href="#"><i class="fa fa-check-square-o"></i><span class="link-text"> 체크시트</span></a>
+        <a href="/mount-label"><i class="fa fa-camera"></i><span class="link-text"> 마운트라벨 등록</span></a>
+        <a href="/checksheet-history"><i class="fa fa-history"></i><span class="link-text"> 이력관리</span></a>
+        <a href="/logout"><i class="fa fa-sign-out"></i><span class="link-text"> 로그아웃</span></a>
+    </div>
+    <button class="openbtn" onclick="toggleNav()">☰</button> <!-- 기존의 햄버거 메뉴 아이콘을 사용 -->
+    <div id="main">
+        <h1>체크시트 페이지</h1>
+        <p><strong>담당 작업자:</strong> <span id="employeeName"></span></p>
+        <p><strong>담당 라인:</strong> <span id="deptInfo"></span></p>
+        <form id="barcode-form">
+            <label for="processSelect">공정 선택:</label> 
+            <select id="processSelect" name="processSelect">
+                <option value="08">부품SET</option>
+                <option value="06">단자체결기</option>
+                <option value="11">조립</option>
+                <option value="15">출하검사</option>
+            </select>
+            <br><br>
+            <label for="barcodeInput">바코드 입력:</label>
+            <input type="text" id="barcodeInput" name="barcodeInput" autofocus oninput="validateInput(this);" />
+            <input type="submit" value="Submit" style="display: none;">
+            <p><strong>Index No:</strong> <span id="indexNo"></span></p>   
+            <p><strong>MS-CODE:</strong> <span id="msCode"></span></p>
+            <p><strong>Serial No:</strong> <span id="serialNo"></span></p>
+            <p id="error" style="color: red;"></p>
+            <button type="button" id="checkCompleteButton">체크 완료</button>
+            <div style="position: relative; width: 800px; height: 600px;">
+                <canvas id="baseImageCanvas" width="800" height="600" style="position: absolute; border:1px solid #000000;"></canvas>
+                <canvas id="drawingCanvas" width="800" height="600" style="position: absolute; border:1px solid #000000;"></canvas>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        const barcodeInput = document.getElementById('barcodeInput');
+        const indexNoDisplay = document.getElementById('indexNo');    
+        const msCodeDisplay = document.getElementById('msCode');
+        const serialNoDisplay = document.getElementById('serialNo');
+        const errorDisplay = document.getElementById('error');
+        const form = document.getElementById('upload-form');
+        const baseImageCanvas = document.getElementById('baseImageCanvas');
+        const drawingCanvas = document.getElementById('drawingCanvas');
+        const baseCtx = baseImageCanvas.getContext('2d');
+        const drawingCtx = drawingCanvas.getContext('2d');
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const drawingCanvas = document.getElementById('drawingCanvas');
+            const barcodeInput = document.getElementById('barcodeInput');
+
+            // 체크박스 클릭 이벤트 핸들러
+            drawingCanvas.addEventListener('click', function(event) {
+                event.preventDefault(); // 기본 동작 방지
+                // 여기에 기존의 체크박스 처리 로직을 넣으세요
+            });
+
+            // 바코드 입력 필드 포커스 이벤트
+            barcodeInput.addEventListener('focus', function(event) {
+                if (window.innerWidth <= 1024) { // 태블릿 크기 기준
+                    this.blur(); // 포커스 제거
+                }
+            });
+
+            // 문서 전체에 대한 키 다운 이벤트 수정
+            document.addEventListener('keydown', function(event) {
+                if (document.activeElement !== barcodeInput && window.innerWidth > 1024) {
+                    barcodeInput.focus();
+                    event.preventDefault();
+                    if ((event.key >= '0' && event.key <= '9') || (event.key >= 'A' && event.key <= 'Z') || (event.key >= 'a' && event.key <= 'z')) {
+                        barcodeInput.value += event.key;
+                    }
+                } else if (barcodeInput.value.length == 6) {
+                    processBarcode(barcodeInput.value);
+                    barcodeInput.value = '';
+                    event.preventDefault();
+                }
+            });
+        });
+
+        // Initial configurations and event listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeSidebar();
+            var employeeNameElement = document.getElementById('employeeName');
+            var deptInfoElement = document.getElementById('deptInfo');
+            
+            if (employeeNameElement && deptInfoElement) {
+                employeeNameElement.textContent = '{{ employee_name }}';
+                deptInfoElement.textContent = '{{ dept_info }}';
+            }
+        });
+
+        function initializeSidebar() {
+            var sidebar = document.getElementById("mySidebar");
+            var main = document.getElementById("main");
+            var openbtn = document.querySelector(".openbtn");
+
+            // 사이드바 초기 상태 설정: 축소
+            sidebar.classList.add('collapsed');
+            sidebar.style.width = "50px";
+            main.style.marginLeft = "50px";
+            openbtn.innerHTML = "☰"; // 햄버거 아이콘 설정
+        }
+
+        function toggleNav() {
+            var sidebar = document.getElementById("mySidebar");
+            var main = document.getElementById("main");
+            var openbtn = document.querySelector(".openbtn");
+
+            if (sidebar.classList.contains('collapsed')) {
+                sidebar.classList.remove('collapsed');
+                sidebar.style.width = "250px";
+                main.style.marginLeft = "250px";
+                openbtn.innerHTML = "×"; // 'X' 아이콘으로 변경
+            } else {
+                sidebar.classList.add('collapsed');
+                sidebar.style.width = "50px";
+                main.style.marginLeft = "50px";
+                openbtn.innerHTML = "☰"; // 햄버거 아이콘으로 변경
+            }
+        }
+
+        function closeNav() {
+            var sidebar = document.getElementById("mySidebar");
+            var main = document.getElementById("main");
+            var openbtn = document.querySelector(".openbtn");
+
+            sidebar.classList.add('collapsed');
+            sidebar.style.width = "50px";
+            main.style.marginLeft = "50px";
+            openbtn.innerHTML = "☰"; // 햄버거 아이콘으로 변경
+        }
+
+        // const clearMessages = () => {
+        //     errorDisplay.textContent = '';
+        // };
+
+        function clearAllDisplays() {
+            barcodeInput.textContent = '';
+            indexNoDisplay.textContent = '';
+            msCodeDisplay.textContent = '';
+            serialNoDisplay.textContent = '';
+            errorDisplay.textContent = '';
+            baseCtx.clearRect(0, 0, baseImageCanvas.width, baseImageCanvas.height);
+            drawingCtx.clearRect(0, 0, drawingCanvas.width, drawingCanvas.height);
+        }
+
+        function processBarcode(barcode) {
+            clearAllDisplays();
+            if (barcode.length === 6) {
+                fetchIndexNo(barcode);
+            } else {
+                errorDisplay.textContent = '6자리의 Index No를 입력해주세요.';
+            }
+        }
+        // // URL에서 employeeName 매개변수 값을 추출하는 함수
+        // function getQueryVariable(variable) {
+        //     var query = window.location.search.substring(1);
+        //     var vars = query.split('&');
+        //     for (var i = 0; i < vars.length; i++) {
+        //         var pair = vars[i].split('=');
+        //         if (decodeURIComponent(pair[0]) === variable) {
+        //             // '=' 기호를 포함하는 값 처리
+        //             return decodeURIComponent(pair.slice(1).join('='));
+        //         }
+        //     }
+        //     console.log('Query variable %s not found', variable);
+        //     return null; // 찾지 못한 경우 null 반환
+        // }
+    
+        document.getElementById('checkCompleteButton').addEventListener('click', function() {
+            const selectedProcess = document.getElementById('processSelect').value;
+            let allChecked = true;
+            let anyCrossed = false;
+            if (selectedProcess !== "06") {
+                checkBoxes.forEach((box, index) => {
+                    if (!(index in checkBoxStates) || checkBoxStates[index] === 'default') {
+                        allChecked = false;
+                    }            
+                    if (checkBoxStates[index] === 'crossed') {
+                        anyCrossed = true;
+                    }
+                });
+            }
+            let result = anyCrossed ? 'NG' : 'OK';
+
+            // 체크박스 상태를 서버로 전송
+            const checkboxData = {
+                indexNo: indexNoDisplay.textContent,
+                serialNo: serialNoDisplay.textContent,
+                deptCode: document.getElementById('deptInfo').textContent.split(' ')[0],
+                processCode: selectedProcess,
+                checkboxStates: checkBoxStates,
+                empNo: document.getElementById('employeeName').textContent.split(' ')[0]
+            };
+
+            fetch('/save_checkbox_states', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(checkboxData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Checkbox states saved:', data);
+                // 이미지 저장 로직 계속 진행
+                mergedCanvas.toBlob(function(blob) {
+                    // ... (기존 이미지 저장 코드)
+                });
+            })
+            .catch(error => {
+                console.error('Error saving checkbox states:', error);
+                alert('체크박스 상태 저장에 실패했습니다.');
+            });
+        });
+
+        // 페이지가 로드되면 바코드 입력 필드에 자동으로 포커스를 맞춥니다.
+        window.onload = function() {
+            document.getElementById('barcodeInput').focus();
+        };
+
+        // 문서 전체에 대해 키 다운 이벤트를 캡쳐하고, 이벤트가 발생할 때마다
+        // 바코드 입력 필드로 포커스를 옮기고 입력을 리다이렉트합니다.
+        document.addEventListener('keydown', function(event) {
+            const barcodeInput = document.getElementById('barcodeInput');
+            // 현재 포커스가 이미 바코드 입력 필드에 있지 않은 경우에만 실행
+            if (document.activeElement !== barcodeInput) {
+                barcodeInput.focus();
+                // 기본 이벤트를 방지하고 포커스된 입력 필드에 키 입력을 적용합니다.
+                event.preventDefault();
+                // 숫자와 영문자만 입력 받음
+                if ((event.key >= '0' && event.key <= '9') || (event.key >= 'A' && event.key <= 'Z') || (event.key >= 'a' && event.key <= 'z')) {
+                    barcodeInput.value += event.key;
+                }
+            } else {
+                // 이미 바코드 입력란에 포커스가 있는 경우, 바코드 길이가 6자리에 도달하면 처리를 시작
+                if (barcodeInput.value.length == 6) {
+                    processBarcode(barcodeInput.value);
+                    // 처리 후 입력 필드 초기화
+                    barcodeInput.value = '';
+                    event.preventDefault(); // 폼 제출 방지
+                }
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // 바코드 입력 필드에 keypress 이벤트 리스너 추가
+            barcodeInput.addEventListener('keypress', function(event) {
+                if (event.key === 'Enter') {
+                    event.preventDefault();  // 폼 자동 제출 방지
+
+                    const barcode = barcodeInput.value.trim();
+                    clearAllDisplays()
+                    // 바코드가 6자리일 경우 처리 함수 호출
+                    if (barcode.length === 6) {
+                        fetchIndexNo(barcode);
+                        barcodeInput.value = ''
+                    } else {
+                        // 입력 길이가 6자리가 아니면 에러 메시지 출력
+                        errorDisplay.textContent = '6자리의 Index No를 입력해주세요.';
+                    }
+                }
+            });
+        });
+
+        // DB에서 IndexNo를 조회하여 MSCODE, SerialNo 페이지에 표시하고 이미지를 로드합니다.
+        const handleResponse = (data) => {
+            // 응답에서 MS-CODE와 Serial No를 받아 페이지에 표시합니다.
+            if (data.MS_CODE && data.Serial_No && data.Index_No) {
+                indexNoDisplay.textContent = data.Index_No;
+                msCodeDisplay.textContent = data.MS_CODE;
+                serialNoDisplay.textContent = data.Serial_No;
+                errorDisplay.textContent = '';  // 에러 메시지를 초기화합니다.
+
+                // Serial No와 선택된 공정명으로 이미지 URL을 구성합니다.
+                // const processSelect = document.getElementById('processSelect');
+                // const selectedProcess = processSelect.options[processSelect.selectedIndex].value;
+                // const imageUrl = `/images/${data.Serial_No}_${selectedProcess}.png`; // 이미지 경로 포맷을 서버 설정에 맞게 조정해야 할 수 있습니다.
+
+                // 이미지를 로드합니다.
+                // loadImage(imageUrl);
+            } else {
+                // 에러가 발생했거나 필요한 데이터가 없는 경우
+                indexNoDisplay.textContent = 'Unavailable';
+                msCodeDisplay.textContent = 'Unavailable';
+                serialNoDisplay.textContent = 'Unavailable';
+                errorDisplay.textContent = data.error || 'An error occurred';  // 에러 메시지를 표시합니다.
+            }
+        };
+            
+        // 바코드가 6자리 입력되면 호출되는 함수
+        function fetchIndexNo(barcode) {
+            fetch('/get_product_info', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({'indexNo': barcode})
+            })
+            .then(response => response.json())
+            .then(data => {
+                handleResponse(data);
+                
+                if (data.Serial_No) {
+                    const processSelect = document.getElementById('processSelect');
+                    const selectedIndex = processSelect.selectedIndex;
+                    const selectedProcess = processSelect.options[selectedIndex].value;
+                    const deptCode = document.getElementById('deptInfo').textContent.split(' ')[0];
+                    console.log(deptCode);
+
+                    const uploadImageUrl = `/upload_image/${data.Index_No}_${deptCode}_${data.Serial_No}_${selectedProcess}_${selectedIndex}`;
+
+                    fetch(uploadImageUrl, {
+                        method: 'GET',
+                        headers: {
+                            'Accept': 'application/json'
+                        }
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('이미지를 서버에서 가져오는데 실패했습니다.');
+                        }
+                        return response.json();
+                    })
+                    .then(imageData => {
+                        if (imageData.image_url) {
+                            loadImage(imageData.image_url);
+                            checkBoxes = imageData.checkboxes || [];
+                            
+                            // 체크박스 상태 불러오기
+                            fetch(`/get_checkbox_states?indexNo=${encodeURIComponent(data.Index_No)}&serialNo=${encodeURIComponent(data.Serial_No)}&processCode=${encodeURIComponent(selectedProcess)}&deptCode=${encodeURIComponent(deptCode)}`)
+                            .then(response => response.json())
+                            .then(states => {
+                                checkBoxStates = states;
+                                redrawCheckboxes();
+                            })
+                            .catch(error => {
+                                console.error('체크박스 상태 불러오기 오류:', error);
+                            });
+                        } else {
+                            throw new Error('이미지 URL이 없습니다.');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('이미지 가져오기 오류:', error);
+                        errorDisplay.textContent = '요청한 이미지가 존재하지 않습니다. Index No 바코드 혹은 공정을 확인해주세요.';
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Index No 가져오기 오류:', error);
+                errorDisplay.textContent = 'DB에서 정보를 조회할 수 없습니다.';
+            });
+        }
+
+        // function loadCheckboxData(serialNo, processCode) {
+        //     // 서버로부터 체크박스 데이터를 불러옴
+        //     fetch(`/api/get_checkbox_data?serialNo=${serialNo}&processCode=${processCode}`, {
+        //         method: 'GET',
+        //         headers: {
+        //             'Accept': 'application/json'
+        //         }
+        //     })
+        //     .then(response => {
+        //         if (!response.ok) {
+        //             throw new Error('Failed to fetch checkbox data from server');
+        //         }
+        //         return response.json();
+        //     })
+        //     .then(data => {
+        //         // 체크박스 데이터로 checkBoxes 배열 업데이트
+        //         checkBoxes = data.checkboxes || [];
+        //         // 체크박스 상태 초기화
+        //         checkBoxStates = {}; 
+        //         // 각 체크박스에 대해 초기 상태를 'default'로 설정
+        //         checkBoxes.forEach((_, index) => {
+        //             checkBoxStates[index] = 'default';
+        //         });
+        //         console.log('Checkbox data loaded successfully');
+        //     })
+        //     .catch(error => {
+        //         console.error('Error fetching the checkbox data:', error);
+        //         errorDisplay.textContent = '체크박스 데이터를 불러오는 데 실패했습니다.';
+        //     });
+        // }
+
+        // 바코드 입력 필드에 영문과 숫자만 입력 허용
+        function validateInput(input) {
+            const nonAlphaNumericRegex = /[^a-zA-Z0-9]/g;
+            input.value = input.value.replace(nonAlphaNumericRegex, '');
+            // Validate 함수 내에서도 기존 정보를 초기화할 수 있습니다.
+            if (input.value.length === 0 || input.value.length > 0) {
+                clearAllDisplays();
+            }
+        }
+
+        const LONG_PRESS_TIME = 1000; // 길게 누르기로 간주할 시간 (밀리초)
+        let isLongPress = false; // 길게 누르기 상태를 저장하는 변수
+        let drawing = false; // 그리기 상태
+        // 우클릭 드래그를 감지하기 위한 변수
+        let rightClickDragging = false;
+        let startX, startY;  // 드래그 시작 좌표
+
+        // 체크박스 영역을 나타내는 배열 (실제 사용 시 서버로부터 받아온 데이터 사용)
+        let checkBoxes = [{ x: 50, y: 50, width: 20, height: 20 }]; // 예시 데이터
+        // 체크박스 상태 관리
+        // 각 체크박스에 대해 'default', 'checked', 'crossed' 등의 상태를 저장합니다.
+        let checkBoxStates = {};
+
+        // 이미지를 로드하는 함수
+        function loadImage(url) {
+            const image = new Image();
+            image.onload = function() {
+                baseImageCanvas.width = image.width;
+                baseImageCanvas.height = image.height;
+                drawingCanvas.width = image.width;
+                drawingCanvas.height = image.height;
+                baseCtx.drawImage(image, 0, 0);
+                drawingCtx.drawImage(image, 0, 0);
+
+                // // 체크박스 데이터 로드
+                // loadCheckboxData(serialNo, processCode);
+                // 이미지 로드 후 해당 캔버스로 스크롤 이동
+                document.getElementById('baseImageCanvas').scrollIntoView({ behavior: 'smooth' });
+
+            };
+            image.onerror = function() {
+                // 이미지 로드에 실패한 경우 에러 처리
+                console.error('Failed to load image at ' + url);
+            };
+            image.src = url;
+        }
+
+        drawingCanvas.onclick = function(event) {
+            event.preventDefault();
+            const rect = drawingCanvas.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
+            const selectedProcess = document.getElementById('processSelect').value;
+
+            if (selectedProcess === "06") {
+                return;
+            }
+
+            const clickedCheckbox = checkBoxes.find((checkBox, index) => 
+                x >= checkBox.x - 25 && x <= (checkBox.x + checkBox.width + 25) && 
+                y >= checkBox.y - 25 && y <= (checkBox.y + checkBox.height + 25)
+            );
+
+            if (clickedCheckbox) {
+                const index = checkBoxes.indexOf(clickedCheckbox);
+                const centerX = clickedCheckbox.x + clickedCheckbox.width / 2;
+                const centerY = clickedCheckbox.y + clickedCheckbox.height / 2;
+                const state = checkBoxStates[index] || 'default';
+
+                console.log(`체크박스 ${index} 클릭 전 상태: ${state}`);
+
+                switch (state) {
+                    case 'default':
+                        drawCheck(centerX, centerY);
+                        checkBoxStates[index] = 'checked';
+                        break;
+                    case 'checked':
+                        clearCheckboxVisual(index);
+                        drawCross(centerX, centerY);
+                        checkBoxStates[index] = 'crossed';
+                        break;
+                    case 'crossed':
+                        drawCircleAndCheck(centerX, centerY);
+                        checkBoxStates[index] = 'rechecked';
+                        break;
+                    case 'rechecked':
+                        clearCheckboxVisual(index);   
+                        checkBoxStates[index] = 'default';
+                        break;
+                }
+
+                console.log(`체크박스 ${index} 클릭 후 상태: ${checkBoxStates[index]}`);
+
+                checkAllBoxesChecked();
+            }
+        };
+
+        // 모든 체크박스가 체크되었는지 확인하는 함수
+        function checkAllBoxesChecked() {
+            if (typeof checkBoxStates !== 'object' || checkBoxStates.hasOwnProperty('error')) {
+                console.error('체크박스 상태 오류:', checkBoxStates);
+                return;
+            }
+
+            const totalCheckboxes = checkBoxes.length;
+            const checkedBoxes = Object.values(checkBoxStates).filter(state => state !== 'default').length;
+            const allChecked = totalCheckboxes === checkedBoxes;
+
+            console.log('모든 체크박스 상태:', checkBoxStates);
+            console.log('체크박스 총 개수:', totalCheckboxes);
+            console.log('체크된 체크박스 개수:', checkedBoxes);
+            console.log('모든 체크박스가 체크되었나요?', allChecked);
+
+            if (allChecked) {
+                console.log('모든 체크박스가 체크되어 자동으로 체크 완료 처리를 시도합니다.');
+                document.getElementById('checkCompleteButton').click();
+            }
+        }
+
+        // 우클릭 이벤트 리스너를 주석 처리합니다.
+        /*
+        drawingCanvas.oncontextmenu = function(event) {
+            event.preventDefault();
+            if (isLongPress) return;
+            const selectedProcess = document.getElementById('processSelect').value;
+
+            if (selectedProcess === "06") {
+                return;
+            }
+            const rect = drawingCanvas.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
+
+            checkBoxes.forEach(function(checkBox, index) {
+                const centerX = checkBox.x + checkBox.width / 2;
+                const centerY = checkBox.y + checkBox.height / 2;
+
+                if (x >= checkBox.x && x <= (checkBox.x + checkBox.width) &&
+                    y >= checkBox.y && y <= (checkBox.y + checkBox.height)) {
+                    if (checkBoxStates[index] === 'default') {
+                        drawCross(centerX, centerY);
+                        checkBoxStates[index] = 'crossed';
+                    }
+                }
+            });
+        };
+        */
+
+        // 그리기 시작
+        drawingCanvas.onpointerdown = function(event) {
+            event.preventDefault();
+            isLongPress = false;
+            let timer = setTimeout(() => isLongPress = true, LONG_PRESS_TIME);
+
+            const {x, y} = getCursorPosition(event);
+
+            // 우클릭 검사
+            if (event.button === 2) {
+                const {x, y} = getCursorPosition(event);
+                if (!isInsideCheckbox(x, y)) {
+                    rightClickDragging = true;
+                    startX = x;
+                    startY = y;
+                    event.preventDefault();  // 컨텍스트 메뉴 방지
+                }
+            } else {
+                // 체크박스 내부에서는 그리지 않음
+                if (!isInsideCheckbox(x, y)) {
+                    drawing = true;
+                    drawingCtx.beginPath();
+                    drawingCtx.moveTo(x, y);
+                } else {
+                    // 체크박스 내부에서 길게 눌렀을 때의 처리
+                    document.body.addEventListener('pointerup', () => {
+                        clearTimeout(timer);
+                        if (isLongPress) {
+                            redrawCheckbox(getCheckboxIndex(x, y));
+                        }
+                    }, {once: true});
+                }
+            }
+        };
+
+        // 그리기 진행
+        drawingCanvas.onpointermove = function(event) {
+            event.preventDefault();
+            if (rightClickDragging) {
+                const {x, y} = getCursorPosition(event);
+
+                // 각 체크박스를 순회하면서 포인터 위치가 체크박스 내부인지 확인합니다.
+                checkBoxes.forEach(function(checkBox, index) {
+                    if (x >= checkBox.x && x <= checkBox.x + checkBox.width &&
+                        y >= checkBox.y && y <= checkBox.y + checkBox.height) {
+                        // 포인터가 체크박스 내부로 들어간 경우 상태를 default로 설정합니다.
+                        checkBoxStates[index] = 'default';
+
+                        // 선택적으로 체크박스 상태가 변경됨을 사용자에게 시각적으로 표시할 수 있습니다.
+                        clearCheckboxVisual(index);
+                    }
+                });
+
+                eraseLine(startX, startY, x, y);
+                startX = x;
+                startY = y;
+            } else {
+                if (drawing) {
+                    const {x, y} = getCursorPosition(event);
+                    drawingCtx.lineTo(x, y);
+                    drawingCtx.strokeStyle = 'red';
+                    drawingCtx.lineWidth = 2;
+                    drawingCtx.stroke();
+                }
+            }
+        };
+
+        // 체크박스 영역을 클리어하고 시각적으로 표시하는 함수입니다.
+        function clearCheckboxVisual(index) {
+            const checkBox = checkBoxes[index];
+            // 체크박스 영역 클리어
+            drawingCtx.clearRect(checkBox.x, checkBox.y, checkBox.width, checkBox.height);
+            // 경계선을 다시 그려서 사용자에게 체크박스가 리셋되었음을 알립니다.
+            // drawingCtx.strokeStyle = 'black';
+            // drawingCtx.strokeRect(checkBox.x, checkBox.y, checkBox.width, checkBox.height);
+        }
+
+        // 그리기 종료
+        drawingCanvas.onpointerup = function(event) {
+            event.preventDefault();
+            if (event.button === 2 && rightClickDragging) {
+                rightClickDragging = false;
+            } else {
+                if (drawing) {
+                    drawingCtx.closePath();
+                    drawing = false;
+                // } else {
+                //     processClick(event)
+                }
+            }
+        };
+
+        drawingCanvas.onpointerleave = function(event) {
+            event.preventDefault();
+            if (drawing) {
+                drawingCtx.closePath();
+                drawing = false;
+            }
+        };
+
+        // 커서 위치 계산
+        function getCursorPosition(event) {
+            const rect = drawingCanvas.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
+            return { x, y };
+        }
+        // 체크박스 내부 확인
+        function isInsideCheckbox(x, y) {
+            return checkBoxes.some(box => 
+                x >= box.x && x <= box.x + box.width && y >= box.y && y <= box.y + box.height
+            );
+        }
+
+        // 체크박스 인덱스 가져오기
+        function getCheckboxIndex(x, y) {
+            return checkBoxes.findIndex(box => 
+                x >= box.x && x <= box.x + box.width && y >= box.y && y <= box.y + box.height
+            );
+        }
+
+        function processClick(event) {
+            if (isLongPress) return; // 길게 누르기 상태에서는 추가 동작을 수행하지 않음
+
+            const rect = drawingCanvas.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
+
+            checkBoxes.forEach(function(checkBox, index) {
+                const centerX = checkBox.x + checkBox.width / 2;
+                const centerY = checkBox.y + checkBox.height / 2; // Y 위치 조정
+
+                if (x >= checkBox.x && x <= (checkBox.x + checkBox.width) &&
+                    y >= checkBox.y && y <= (checkBox.y + checkBox.height)) {
+                    const state = checkBoxStates[index] || 'default';
+
+                    if (event.button === 0 && state === 'default') { // 왼쪽 버튼 클릭 및 상태 확인
+                        drawCheck(centerX, centerY);
+                        checkBoxStates[index] = 'checked';
+                    } else if (event.button === 2 && state === 'default') {
+                        drawCross(centerX, centerY);
+                        checkBoxStates[index] = 'crossed';
+                    }
+                }
+            });
+        }
+
+        // 각 도형을 체크박스 가운데에 그리는 함수
+        function drawCheck(x, y) {
+            drawingCtx.beginPath();
+            drawingCtx.moveTo(x - 5, y - 5); // V자의 시작 위치를 조정
+            drawingCtx.lineTo(x, y + 5);
+            drawingCtx.lineTo(x + 5, y - 5);
+            drawingCtx.strokeStyle = 'blue';
+            drawingCtx.lineWidth = 2;
+            drawingCtx.stroke();
+        }
+
+        function drawCross(centerX, centerY) {
+            // 체크박스 중앙을 기준으로 X자 그리기
+            let lineLength = 10; // X자를 그릴 때 각 선의 길이
+
+            drawingCtx.beginPath();
+            // 왼쪽 위에서 시작하여 오른쪽 아래로 선을 그립니다.
+            drawingCtx.moveTo(centerX - lineLength / 2, centerY - lineLength / 2);
+            drawingCtx.lineTo(centerX + lineLength / 2, centerY + lineLength / 2);
+            // 오른쪽 위에서 시작하여 왼쪽 아래로 선을 그립니다.
+            drawingCtx.moveTo(centerX + lineLength / 2, centerY - lineLength / 2);
+            drawingCtx.lineTo(centerX - lineLength / 2, centerY + lineLength / 2);
+
+            drawingCtx.strokeStyle = 'red';
+            drawingCtx.lineWidth = 2;
+            drawingCtx.stroke();
+        }
+
+        // 동그라미와 체크를 그리는 함수
+        function drawCircleAndCheck(centerX, centerY) {
+            // 체크박스 중심에 원 그리기
+            drawingCtx.beginPath();
+            drawingCtx.arc(centerX, centerY, 10, 0, Math.PI * 2);
+            drawingCtx.strokeStyle = 'red';
+            drawingCtx.lineWidth = 2;
+            drawingCtx.stroke();
+
+            // 원의 우측에 V표시 추가
+            // 원이 체크박스의 중심에 그려진다고 했을 때, V자를 그릴 위치를 조정합니다.
+            // 여기서는 원의 오른쪽 옆에 위치하도록 x 좌표를 조정합니다.
+            drawCheck(centerX + 15, centerY);
+        }
+        function clearCheckboxVisual(index) {
+            const checkBox = checkBoxes[index];
+            // 체크박스 영역과 그 주변을 더 넓게 지웁니다.
+            drawingCtx.clearRect(checkBox.x - 20, checkBox.y - 20, checkBox.width + 40, checkBox.height + 40);
+        }
+
+        // function longPress(event) {
+        //     const rect = drawingCanvas.getBoundingClientRect();
+        //     const x = event.clientX - rect.left;
+        //     const y = event.clientY - rect.top;
+
+        //     checkBoxes.forEach(function(checkBox, index) {
+        //         if (x >= checkBox.x && x <= (checkBox.x + checkBox.width) &&
+        //             y >= checkBox.y && y <= (checkBox.y + checkBox.height)) {
+        //             checkBoxStates[index] = 'default';
+        //             redrawCheckBox(index);
+        //         }
+        //     });
+        // }
+
+                // 지우개 기능을 수행하는 함수
+        function eraseLine(x0, y0, x1, y1) {
+            drawingCtx.globalCompositeOperation = 'destination-out';  // 현재 그려진 내용 지우기
+            drawingCtx.beginPath();
+            drawingCtx.moveTo(x0, y0);
+            drawingCtx.lineTo(x1, y1);
+            drawingCtx.strokeStyle = 'rgba(0,0,0,1)';
+            drawingCtx.lineWidth = 20;  // 지우개 선의 너비
+            drawingCtx.stroke();
+            drawingCtx.globalCompositeOperation = 'source-over';  // 다시 일반적인 드로잉 모드로 복귀
+        }
+        
+        // 체크박스 초기화 및 다시 그리기
+        function redrawCheckBox(index) {
+            const checkBox = checkBoxes[index];
+            // Clear the checkbox area
+            drawingCtx.clearRect(checkBox.x, checkBox.y, checkBox.width, checkBox.height);
+            // Optionally, redraw the checkbox border or background for visual clarity
+            drawingCtx.strokeStyle = 'red';
+            drawingCtx.strokeRect(checkBox.x, checkBox.y, checkBox.width, checkBox.height);
+            checkBoxStates[index] = 'default';
+        }
+
+        function redrawCheckboxes() {
+            checkBoxes.forEach((box, index) => {
+                const state = checkBoxStates[index] || 'default';
+                const centerX = box.x + box.width / 2;
+                const centerY = box.y + box.height / 2;
+                
+                switch (state) {
+                    case 'checked':
+                        drawCheck(centerX, centerY);
+                        break;
+                    case 'crossed':
+                        drawCross(centerX, centerY);
+                        break;
+                    case 'rechecked':
+                        drawCircleAndCheck(centerX, centerY);
+                        break;
+                }
+            });
+        }
+
+        function checkSession() {
+            return fetch('/check_login_status')
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.loggedIn) {
+                        alert('로그인 후에 계속해주세요.');
+                        window.location.href = '/login';
+                        return false;
+                    }
+                    return true;
+                })
+                .catch(error => {
+                    console.error('세션 확인 중 오류 발생:', error);
+                    return false;
+                });
+        }
+    </script>
+</body>
+</html>

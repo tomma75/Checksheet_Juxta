@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>체크시트 이력 조회</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+        body, input, button, select {
+            font-size: 20px;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            color: #333;
+            display: flex;
+            transition: margin-right 0.5s;
+        }
+        h1 {
+            color: #0056b3;
+        }
+        form {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        select, input[type="text"], input[type="date"] {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            margin-bottom: 20px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        button:active {
+            background-color: #3e8c43;
+            transform: scale(0.98);
+        }
+        .sidebar {
+            height: 100vh;
+            width: 50px; /* 초기 너비 설정 */
+            position: fixed;
+            z-index: 1;
+            top: 0;
+            left: 0;
+            background-color: #111;
+            overflow-x: hidden;
+            transition: width 0.5s;
+            padding-top: 20px;
+        }
+        .sidebar a {
+            padding: 10px 15px;
+            text-decoration: none;
+            font-size: 25px;
+            color: white;
+            display: block;
+            transition: 0.3s;
+        }
+        .sidebar a:hover {
+            color: #f1f1f1;
+        }
+        .sidebar .closebtn {
+            position: absolute;
+            top: 0;
+            right: 25px;
+            font-size: 36px;
+            margin-left: 50px;
+        }
+        .link-text {
+            display: inline; /* 기본적으로 텍스트 표시 */
+        }
+
+        .sidebar.collapsed .link-text {
+            display: none; /* 축소된 상태에서는 텍스트 숨김 */
+        }
+
+        .sidebar:not(.collapsed) .link-text {
+            display: inline; /* 확장된 상태에서 텍스트 표시 */
+        }
+
+        .sidebar.collapsed {
+            width: 50px; /* 축소된 상태의 사이드바 너비 */
+        }
+
+        .sidebar:not(.collapsed) {
+            width: 250px; /* 확장된 상태의 사이드바 너비 */
+        }
+        .sidebar.collapsed + #main {
+            margin-left: 50px; /* 사이드바가 축소되었을 때의 marginLeft */
+        }
+
+        .sidebar:not(.collapsed) + #main {
+            margin-left: 250px; /* 사이드바가 확장되었을 때의 marginLeft */
+        }
+        #main {
+            transition: margin-right 0.5s, margin-left 0.5s ease;
+            padding: 16px;
+            flex-grow: 1;
+            margin-right: 50px; /* 초기 marginRight 설정 */
+        }
+        .openbtn {
+            font-size: 20px;
+            cursor: pointer;
+            background-color: #111;
+            color: white;
+            border: none;
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            width: 50px; /* 너비 조정 */
+            height: 50px; /* 높이 조정 */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .sidebar.collapsed .openbtn {
+            left: calc(50px - 50px / 2); /* 축소된 사이드바 중앙에 위치 */
+        }
+        .openbtn:hover {
+            background-color: #444;
+        }
+        table {
+            width: 100%; /* 테이블의 너비를 최대로 설정 */
+            font-size: 14px; /* 글자 크기 조정 */
+            border-collapse: collapse; /* 셀 사이의 간격을 없애고 테이블 라인을 하나로 합침 */
+            border: 3px solid #333; /* 테이블 외곽의 테두리를 두껍게 설정 */
+        }
+        th, td {
+            text-align: center; /* 테이블의 텍스트를 중앙 정렬 */
+            padding: 8px; /* 셀 패딩 조정 */
+            border: 1px solid #333; /* 셀의 테두리를 뚜렷하게 설정 */
+        }
+        a {
+            text-decoration: none; /* 밑줄 제거 */
+            color: #4CAF50; /* 링크 색상을 녹색 계열로 설정 */
+        }
+        a:hover {
+            text-decoration: underline; /* 마우스 오버 시 밑줄 표시 */
+            color: #3e8c43; /* 마우스 오버 시 색상 변경 */
+        }
+        th {
+            background-color: #4CAF50; /* 컬럼의 배경 색상 설정 */
+            color: white; /* 컬럼 텍스트 색상 설정 */
+        }
+        .status-link {
+            font-weight: bold; /* 글자를 볼드 처리 */
+            cursor: pointer; /* 클릭 가능한 항목으로 마우스 커서 변경 */
+        }
+        .status-ok {
+            color: #007BFF; /* 파란색 */
+        }
+        .status-ng {
+            color: #FF0000; /* 빨간색 */
+        }
+        .status-link:hover {
+            text-decoration: underline; /* 마우스 오버 시 밑줄 표시 */
+        }
+        .date-range-container {
+            display: flex;
+            justify-content: space-between; /* 컨테이너 안의 요소들을 좌우로 공간을 균등하게 배분 */
+            align-items: center; /* 수직 방향으로 중앙 정렬 */
+            margin-bottom: 20px; /* 아래쪽 여백 추가 */
+        }
+
+        .date-input-container {
+            display: flex;
+            flex-direction: column; /* 라벨과 입력 필드를 세로로 정렬 */
+            width: 48%; /* 각 컨테이너의 너비를 부모의 절반 크기로 설정 */
+        }
+        .pagination {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+        }
+        .pagination button {
+            margin: 0 5px;
+            padding: 5px 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .pagination button.active {
+            background-color: #3e8c43;
+        }
+    </style>
+</head>
+<body>
+    <div id="mySidebar" class="sidebar">
+        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">×</a>
+        <a href="/login"><i class="fa fa-home"></i><span class="link-text"> 로그인</span></a>
+        <a href="/checkSheet"><i class="fa fa-check-square-o"></i><span class="link-text"> 체크시트</span></a>
+        <a href="/mount-label"><i class="fa fa-camera"></i><span class="link-text"> 마운트라벨 등록</span></a>
+        <a href="/checksheet-history"><i class="fa fa-history"></i><span class="link-text"> 이력관리</span></a>
+        <a href="/logout"><i class="fa fa-sign-out"></i><span class="link-text"> 로그아웃</span></a>
+    </div>
+    <button class="openbtn" onclick="toggleNav()">☰</button> <!-- 기존의 햄버거 메뉴 아이콘을 사용 -->
+    <div style="padding: 20px; width: 100%;">
+        <div id="main">
+            <h1>체크시트 이력 조회</h1>
+            <form id="searchForm" onsubmit="return handleSubmit(event)">
+                <select id="3165_processSelect" name="3165_processSelect" style="display: none;">
+                    <option value="00">마운트라벨</option>
+                    <option value="08">부품SET</option>
+                    <option value="06">단자체결기</option>
+                    <option value="11">조립</option>
+                    <option value="15">출하검사</option>
+                </select>
+                <label for="deptSelect">라인 선택:</label>
+                <select id="deptSelect" name="deptSelect">
+                    <option value="3165">UTA</option>
+                </select>
+                <!-- 기존 라벨과 입력 필드 구조를 컨테이너로 감싸서 같은 행에 배치 -->
+                <div class="date-range-container">
+                    <div class="date-input-container">
+                        <label for="startDate">시작 일시:</label>
+                        <input type="date" id="startDate" name="startDate">
+                    </div>
+                    <div class="date-input-container">
+                        <label for="endDate">종료 일시:</label>
+                        <input type="date" id="endDate" name="endDate">
+                    </div>
+                </div>
+                <label for="serialNumber" >Serial No:</label>
+                <input type="text" id="serialNumber" name="serialNumber" placeholder="시리얼 넘버 입력" oninput="validateInput(this);">
+                <button type="button" onclick="searchRecords()">이력 조회</button>
+            </form>
+
+            <div id="results" style="margin-top: 20px;">
+                <!-- 검색 결과 표시 영역 -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let processMap = {};
+        // Initial configurations and event listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeSidebar();
+            // setupEventListeners(); // 다른 이벤트 리스너 설정
+            fetchConfig();
+            initializeProcessMap();
+        });
+
+        function initializeProcessMap() {
+            const processSelect = document.getElementById('3165_processSelect');
+            if (processSelect) {
+                processMap = Array.from(processSelect.options).reduce((map, option) => {
+                    map[option.text] = option.value;
+                    return map;
+                }, {});
+                console.log('Process Map initialized:', processMap);
+            } else {
+                console.error('Process select element not found');
+            }
+        }
+
+        function initializeSidebar() {
+            var sidebar = document.getElementById("mySidebar");
+            var main = document.getElementById("main");
+            var openbtn = document.querySelector(".openbtn");
+
+            // 사이드바 초기 상태 설정: 축소
+            sidebar.classList.add('collapsed');
+            sidebar.style.width = "50px";
+            main.style.marginLeft = "50px";
+            openbtn.innerHTML = "☰"; // 햄버거 아이콘 설정
+        }
+
+        function handleSubmit(event) {
+            event.preventDefault(); // Prevent the default form submit action
+            searchRecords(); // Call the search function
+            return false; // Return false to prevent the form from submitting
+        }
+
+        function fetchConfig() {
+            fetch('/config')
+                .then(response => response.json())
+                .then(config => {
+                    window.uploadFolder = config.uploadFolder;
+                });
+        }
+
+        function toggleNav() {
+            var sidebar = document.getElementById("mySidebar");
+            var main = document.getElementById("main");
+            var openbtn = document.querySelector(".openbtn");
+
+            if (sidebar.classList.contains('collapsed')) {
+                sidebar.classList.remove('collapsed');
+                sidebar.style.width = "250px";
+                main.style.marginLeft = "250px";
+                openbtn.innerHTML = "×"; // 'X' 아이콘으로 변경
+            } else {
+                sidebar.classList.add('collapsed');
+                sidebar.style.width = "50px";
+                main.style.marginLeft = "50px";
+                openbtn.innerHTML = "☰"; // 햄버거 아이콘으로 변경
+            }
+        }
+
+        function closeNav() {
+            var sidebar = document.getElementById("mySidebar");
+            var main = document.getElementById("main");
+            var openbtn = document.querySelector(".openbtn");
+
+            sidebar.classList.add('collapsed');
+            sidebar.style.width = "50px";
+            main.style.marginLeft = "50px";
+            openbtn.innerHTML = "☰"; // 햄버거 아이콘으로 변경
+        }
+
+        function formatDate(dateString) {
+            // '수, 24 4월 2024 09:31:29' 같은 형식을 파싱하기 위해 커스텀 파싱 로직 적용
+            // 이 함수는 날짜 문자열을 'YYYY/MM/DD HH:mm:ss' 형식으로 변환
+            var parts = dateString.match(/\d+/g); // 모든 숫자 추출
+            if (!parts || parts.length < 5) return "Invalid date format"; // 적절한 숫자가 없으면 오류 메시지 반환
+
+            var months = { '1월': '01', '2월': '02', '3월': '03', '4월': '04', '5월': '05', '6월': '06',
+                        '7월': '07', '8월': '08', '9월': '09', '10월': '10', '11월': '11', '12월': '12' };
+            var month = months[parts[1] + '월'];
+            if (!month) return "Invalid month";
+
+            var day = parts[0].padStart(2, '0');
+            var year = parts[2];
+            var time = parts[3] + ':' + parts[4] + ':' + parts[5];
+
+            return `${year}/${month}/${day} ${time}`;
+        }
+
+        function searchRecords() {
+            var startDate = document.getElementById('startDate').value;
+            var endDate = document.getElementById('endDate').value;
+            var serialNumber = document.getElementById('serialNumber').value;
+            var deptCode = document.getElementById('deptSelect').value;
+
+            var formData = new FormData(document.getElementById('searchForm'));
+            var processSelectId = deptCode + "_processSelect";
+            var processSelect = document.getElementById(processSelectId);
+            
+            // `processCodes`를 formData에 추가
+            if (processSelect) {
+                var processCodes = [];
+                Array.from(processSelect.options).forEach(option => {
+                    processCodes.push(`${option.value}:${option.text}`);
+                });
+                formData.append('processCodes', processCodes.join(',')); // 모든 코드를 하나의 문자열로 조합하여 추가
+            } else {
+                console.error('No process select found for the given deptCode:', deptCode);
+                alert('선택된 라인에 해당하는 공정 정보가 없습니다.');
+                return;  // 함수를 여기서 종료하여 백엔드 호출을 방지
+            }
+
+            fetch('/search_history', {
+                method: 'POST', 
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => displayResults(data, deptCode))
+            .catch(error => console.error('Error:', error));
+
+            console.log('Searching records for:', startDate, endDate, serialNumber, deptCode);
+        }
+
+        function displayResults(data, deptCode) {
+            var resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '';
+
+            if (data.error) {
+                resultsDiv.innerHTML = `<p>Error: ${data.error}</p>`;
+                return;
+            }
+
+            const itemsPerPage = 10;
+            let currentPage = 1;
+            const totalPages = Math.ceil(data.length / itemsPerPage);
+
+            function renderPage(page) {
+                resultsDiv.innerHTML = '';
+                let tableHtml = '<table border="1" style="border-collapse: collapse; width: 100%;"><tr><th rowspan="2">시리얼 번호</th>';
+                Object.keys(processMap).forEach(process => {
+                    if (process === '마운트라벨') {
+                        tableHtml += `<th>${process}</th>`;
+                    } else {
+                        tableHtml += `<th colspan="3">${process}</th>`;
+                    }
+                });
+                tableHtml += '</tr><tr>';
+                Object.keys(processMap).forEach(process => {
+                    if (process === '마운트라벨') {
+                        tableHtml += '<td>저장여부</td>';
+                    } else {
+                        tableHtml += '<td>진행상태</td><td>작업 시간</td><td>작업자 사번</td>';
+                    }
+                });
+                tableHtml += '</tr>';
+
+                const start = (page - 1) * itemsPerPage;
+                const end = start + itemsPerPage;
+                const pageData = data.slice(start, end);
+
+                pageData.forEach(item => {
+                    tableHtml += `<tr><td>${item['SERIAL_NO']}</td>`;
+                    Object.keys(processMap).forEach(process => {
+                        let statusText = item[process + ' 상태'] === 1 ? '저장' : '미저장';
+                        let statusClass = statusText === '저장' ? 'status-ok' : 'status-ng';
+                        if (process === '마운트라벨') {
+                            if (statusText === '저장') {
+                                tableHtml += `<td><a href="#" class="status-link ${statusClass}" onclick="openMountLabelImage('${deptCode}', '${formatDateForPath(item[process + ' 시간'])}', '${item['SERIAL_NO']}', '${process}')">${statusText}</a></td>`;
+                            } else {
+                                tableHtml += `<td><span class="status-link ${statusClass}">${statusText}</span></td>`;
+                            }
+                        } else {
+                            let statusText = item[process + ' 상태'] === 1 ? 'OK' : item[process + ' 상태'] === 0 ? '미진행' : 'NG';
+                            let statusClass = statusText === 'OK' ? 'status-ok' : statusText === 'NG' ? 'status-ng' : 'status-pending';
+                            let statusLink = statusText === '미진행' ? `<span class="status-link ${statusClass}">${statusText}</span>` : `<a href="#" class="status-link ${statusClass}" onclick="openFirstImage('${deptCode}', '${formatDateForPath(item[process + ' 시간'])}', '${item['SERIAL_NO']}', '${process}')">${statusText}</a>`;
+                            let workTime = statusText === '미진행' ? '-' : formatDate(item[process + ' 시간']);
+                            tableHtml += `<td>${statusLink}</td>`;
+                            tableHtml += `<td>${workTime}</td>`;
+                            tableHtml += `<td>${item[process + ' 작업자 번호'].trim()}</td>`;
+                        }
+                    });
+                    tableHtml += '</tr>';
+                });
+                tableHtml += '</table>';
+
+                // 페이지 네비게이션 추가
+                tableHtml += '<div class="pagination">';
+                if (page > 1) {
+                    tableHtml += `<button onclick="changePage(${page - 1})">이전</button>`;
+                }
+                for (let i = 1; i <= totalPages; i++) {
+                    tableHtml += `<button onclick="changePage(${i})" ${i === page ? 'class="active"' : ''}>${i}</button>`;
+                }
+                if (page < totalPages) {
+                    tableHtml += `<button onclick="changePage(${page + 1})">다음</button>`;
+                }
+                tableHtml += '</div>';
+
+                resultsDiv.innerHTML = tableHtml;
+            }
+
+            window.changePage = function(page) {
+                currentPage = page;
+                renderPage(page);
+            }
+
+            renderPage(currentPage);
+        }
+
+        function formatDateForPath(dateString) {
+            if (!dateString) {
+                console.error("Invalid date format: dateString is null or undefined");
+                return "Invalid date";
+            }
+
+            var parts = dateString.match(/\d+/g);
+            if (!parts || parts.length < 6) {
+                console.error("Invalid date format");
+                return "Invalid date";
+            }
+
+            var year = parts[2];
+            var month = parts[1];
+            var day = parts[0];
+            var hour = parts[3];
+            var minute = parts[4];
+            var second = parts[5];
+
+            month = parseInt(month, 10) - 1;
+
+            var date = new Date(year, month, day, hour, minute, second);
+
+            return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
+        }
+
+        function openFirstImage(deptCode, datePath, serialNo, processName) {
+            const processValue = processMap[processName];
+            const listPath = `/files/list/${deptCode}/Checked/${datePath}/${serialNo}/`;
+
+            fetch(listPath)
+                .then(response => response.json())
+                .then(files => {
+                    const regexPattern = new RegExp(`${serialNo}_${processValue}\\.png$`);
+                    const targetFile = files.find(file => regexPattern.test(file));
+
+                    if (targetFile) {
+                        const filePath = `/files/get/${deptCode}/Checked/${datePath}/${serialNo}/${targetFile}`;
+                        console.log(`Opening file from: ${filePath}`);
+                        window.open(filePath, '_blank');
+                    } else {
+                        console.error('No matching files found.', files);
+                        alert('No matching files found.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching file list:', error);
+                    alert('Error fetching file list: ' + error.message);
+                });
+        }
+
+        function openMountLabelImage(deptCode, datePath, serialNo, processName) {
+            const processValue = processMap[processName];
+            const listPath = `/files/list/${deptCode}/MountLabel/${datePath}/${serialNo}/`;
+
+            fetch(listPath)
+                .then(response => response.json())
+                .then(files => {
+                    const regexPattern = new RegExp(`${serialNo}_${processValue}\\.png$`);
+                    const targetFile = files.find(file => regexPattern.test(file));
+
+                    if (targetFile) {
+                        const filePath = `/files/get/${deptCode}/MountLabel/${datePath}/${serialNo}/${targetFile}`;
+                        console.log(`Opening file from: ${filePath}`);
+                        window.open(filePath, '_blank');
+                    } else {
+                        console.error('No matching files found.', files);
+                        alert('No matching files found.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching file list:', error);
+                    alert('Error fetching file list: ' + error.message);
+                });
+        }
+
+        function checkSession() {
+            // Example of a client-side session check (note: actual session check must be on server-side)
+            if (!sessionStorage.getItem('logged_in')) {
+                alert('로그인 후에 계속해주세요.');
+                window.location.href = '/login';
+                return false;
+            }
+            return true;
+        }
+    </script>
+</body>
+</html>
+

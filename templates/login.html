@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>YMF-K 전자 체크시트 로그인 페이지</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"> <!-- Font Awesome 추가 -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 40px;
+            color: #333;
+        }
+        h1 {
+            color: #0056b3;
+            text-align: center; /* Centers the title */
+        }
+        form {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 300px;
+            margin: auto;
+            text-align: center; /* Optionally center all content in the form */
+        }
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        input[type="text"], input[type="submit"] {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            margin-bottom: 20px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        input[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+        input[type="submit"]:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        p {
+            margin: 5px 0;
+        }
+        .sidebar {
+            height: 100vh;
+            width: 50px;
+            position: fixed;
+            z-index: 1;
+            top: 0;
+            left: 0;
+            background-color: #111;
+            overflow-x: hidden;
+            transition: width 0.5s;
+            padding-top: 20px;
+        }
+
+        .sidebar a {
+            padding: 10px 15px;
+            text-decoration: none;
+            font-size: 25px;
+            color: white;
+            display: block;
+            transition: 0.3s;
+        }
+
+        .sidebar a:hover {
+            color: #f1f1f1;
+        }
+
+        .sidebar .closebtn {
+            position: absolute;
+            top: 0;
+            right: 25px;
+            font-size: 36px;
+            margin-left: 50px;
+        }
+
+        .link-text {
+            display: none;
+        }
+
+        .sidebar.collapsed .link-text {
+            display: none;
+        }
+
+        .sidebar:not(.collapsed) .link-text {
+            display: inline;
+        }
+
+        .sidebar.collapsed {
+            width: 50px;
+        }
+
+        .sidebar:not(.collapsed) {
+            width: 250px;
+        }
+
+        .sidebar.collapsed + #content {
+            margin-left: 50px;
+        }
+
+        .sidebar:not(.collapsed) + #content {
+            margin-left: 250px;
+        }
+
+        .openbtn {
+            font-size: 20px;
+            cursor: pointer;
+            background-color: #111;
+            color: white;
+            border: none;
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .openbtn:hover {
+            background-color: #444;
+        }
+
+    </style>
+</head>
+<body>
+    <div id="mySidebar" class="sidebar">
+        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">×</a>
+        <a href="/login"><i class="fa fa-home"></i><span class="link-text"> 홈</span></a>
+        <a href="#" onclick="checkSession().then(isLoggedIn => { if (isLoggedIn) window.location.href = '/checkSheet'; });"><i class="fa fa-check-square-o"></i><span class="link-text"> 체크시트</span></a>
+        <a href="#" onclick="checkSession().then(isLoggedIn => { if (isLoggedIn) window.location.href = '/mount-label'; });"><i class="fa fa-camera"></i><span class="link-text"> 마운트라벨 등록</span></a>
+        <a href="/checksheet-history"><i class="fa fa-history"></i><span class="link-text"> 이력 관리</span></a>
+    </div>
+    <button class="openbtn" onclick="toggleNav()">☰</button>
+    <h1>YMF-K 전자 체크시트 로그인 페이지</h1>
+    <form id="login-form" method="post">
+        <label for="employeeId">사원번호:</label>
+        <input type="text" id="employeeId" name="employeeId" placeholder="Scan your barcode" required>
+        <p id="deptInfo" style="color: green;"></p>
+        <p id="employeeName" style="color: green;"></p>
+        <p id="error" style="color: red;"></p>
+        <input type="submit" value="Login" id="loginButton" disabled>
+    </form>
+
+    <script>
+        const loginForm = document.getElementById('login-form');
+        const employeeIdInput = document.getElementById('employeeId');
+        const employeeNameDisplay = document.getElementById('employeeName');
+        const deptInfoDisplay = document.getElementById('deptInfo');
+        const errorDisplay = document.getElementById('error');
+        const loginButton = document.getElementById('loginButton');
+
+                // Initial configurations and event listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeSidebar();
+        });
+
+        function initializeSidebar() {
+            var sidebar = document.getElementById("mySidebar");
+            var openbtn = document.querySelector(".openbtn");
+
+            // 사이드바 초기 상태 설정: 축소
+            sidebar.classList.add('collapsed');
+            sidebar.style.width = "50px";
+            openbtn.innerHTML = "☰"; // 햄버거 아이콘 설정
+        }
+
+        function toggleNav() {
+            var sidebar = document.getElementById("mySidebar");
+            var main = document.getElementById("main");
+            var openbtn = document.querySelector(".openbtn");
+
+            if (sidebar.classList.contains('collapsed')) {
+                sidebar.classList.remove('collapsed');
+                sidebar.style.width = "250px";
+                main.style.marginLeft = "250px";
+                openbtn.innerHTML = "×"; // 'X' 아이콘으로 변경
+            } else {
+                sidebar.classList.add('collapsed');
+                sidebar.style.width = "50px";
+                main.style.marginLeft = "50px";
+                openbtn.innerHTML = "☰"; // 햄버거 아이콘으로 변경
+            }
+        }
+
+        function closeNav() {
+            var sidebar = document.getElementById("mySidebar");
+            var main = document.getElementById("main");
+            var openbtn = document.querySelector(".openbtn");
+
+            sidebar.classList.add('collapsed');
+            sidebar.style.width = "50px";
+            main.style.marginLeft = "50px";
+            openbtn.innerHTML = "☰"; // 햄버거 아이콘으로 변경
+        }
+
+        const clearMessages = () => {
+            employeeNameDisplay.textContent = '';
+            deptInfoDisplay.textContent = '';
+            errorDisplay.textContent = '';
+        };
+
+        // DB에서 사원 이름을 조회하여 페이지에 표시합니다.
+        const handleResponse = (data) => {
+            if (data.employeeName) {
+                employeeName = data.employeeName;
+                deptInfo = data.deptInfo || '';
+                employeeNameDisplay.textContent = employeeName;
+                deptInfoDisplay.textContent = deptInfo;
+                if (deptInfo.includes('UTA')) {
+                    loginButton.disabled = false;
+                } else {
+                    errorDisplay.textContent = '이 부서(라인)은 전자체크시트를 지원하지 않습니다.';
+                    loginButton.disabled = true;
+                }
+            } else {
+                employeeName = '';
+                errorDisplay.textContent = data.error || 'An error occurred';
+                loginButton.disabled = true;
+            }
+        };
+
+        const fetchEmployeeName = (employeeId) => {
+            fetch('/get_employee_name', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({'employeeId': employeeId})
+            })
+            .then(response => response.json())
+            .then(handleResponse)
+            .catch(error => {
+                console.error('Error fetching the employee name:', error);
+                errorDisplay.textContent = 'DB에 없는 사원번호입니다.';
+            });
+        };
+
+        employeeIdInput.oninput = () => {
+            clearMessages();
+            const employeeId = employeeIdInput.value.trim();
+
+            // 사원번호가 7자리일 때만 DB 조회를 수행합니다.
+            if (employeeId.length === 7) {
+                fetchEmployeeName(employeeId);
+            } else {
+                // 입력 길이가 7자리가 아니면 로그인 버튼을 비활성화합니다.
+                loginButton.disabled = true;
+                if (employeeId.length > 0 && employeeId.length !== 7) {
+                    errorDisplay.textContent = '7자리의 사원번호를 입력해주세요.';
+                }
+            }
+        };
+
+        // 로그인 버튼 클릭 시 사원 이름을 다음 페이지로 전달합니다.
+        loginForm.onsubmit = (event) => {
+            event.preventDefault();
+            fetch('/get_employee_name', {
+                method: 'POST',
+                body: new FormData(loginForm)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    errorDisplay.textContent = data.error;
+                } else {
+                    sessionStorage.setItem('employeeName', data.employeeName);
+                    sessionStorage.setItem('deptInfo', data.deptInfo);
+                    window.location.href = '/checkSheet';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                errorDisplay.textContent = '로그인 처리 중 오류가 발생했습니다.';
+            });
+        };
+        function checkSession() {
+            return fetch('/check_login_status')
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.loggedIn) {
+                        alert('로그인 후에 계속해주세요.');
+                        window.location.href = '/login';
+                        return false;
+                    }
+                    return true;
+                })
+                .catch(error => {
+                    console.error('세션 확인 중 오류 발생:', error);
+                    return false;
+                });
+        }
+    </script>
+    
+</body>
+</html>
