@@ -6,17 +6,24 @@ import numpy as np
 class ImageProcessor:
     @staticmethod
     def find_checkboxes(image):
+        # 이미지를 그레이스케일로 변환
         gray = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
+        # 노이즈 제거를 위한 가우시안 블러 적용
         blurred = cv2.GaussianBlur(gray, (3, 3), 0)
+        # 엣지 검출
         edges = cv2.Canny(blurred, 30, 100, apertureSize=3)
+        # 엣지를 기반으로 컨투어 검출
         contours, _ = cv2.findContours(edges, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
         boxes = []
         for cnt in contours:
+            # 컨투어를 근사화하여 다각형 근사화
             approx = cv2.approxPolyDP(cnt, 0.04 * cv2.arcLength(cnt, True), True)
-            if len(approx) == 4:
+            if len(approx) == 4:    # 사각형 모양인 경우
                 x, y, w, h = cv2.boundingRect(approx)
+                # 사각형의 너비와 높이가 일정 범위 내에 있는 경우에만 체크박스로 인식
                 if 0.8 <= w / h <= 1.2 and 15 <= w <= 25 and 15 <= h <= 25:
                     boxes.append({'x': x, 'y': y, 'width': w, 'height': h})
+        # 결과 이미지 생성
         result_image = Image.fromarray(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
         draw = ImageDraw.Draw(result_image)
         for box in boxes:

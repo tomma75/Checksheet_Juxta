@@ -246,7 +246,7 @@
                     </div>
                 </div>
                 <label for="serialNumber" >Serial No:</label>
-                <input type="text" id="serialNumber" name="serialNumber" placeholder="시리얼 넘버 입력" oninput="validateInput(this);">
+                <input type="text" id="serialNumber" name="serialNumber" placeholder="시리얼 넘버 입력" maxlength="9" oninput="validateSerialInput(this);">
                 <button type="button" onclick="searchRecords()">이력 조회</button>
             </form>
 
@@ -258,7 +258,7 @@
 
     <script>
         let processMap = {};
-        // Initial configurations and event listeners
+        // 초기 설정 및 이벤트 리스너
         document.addEventListener('DOMContentLoaded', () => {
             initializeSidebar();
             // setupEventListeners(); // 다른 이벤트 리스너 설정
@@ -266,6 +266,7 @@
             initializeProcessMap();
         });
 
+        // 공정 맵 초기화 함수
         function initializeProcessMap() {
             const processSelect = document.getElementById('3165_processSelect');
             if (processSelect) {
@@ -292,11 +293,12 @@
         }
 
         function handleSubmit(event) {
-            event.preventDefault(); // Prevent the default form submit action
-            searchRecords(); // Call the search function
-            return false; // Return false to prevent the form from submitting
+            event.preventDefault(); // 기본 폼 제출 동작 방지
+            searchRecords(); // 검색 함수 호출
+            return false; // 폼 제출 방지
         }
 
+        // 설정 파일 가져오기
         function fetchConfig() {
             fetch('/config')
                 .then(response => response.json())
@@ -305,6 +307,7 @@
                 });
         }
 
+        // 사이드바 토글 함수
         function toggleNav() {
             var sidebar = document.getElementById("mySidebar");
             var main = document.getElementById("main");
@@ -323,6 +326,7 @@
             }
         }
 
+        // 사이드바 닫기 함수
         function closeNav() {
             var sidebar = document.getElementById("mySidebar");
             var main = document.getElementById("main");
@@ -334,6 +338,7 @@
             openbtn.innerHTML = "☰"; // 햄버거 아이콘으로 변경
         }
 
+        // 날짜 형식 변환 함수
         function formatDate(dateString) {
             // '수, 24 4월 2024 09:31:29' 같은 형식을 파싱하기 위해 커스텀 파싱 로직 적용
             // 이 함수는 날짜 문자열을 'YYYY/MM/DD HH:mm:ss' 형식으로 변환
@@ -352,6 +357,7 @@
             return `${year}/${month}/${day} ${time}`;
         }
 
+        // 검색 함수
         function searchRecords() {
             var startDate = document.getElementById('startDate').value;
             var endDate = document.getElementById('endDate').value;
@@ -362,6 +368,11 @@
             var processSelectId = deptCode + "_processSelect";
             var processSelect = document.getElementById(processSelectId);
             
+            // Serial Number는 그대로 전송 (와일드카드 추가하지 않음)
+            if (serialNumber) {
+                formData.set('serialNumber', serialNumber);
+            }
+
             // `processCodes`를 formData에 추가
             if (processSelect) {
                 var processCodes = [];
@@ -386,19 +397,22 @@
             console.log('Searching records for:', startDate, endDate, serialNumber, deptCode);
         }
 
+        // 검색 결과 표시 함수
         function displayResults(data, deptCode) {
             var resultsDiv = document.getElementById('results');
             resultsDiv.innerHTML = '';
-
+            // 에러 처리    
             if (data.error) {
                 resultsDiv.innerHTML = `<p>Error: ${data.error}</p>`;
                 return;
             }
 
+            // 페이지네이션 설정
             const itemsPerPage = 10;
             let currentPage = 1;
             const totalPages = Math.ceil(data.length / itemsPerPage);
 
+            // 페이지 렌더링 함수
             function renderPage(page) {
                 resultsDiv.innerHTML = '';
                 let tableHtml = '<table border="1" style="border-collapse: collapse; width: 100%;"><tr><th rowspan="2">시리얼 번호</th>';
@@ -419,10 +433,12 @@
                 });
                 tableHtml += '</tr>';
 
+                // 페이지 데이터 추출
                 const start = (page - 1) * itemsPerPage;
                 const end = start + itemsPerPage;
                 const pageData = data.slice(start, end);
 
+                // 페이지 데이터 반복
                 pageData.forEach(item => {
                     tableHtml += `<tr><td>${item['SERIAL_NO']}</td>`;
                     Object.keys(processMap).forEach(process => {
@@ -464,20 +480,23 @@
                 resultsDiv.innerHTML = tableHtml;
             }
 
+            // 페이지 변경 함수
             window.changePage = function(page) {
                 currentPage = page;
                 renderPage(page);
             }
 
+            // 초기 페이지 렌더링
             renderPage(currentPage);
         }
 
+        // 날짜 형식 변환 함수
         function formatDateForPath(dateString) {
             if (!dateString) {
                 console.error("Invalid date format: dateString is null or undefined");
                 return "Invalid date";
             }
-
+            // 날짜 형식 변환   
             var parts = dateString.match(/\d+/g);
             if (!parts || parts.length < 6) {
                 console.error("Invalid date format");
@@ -498,10 +517,12 @@
             return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
         }
 
+        // 이미지 열기 함수
         function openFirstImage(deptCode, datePath, serialNo, processName) {
             const processValue = processMap[processName];
-            const listPath = `/files/list/${deptCode}/Checked/${datePath}/${serialNo}/`;
+            const listPath = `/files/list/${deptCode}/Checked/${serialNo}/`;
 
+            // 체크시트 이미지 열기
             fetch(listPath)
                 .then(response => response.json())
                 .then(files => {
@@ -509,7 +530,7 @@
                     const targetFile = files.find(file => regexPattern.test(file));
 
                     if (targetFile) {
-                        const filePath = `/files/get/${deptCode}/Checked/${datePath}/${serialNo}/${targetFile}`;
+                        const filePath = `/files/get/${deptCode}/Checked/${serialNo}/${targetFile}`;
                         console.log(`Opening file from: ${filePath}`);
                         window.open(filePath, '_blank');
                     } else {
@@ -523,10 +544,12 @@
                 });
         }
 
+        // 마운트 라벨 이미지 열기 함수
         function openMountLabelImage(deptCode, datePath, serialNo, processName) {
             const processValue = processMap[processName];
-            const listPath = `/files/list/${deptCode}/MountLabel/${datePath}/${serialNo}/`;
+            const listPath = `/files/list/${deptCode}/MountLabel/${serialNo}/`;
 
+            // 마운트 라벨 이미지 열기
             fetch(listPath)
                 .then(response => response.json())
                 .then(files => {
@@ -534,7 +557,7 @@
                     const targetFile = files.find(file => regexPattern.test(file));
 
                     if (targetFile) {
-                        const filePath = `/files/get/${deptCode}/MountLabel/${datePath}/${serialNo}/${targetFile}`;
+                        const filePath = `/files/get/${deptCode}/MountLabel/${serialNo}/${targetFile}`;
                         console.log(`Opening file from: ${filePath}`);
                         window.open(filePath, '_blank');
                     } else {
@@ -548,14 +571,21 @@
                 });
         }
 
+        // 세션 체크 함수
         function checkSession() {
-            // Example of a client-side session check (note: actual session check must be on server-side)
+            // 클라이언트 측 세션 체크 (참고: 실제 세션 체크는 서버 측에서 이루어져야 함)
             if (!sessionStorage.getItem('logged_in')) {
                 alert('로그인 후에 계속해주세요.');
                 window.location.href = '/login';
                 return false;
             }
             return true;
+        }
+
+        // 시리얼 번호 유효성 검사 함수
+        function validateSerialInput(input) {
+            // 영문 대문자와 숫자만 허용하고 대문자로 변환
+            input.value = input.value.replace(/[^A-Z0-9]/gi, '').toUpperCase();
         }
     </script>
 </body>
