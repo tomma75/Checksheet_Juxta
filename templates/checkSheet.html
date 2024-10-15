@@ -162,6 +162,36 @@
             background-color: #444;
         }
 
+        /* 메시지 컨테이너 스타일 */
+        #messages-container {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* 개별 메시지 스타일 */
+        .message {
+            background-color: #f44336; /* 기본 빨간색 */
+            color: white; /* 흰색 텍스트 */
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            opacity: 0.9;
+            transition: opacity 0.5s ease;
+            min-width: 200px;
+            text-align: center;
+        }
+
+        /* 메시지가 사라질 때의 효과 */
+        .message.hide {
+            opacity: 0;
+        }
     </style>
 <body onload="focusOnBarcodeInput()">
     <!-- 사이드바 구조 -->
@@ -170,7 +200,7 @@
         <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">×</a>
         <a href="/login"><i class="fa fa-home"></i><span class="link-text"> 로그인</span></a>
         <a href="#"><i class="fa fa-check-square-o"></i><span class="link-text"> 체크시트</span></a>
-        <a href="/mount-label"><i class="fa fa-camera"></i><span class="link-text"> 마운트라벨 등록</span></a>
+        <!-- <a href="/mount-label"><i class="fa fa-camera"></i><span class="link-text"> 마운트라벨 등록</span></a> -->
         <a href="/checksheet-history"><i class="fa fa-history"></i><span class="link-text"> 이력관리</span></a>
         <a href="/logout"><i class="fa fa-sign-out"></i><span class="link-text"> 로그아웃</span></a>
     </div>
@@ -205,14 +235,17 @@
             <!-- 에러 메시지 표시 영역 -->
             <p id="error" style="color: red;"></p>
             <!-- 체크 완료 버튼 -->
-            <button type="button" id="checkCompleteButton">체크 완료</button>
+            <button type="button" id="checkCompleteButton" style="display: none;">체크 완료</button>
             <!-- 이미지 표시 영역 -->
-            <div style="position: relative; width: 800px; height: 600px;">
+            <div id="canvasContainer" style="display: none; position: relative; width: 800px; height: 600px;">
                 <canvas id="baseImageCanvas" width="800" height="600" style="position: absolute; border:1px solid #000000;"></canvas>
                 <canvas id="drawingCanvas" width="800" height="600" style="position: absolute; border:1px solid #000000;"></canvas>
             </div>
         </form>
     </div>
+
+    <!-- 메시지 컨테이너 추가 -->
+    <div id="messages-container"></div>
 
     <script>
         // focusOnBarcodeInput 함수 정의
@@ -256,8 +289,8 @@
 
                 // 체크박스 클릭 이벤트 처리
                 const clickedCheckbox = checkBoxes.find((checkBox, index) => 
-                    x >= checkBox.x - 20 && x <= (checkBox.x + checkBox.width + 20) && 
-                    y >= checkBox.y - 20 && y <= (checkBox.y + checkBox.height + 20)
+                    x >= checkBox.x - 10 && x <= (checkBox.x + checkBox.width + 10) && 
+                    y >= checkBox.y - 5 && y <= (checkBox.y + checkBox.height + 5)
                 );
 
                 if (clickedCheckbox) {
@@ -307,9 +340,9 @@
                     checkBoxStates[index] && checkBoxStates[index] !== 'default'
                 );
 
-                if (allChecked) {
-                    checkCompleteButton.click();
-                }
+                // if (allChecked) {
+                //     checkCompleteButton.click();
+                // }
             }
         });
 
@@ -373,6 +406,9 @@
             errorDisplay.textContent = '';
             baseCtx.clearRect(0, 0, baseImageCanvas.width, baseImageCanvas.height);
             drawingCtx.clearRect(0, 0, drawingCanvas.width, drawingCanvas.height);
+            // 캔버스 컨테이너와 체크 완료 버튼을 숨깁니다.
+            document.getElementById('canvasContainer').style.display = 'none';
+            document.getElementById('checkCompleteButton').style.display = 'none';
         }
 
         function processBarcode(barcode) {
@@ -396,7 +432,8 @@
             let allChecked = true;
             let anyCrossed = false;
 
-            // 부품SET(08)와 단자체결기(06)를 제외한 공정에서 모든 체크박스 확인
+            // 부품SET(08)와 단자체결기(06)를 제외한 공정에서 모든 체크박스 확인 로직
+            /*
             if (selectedProcess !== '08' && selectedProcess !== '06') {
                 checkBoxes.forEach((box, index) => {
                     if (!(index in checkBoxStates) || checkBoxStates[index] === 'default') {
@@ -412,6 +449,7 @@
                     return;
                 }
             }
+            */
 
             let result = anyCrossed ? 'NG' : 'OK';
 
@@ -471,17 +509,20 @@
                     .then(response => response.json())
                     .then(imageData => {
                         console.log('Image saved:', imageData);
-                        alert('체크시트가 성공적으로 저장되었습니다.');
+                        // alert('체크시트가 성공적으로 저장되었습니다.');
+                        showMessage('체크시트가 성공적으로 저장되었습니다.', 'success');
                     })
                     .catch(error => {
                         console.error('Error saving image:', error);
-                        alert('이미지 저장 중 오류가 발생했습니다.');
+                        // alert('이미지 저장 중 오류가 발생했습니다.');
+                        showMessage('이미지 저장 중 오류가 발생했습니다.', 'error');
                     });
                 });
             })
             .catch(error => {
                 console.error('Error saving checkbox states and positions:', error);
-                alert('체크박스 상태와 위치 저장에 실패했습니다. 다시 시도해 주세요.');
+                // alert('체크박스 상태와 위치 저장에 실패했습니다. 다시 시도해 주세요.');
+                showMessage('체크박스 상태와 위치 저장에 실패했습니다. 다시 시도해 주세요.', 'error');
             });
         });
 
@@ -563,6 +604,10 @@
                 handleResponse(data);
                 
                 if (data.Serial_No) {
+                    // 캔버스 컨테이너와 체크 완료 버튼을 표시합니다.
+                    document.getElementById('canvasContainer').style.display = 'block';
+                    document.getElementById('checkCompleteButton').style.display = 'inline-block';
+                    
                     const processSelect = document.getElementById('processSelect');
                     const selectedIndex = processSelect.selectedIndex;
                     const selectedProcess = processSelect.options[selectedIndex].value;
@@ -732,7 +777,7 @@
                 if (drawing) {
                     const {x, y} = getCursorPosition(event);
                     drawingCtx.lineTo(x, y);
-                    drawingCtx.strokeStyle = 'red';
+                    drawingCtx.strokeStyle = 'blue';
                     drawingCtx.lineWidth = 2;
                     drawingCtx.stroke();
                 }
@@ -922,6 +967,41 @@
                     console.error('세션 확인 중 오류 발생:', error);
                     return false;
                 });
+        }
+
+        function showMessage(message, type = 'error', duration = 3000) {
+            const messagesContainer = document.getElementById('messages-container');
+            if (!messagesContainer) {
+                console.error('messages-container 요소를 찾을 수 없습니다.');
+                return;
+            }
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message');
+
+            // 타입에 따라 배경색 변경
+            if (type === 'success') {
+                messageDiv.style.backgroundColor = '#4CAF50'; // 녹색
+            } else if (type === 'info') {
+                messageDiv.style.backgroundColor = '#2196F3'; // 파란색
+            } else {
+                messageDiv.style.backgroundColor = '#f44336'; // 기본 빨간색
+            }
+
+            // Serial No 가져오기
+            const serialNo = document.getElementById('serialNo').textContent || 'N/A';
+
+            // 메시지와 Serial No를 함께 표시
+            messageDiv.innerHTML = `<p>${message}</p><p><strong>Serial No:</strong> ${serialNo}</p>`;
+            messagesContainer.appendChild(messageDiv);
+
+            // 설정된 시간이 지나면 메시지 숨기기
+            setTimeout(() => {
+                messageDiv.classList.add('hide');
+                // 애니메이션이 끝난 후 DOM에서 제거
+                messageDiv.addEventListener('transitionend', () => {
+                    messageDiv.remove();
+                });
+            }, duration);
         }
     </script>
 </body>

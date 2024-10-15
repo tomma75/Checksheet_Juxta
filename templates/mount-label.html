@@ -474,7 +474,12 @@
                         const constraints = {
                             video: {
                                 deviceId: backCamera ? { exact: backCamera.deviceId } : undefined,
-                                facingMode: backCamera ? undefined : { ideal: 'environment' }
+                                facingMode: backCamera ? undefined : { ideal: 'environment' },
+                                focusMode: { ideal: 'continuous' },  // 연속 자동 초점 모드 추가
+                                advanced: [{
+                                    focusMode: 'continuous',
+                                    focusDistance: { ideal: 0.3 }  // 초점 거리 설정 (미터 단위)
+                                }]
                             }
                         };
                         // 선택된 제약 조건으로 비디오 스트림 요청
@@ -485,7 +490,16 @@
                         camera.srcObject = stream;
                         camera.style.display = 'block';
                         captureButton.style.display = 'block';
-                        // 카메라 섹션으로 스크롤
+                        // 트랙 설정 가져오기 및 초점 모드 설정
+                        const track = mediaStream.getVideoTracks()[0];
+                        const capabilities = track.getCapabilities();
+                        const settings = track.getSettings();
+
+                        if ('focusMode' in settings) {
+                            if (capabilities.focusMode.includes('continuous')) {
+                                track.applyConstraints({advanced: [{focusMode: 'continuous'}]});
+                            }
+                        }
                         document.getElementById('camera-section').scrollIntoView({ behavior: 'smooth' });
                     })
                     .catch(error => {

@@ -31,7 +31,7 @@ class RouteHandler:
         self.app.route('/get_employee_name', methods=['POST'])(self.get_employee_name)
         self.app.route('/save_checked_image', methods=['POST'])(self.save_checked_image)
         self.app.route('/checkSheet')(self.checkSheet)
-        self.app.route('/mount-label')(self.mount_label)
+        # self.app.route('/mount-label')(self.mount_label)
         self.app.route('/upload_image/<serial_process>', methods=['GET'])(self.upload_image)
         self.app.route('/get_product_info', methods=['POST'])(self.get_product_info)
         self.app.route('/search_history', methods=['POST'])(self.search_history)
@@ -39,7 +39,7 @@ class RouteHandler:
         self.app.route('/files/list/<path:directory>')(self.list_files)
         self.app.route('/files/get/<path:filepath>')(self.serve_file)
         self.app.route('/check_login_status', methods=['GET'])(self.check_login_status)
-        self.app.route('/save_mount_label_image', methods=['POST'])(self.save_mount_label_image)
+        # self.app.route('/save_mount_label_image', methods=['POST'])(self.save_mount_label_image)
         self.app.route('/save_checkbox_states', methods=['POST'])(self.save_checkbox_states)
         self.app.route('/get_checkbox_states', methods=['GET'])(self.get_checkbox_states)
 
@@ -164,15 +164,15 @@ class RouteHandler:
         pen_cursor_url = url_for('static', filename='icon/pen-tool.png')
         return render_template('checkSheet.html', employee_name=employee_name, dept_info=dept_info, pen_cursor_url=pen_cursor_url)
 
-    @login_required
-    def mount_label(self):
-        # 마운트 라벨 페이지 렌더링
-        if 'employee_name' not in session or 'dept_info' not in session:
-            return redirect(url_for('login'))
-        employee_name = session.get('employee_name', 'Unknown')
-        dept_info = session.get('dept_info', 'Unknown')
-        pen_cursor_url = url_for('static', filename='icon/pen-tool.png')
-        return render_template('mount-label.html', employee_name=employee_name, dept_info=dept_info, pen_cursor_url=pen_cursor_url)
+    # @login_required
+    # def mount_label(self):
+    #     # 마운트 라벨 페이지 렌더링
+    #     if 'employee_name' not in session or 'dept_info' not in session:
+    #         return redirect(url_for('login'))
+    #     employee_name = session.get('employee_name', 'Unknown')
+    #     dept_info = session.get('dept_info', 'Unknown')
+    #     pen_cursor_url = url_for('static', filename='icon/pen-tool.png')
+    #     return render_template('mount-label.html', employee_name=employee_name, dept_info=dept_info, pen_cursor_url=pen_cursor_url)
 
     @login_required
     def upload_image(self, serial_process):
@@ -434,71 +434,71 @@ class RouteHandler:
             return jsonify({'loggedIn': True})
         return jsonify({'loggedIn': False})
 
-    def save_mount_label_image(self):
-        """ 마운트 라벨 이미지 저장 """ 
-        if 'image' not in request.files:
-            return jsonify({'error': 'No image part in the request'}), 400
-        # 파일 저장
-        file = request.files['image']
-        serial_no = request.form['serialNo']
-        process_code = request.form['processCode']
-        deptCode = request.form['deptCode']
-        empNo = request.form['empNo']
-        indexNo = request.form['indexNo'][:-2]
-        indexNo_sfix = request.form['indexNo'][-2:]
-        # 파일 이름 생성
-        filename = f"{indexNo}{indexNo_sfix}_{serial_no}_{process_code}.png"
-        # 날짜 문자열 생성
-        date_str = datetime.now().strftime('%Y-%m-%d')
-        pc_name = socket.gethostname()
-        # 일일 폴더 생성
-        daily_folder = os.path.join(self.app.config['UPLOAD_FOLDER'], deptCode, 'MountLabel', serial_no)
-        # 일일 폴더 존재 여부 확인 및 생성
-        if not os.path.exists(daily_folder):
-            os.makedirs(daily_folder)
-        save_path = os.path.join(daily_folder, filename)
-        file.save(save_path)
-        # 이미지 저장 경로 반환
-        if os.path.exists(save_path):
-            # 데이터베이스에 정보 삽입
-            connection = self.db_manager_2.connect()
-            cursor = connection.cursor()
-            # SQL 쿼리 생성
-            sql = """
-                MERGE INTO DCS_HISTORY USING dual
-                ON (INDEX_NO = :1 AND INDEX_NO_SFIX = :2 AND SERIAL_NO = :3 AND DEPT_CODE = :4 AND PROCESS_CODE = :5)
-                WHEN MATCHED THEN
-                    UPDATE SET STATUS = :6, EMP_NO = :7, RENEWAL_D = :8, RENEWAL_BY = :9
-                WHEN NOT MATCHED THEN
-                    INSERT (INDEX_NO, INDEX_NO_SFIX, SERIAL_NO, DEPT_CODE, PROCESS_CODE, STATUS, EMP_NO, ENTRY_D, ENTRY_BY)
-                    VALUES (:1, :2, :3, :4, :5, :6, :7, :8, :9)
-            """
-            params = (indexNo, indexNo_sfix, serial_no, deptCode, process_code, 1, empNo, date_str, pc_name)
-            # 데이터베이스에 정보 삽입
-            try:
-                cursor.execute(sql, params)
-                connection.commit()
-                return jsonify({
-                    'message': f'Image successfully saved at {save_path} and data recorded in database',
-                    'imagePath': f'/files/get/{deptCode}/MountLabel/{date_str}/{serial_no}/{filename}'
-                })
-            except Exception as e:
-                connection.rollback()
-                logging.error("Failed to insert image data into database", exc_info=True)
-                try:
-                    os.remove(save_path)
-                    logging.info(f"Removed failed upload file at {save_path}")
-                except OSError as os_error:
-                    logging.error(f"Failed to remove file at {save_path}: {os_error}")
-                return jsonify({'error': str(e)}), 500
-            finally:
-                cursor.close()
-                connection.close()
-        # 이미지 저장 경로 반환 
-        return jsonify({
-            'message': f'Image successfully saved at {save_path}',
-            'imagePath': f'/files/get/{deptCode}/MountLabel/{date_str}/{serial_no}/{filename}'
-        })
+    # def save_mount_label_image(self):
+    #     """ 마운트 라벨 이미지 저장 """ 
+    #     if 'image' not in request.files:
+    #         return jsonify({'error': 'No image part in the request'}), 400
+    #     # 파일 저장
+    #     file = request.files['image']
+    #     serial_no = request.form['serialNo']
+    #     process_code = request.form['processCode']
+    #     deptCode = request.form['deptCode']
+    #     empNo = request.form['empNo']
+    #     indexNo = request.form['indexNo'][:-2]
+    #     indexNo_sfix = request.form['indexNo'][-2:]
+    #     # 파일 이름 생성
+    #     filename = f"{indexNo}{indexNo_sfix}_{serial_no}_{process_code}.png"
+    #     # 날짜 문자열 생성
+    #     date_str = datetime.now().strftime('%Y-%m-%d')
+    #     pc_name = socket.gethostname()
+    #     # 일일 폴더 생성
+    #     daily_folder = os.path.join(self.app.config['UPLOAD_FOLDER'], deptCode, 'MountLabel', serial_no)
+    #     # 일일 폴더 존재 여부 확인 및 생성
+    #     if not os.path.exists(daily_folder):
+    #         os.makedirs(daily_folder)
+    #     save_path = os.path.join(daily_folder, filename)
+    #     file.save(save_path)
+    #     # 이미지 저장 경로 반환
+    #     if os.path.exists(save_path):
+    #         # 데이터베이스에 정보 삽입
+    #         connection = self.db_manager_2.connect()
+    #         cursor = connection.cursor()
+    #         # SQL 쿼리 생성
+    #         sql = """
+    #             MERGE INTO DCS_HISTORY USING dual
+    #             ON (INDEX_NO = :1 AND INDEX_NO_SFIX = :2 AND SERIAL_NO = :3 AND DEPT_CODE = :4 AND PROCESS_CODE = :5)
+    #             WHEN MATCHED THEN
+    #                 UPDATE SET STATUS = :6, EMP_NO = :7, RENEWAL_D = :8, RENEWAL_BY = :9
+    #             WHEN NOT MATCHED THEN
+    #                 INSERT (INDEX_NO, INDEX_NO_SFIX, SERIAL_NO, DEPT_CODE, PROCESS_CODE, STATUS, EMP_NO, ENTRY_D, ENTRY_BY)
+    #                 VALUES (:1, :2, :3, :4, :5, :6, :7, :8, :9)
+    #         """
+    #         params = (indexNo, indexNo_sfix, serial_no, deptCode, process_code, 1, empNo, date_str, pc_name)
+    #         # 데이터베이스에 정보 삽입
+    #         try:
+    #             cursor.execute(sql, params)
+    #             connection.commit()
+    #             return jsonify({
+    #                 'message': f'Image successfully saved at {save_path} and data recorded in database',
+    #                 'imagePath': f'/files/get/{deptCode}/MountLabel/{date_str}/{serial_no}/{filename}'
+    #             })
+    #         except Exception as e:
+    #             connection.rollback()
+    #             logging.error("Failed to insert image data into database", exc_info=True)
+    #             try:
+    #                 os.remove(save_path)
+    #                 logging.info(f"Removed failed upload file at {save_path}")
+    #             except OSError as os_error:
+    #                 logging.error(f"Failed to remove file at {save_path}: {os_error}")
+    #             return jsonify({'error': str(e)}), 500
+    #         finally:
+    #             cursor.close()
+    #             connection.close()
+    #     # 이미지 저장 경로 반환 
+    #     return jsonify({
+    #         'message': f'Image successfully saved at {save_path}',
+    #         'imagePath': f'/files/get/{deptCode}/MountLabel/{date_str}/{serial_no}/{filename}'
+    #     })
 
     def save_checkbox_states(self):
         """ 체크박스 상태 저장 """
