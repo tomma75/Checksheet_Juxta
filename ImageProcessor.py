@@ -39,6 +39,9 @@ class ImageProcessor:
     def split_image_by_horizontal_lines(image_path, threshold=200, min_row_height=10):
         # 이미지 로드
         img = cv2.imread(image_path, cv2.IMREAD_COLOR)
+        if img is None:
+            print(f"이미지를 로드할 수 없습니다: {image_path}")
+            return []
 
         # 회색조로 변환
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -48,6 +51,9 @@ class ImageProcessor:
 
         # 수평 투영을 통해 각 행의 픽셀값 합계를 구함
         horizontal_projection = np.sum(binary, axis=1)
+
+        # 수직 투영을 통해 각 열의 픽셀값 합계를 구함
+        vertical_projection = np.sum(binary, axis=0)
 
         # 회색 행(분할선)을 식별하기 위한 기준 설정
         row_threshold = img.shape[1] * 255 * 0.5
@@ -74,27 +80,53 @@ class ImageProcessor:
             # 마지막 회색 행을 추가
             split_positions.append(start_position)
 
-        cropped_images = [] 
+        # 좌우 여백(검정 세로선)의 위치를 찾는다
+        left_margin = 0
+        right_margin = img.shape[1] - 1
+
+        # 왼쪽 마진 찾기 (왼쪽에서 오른쪽으로 탐색)
+        for i, value in enumerate(vertical_projection):
+            if value > 0:  # 검정 픽셀이 있는 경우
+                left_margin = i
+                break
+
+        # 오른쪽 마진 찾기 (오른쪽에서 왼쪽으로 탐색)
+        for i in range(img.shape[1] - 1, -1, -1):
+            if vertical_projection[i] > 0:  # 검정 픽셀이 있는 경우
+                right_margin = i
+                break
+
+        print(f"최종 마진: left_margin={left_margin}, right_margin={right_margin}")
+
+        # 이미지 분할 및 저장 로직
+        cropped_images = []
         start = 0
-        # 리스트에 마지막 분할 위치를 추가합니다. 이것은 이미지의 맨 아래입니다.
         split_positions.append(img.shape[0])
 
         for end in split_positions:
-            # 이미지를 분할선에 따라 잘라낸다
-            cropped = img[start:end, :]
-            cropped_images.append(cropped)
+            if start < end and left_margin < right_margin:
+                cropped = img[start:end, left_margin:right_margin]
+                if cropped.size > 0:
+                    cropped_images.append(cropped)
+            else:
+                print(f"유효하지 않은 크롭 영역: start={start}, end={end}, left_margin={left_margin}, right_margin={right_margin}")
             start = end
 
-        base_directory = os.path.dirname(os.path.dirname(image_path))  # '.../UTA/Master' 디렉토리
-        serial_directory = os.path.join(base_directory, 'process')  # '.../UTA/process' 디렉토리
-        serial = os.path.basename(image_path).split('.')[0]  # 'serial' 파일 이름 (확장자 제외)
+        # 이미지 저장 로직 (이전과 동일)
+        base_directory = os.path.dirname(os.path.dirname(image_path))
+        serial_directory = os.path.join(base_directory, 'process')
+        serial = os.path.basename(image_path).split('.')[0]
 
-        # 이미지 분할 및 저장
         saved_paths = []
         for index, cropped_image in enumerate(cropped_images):
-            serial_directory_path = os.path.join(serial_directory, serial)
-            if not os.path.exists(serial_directory_path):
-                os.makedirs(serial_directory_path)
-            path = os.path.join(serial_directory_path, f'{serial}_{index}.png')
-            cv2.imwrite(path, cropped_image)
-            saved_paths.append(path)
+            if cropped_image.size > 0:
+                serial_directory_path = os.path.join(serial_directory, serial)
+                if not os.path.exists(serial_directory_path):
+                    os.makedirs(serial_directory_path)
+                path = os.path.join(serial_directory_path, f'{serial}_{index}.png')
+                cv2.imwrite(path, cropped_image)
+                saved_paths.append(path)
+            else:
+                print(f"빈 이미지를 건너뜁니다: index {index}")
+
+        return saved_paths
