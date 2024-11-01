@@ -42,6 +42,7 @@ class RouteHandler:
         # self.app.route('/save_mount_label_image', methods=['POST'])(self.save_mount_label_image)
         self.app.route('/save_checkbox_states', methods=['POST'])(self.save_checkbox_states)
         self.app.route('/get_checkbox_states', methods=['GET'])(self.get_checkbox_states)
+        self.app.route('/check_previous_process', methods=['POST'])(self.check_previous_process)
 
     def login(self):
         # 로그인 페이지 렌더링
@@ -225,6 +226,7 @@ class RouteHandler:
                     SELECT CHECKBOX_INDEX, X_POSITION, Y_POSITION, WIDTH, HEIGHT
                     FROM CHECKBOX_STATES 
                     WHERE INDEX_NO = :1 AND INDEX_NO_SFIX = :2 AND SERIAL_NO = :3 AND DEPT_CODE = :4 AND PROCESS_CODE = :5
+                    ORDER BY TO_NUMBER(CHECKBOX_INDEX)
                 """, (indexNo[:8], indexNo[8:], serial, dept, process))
                 checkbox_positions = cursor.fetchall()
             finally:
@@ -353,7 +355,7 @@ class RouteHandler:
                 where_clauses.append("ENTRY_D >= TO_DATE(:start_date, 'YYYY-MM-DD')")
                 params['start_date'] = start_date
             if end_date:
-                where_clauses.append("ENTRY_D <= TO_DATE(:end_date, 'YYYY-MM-DD')")
+                where_clauses.append("ENTRY_D <= TO_DATE(:end_date, 'YYYY-MM-DD') + 1")
                 params['end_date'] = end_date
             if serial_number:
                 where_clauses.append("SERIAL_NO LIKE :serial_number")
@@ -514,7 +516,8 @@ class RouteHandler:
         # 데이터베이스에 정보 삽입
         connection = self.db_manager_2.connect()
         cursor = connection.cursor()
-
+        # print(checkbox_states)
+        # print(checkbox_positions)
         try:
             for index, state in checkbox_states.items():
                 position = checkbox_positions[index]
@@ -554,11 +557,12 @@ class RouteHandler:
 
         connection = self.db_manager_2.connect()
         cursor = connection.cursor()
-        # SQL 쿼리 생성
+        # SQL 쿼리 생성 - Y_POSITION으로 먼저 정렬하고, 같은 Y값을 가진 항목들은 X_POSITION으로 정렬
         sql = """
             SELECT CHECKBOX_INDEX, STATE 
             FROM CHECKBOX_STATES 
             WHERE INDEX_NO = :1 AND INDEX_NO_SFIX = :2 AND SERIAL_NO = :3 AND DEPT_CODE = :4 AND PROCESS_CODE = :5
+            ORDER BY TO_NUMBER(CHECKBOX_INDEX)
         """
 
         try:
@@ -571,4 +575,63 @@ class RouteHandler:
         finally:
             cursor.close()
             connection.close()
+
+    def check_previous_process(self):
+        data = request.get_json()
+        barcode_hex = data.get('serialNo')
+        current_process = data.get('currentProcessCode')
+        dept_code = data.get('deptCode')
+        
+        # 32진수를 10진수로 변환
+        try:
+            index_no_decimal = int(barcode_hex, 32)
+        except ValueError:
+            return jsonify({'error': '유효하지 않은 바코드 형식입니다.', 'previousCompleted': False}), 400
+        
+        # 10진수를 문자열로 변환하고 앞의 8자리와 뒤의 2자리로 분리
+        index_no_str = str(index_no_decimal).zfill(10)
+        index_no = index_no_str[:8]
+        index_no_sfix = index_no_str[8:]
+        
+        # 공정 순서 정의
+        process_order = ['08', '06', '11', '15']  # 부품SET, 단자체결기, 조립, 출하검사 순서
+        
+        try:
+            # 현재 공정의 인덱스 찾기
+            current_index = process_order.index(current_process)
+            
+            # 부품SET(08)와 단자체결기(06)는 이전 공정 체크 불필요
+            if current_process in ['08', '06']:
+                return jsonify({'previousCompleted': True})
+                
+            # 이전 공정 코드 가져오기
+            previous_process = process_order[current_index - 1]
+            
+            connection = self.db_manager_2.connect()
+            cursor = connection.cursor()
+            
+            # 이전 공정의 완료 상태 확인
+            sql = """
+                SELECT STATUS 
+                FROM DCS_HISTORY 
+                WHERE INDEX_NO = :1 
+                  AND INDEX_NO_SFIX = :2 
+                  AND DEPT_CODE = :3 
+                  AND PROCESS_CODE = :4
+            """
+            
+            cursor.execute(sql, (index_no, index_no_sfix, dept_code, previous_process))
+            result = cursor.fetchone()
+            
+            # 이전 공정이 완료되지 않았거나 데이터가 없는 경우
+            if not result or result[0] != 1:  # 1은 OK 상태
+                return jsonify({'previousCompleted': False})
+                
+            return jsonify({'previousCompleted': True})
+        finally:
+            cursor.close()
+            connection.close()
+
+
+
 
