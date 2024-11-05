@@ -1,4 +1,4 @@
-from logger import Logger
+from Logger import Logger
 from flask import request
 import logging
 from logging.handlers import RotatingFileHandler

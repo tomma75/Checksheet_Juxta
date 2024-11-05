@@ -224,7 +224,7 @@
         <a href="/checksheet-history"><i class="fa fa-history"></i><span class="link-text"> 이력관리</span></a>
         <a href="/logout"><i class="fa fa-sign-out"></i><span class="link-text"> 로그아웃</span></a>
     </div>
-    <button class="openbtn" onclick="toggleNav()">☰</button> <!-- 기존의 햄버거 메뉴 아이콘을 사용 -->
+    <button class="openbtn" onclick="toggleNav()">☰</button> <!-- 기존의 햄버거 메뉴 아이콘 사용 -->
     <div style="padding: 20px; width: 100%;">
         <div id="main">
             <h1>체크시트 이력 조회</h1>
@@ -267,7 +267,7 @@
                         <label for="sortOrder">정렬 순서:</label>
                         <select id="sortOrder" name="sortOrder">
                             <option value="asc">오름차순</option>
-                            <option value="desc">내림차순</option>
+                            <option value="desc">내림차</option>
                         </select>
                     </div>
                 </div>
@@ -389,7 +389,7 @@
             // '수, 24 4월 2024 09:31:29' 같은 형식을 파싱하기 위해 커스텀 파싱 로직 적용
             // 이 함수는 날짜 문자열을 'YYYY/MM/DD HH:mm:ss' 형식으로 변환
             var parts = dateString.match(/\d+/g); // 모든 숫자 추출
-            if (!parts || parts.length < 5) return "Invalid date format"; // 적절한 숫자가 없으면 오류 메시지 ��환
+            if (!parts || parts.length < 5) return "Invalid date format"; // 적한 숫자가 없으면 오류 메시지 환
 
             var months = { '1월': '01', '2월': '02', '3월': '03', '4월': '04', '5월': '05', '6월': '06',
                         '7월': '07', '8월': '08', '9월': '09', '10월': '10', '11월': '11', '12월': '12' };
@@ -486,8 +486,46 @@
             return sortedData;
         }
 
-        // 검색 함수
+        // 날짜 유효성 검사 함수 추가
+        function validateDates() {
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            
+            // 날짜가 비어있는 경우는 허용
+            if (!startDate && !endDate) {
+                return true;
+            }
+
+            // 날짜 형식 검사
+            const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+            if (!dateRegex.test(startDate) || !dateRegex.test(endDate)) {
+                alert('올바른 날짜 형식이 아닙니다. (YYYY-MM-DD)');
+                return false;
+            }
+
+            // 시작일이 종료일보다 늦은 경우
+            if (new Date(startDate) > new Date(endDate)) {
+                alert('시작일은 종료일보다 이전이어야 합니다.');
+                return false;
+            }
+
+            return true;
+        }
+
+        // 시리얼 번호 유효성 검사 함수 수정
+        function validateSerialInput(input) {
+            // 영문 대문자와 숫자만 허용하고 대문자로 변환
+            input.value = input.value.replace(/[^A-Z0-9]/gi, '').toUpperCase();
+        }
+
+        // 검색 함수 수정
         function searchRecords() {
+            // 날짜 유효성 검사
+            if (!validateDates()) {
+                return;
+            }
+
+            startDebugTimer('검색 요청');
             var startDate = document.getElementById('startDate').value;
             var endDate = document.getElementById('endDate').value;
             var serialNumber = document.getElementById('serialNumber').value;
@@ -497,41 +535,63 @@
             var processSelectId = deptCode + "_processSelect";
             var processSelect = document.getElementById(processSelectId);
             
-            // Serial Number는 그대로 전송 (와일드카드 추가하지 않음)
             if (serialNumber) {
                 formData.set('serialNumber', serialNumber);
             }
 
-            // `processCodes`를 formData에 추가
             if (processSelect) {
                 var processCodes = [];
                 Array.from(processSelect.options).forEach(option => {
                     processCodes.push(`${option.value}:${option.text}`);
                 });
-                formData.append('processCodes', processCodes.join(',')); // 모든 코드를 하나의 문자열로 조합하여 추가
+                formData.append('processCodes', processCodes.join(','));
             } else {
                 console.error('No process select found for the given deptCode:', deptCode);
                 alert('선택된 라인에 해당하는 공정 정보가 없습니다.');
-                return;  // 함수를 여기서 종료하여 백엔드 호출을 방지
+                return;
             }
 
             fetch('/search_history', {
-                method: 'POST', 
+                method: 'POST',
                 body: formData
             })
             .then(response => response.json())
             .then(data => {
-                // console.log('검색 결과 데이터:', data);
-                window.lastSearchData = data; // 검색 결과 저장
+                endDebugTimer('검색 요청');
+                startDebugTimer('결과 표시');
+                
+                // 검색 결과가 없는 경우 처리
+                if (data.error) {
+                    alert(data.error);
+                    return;
+                }
+                if (data.length === 0) {
+                    if (serialNumber) {
+                        alert('존재하지 않는 시리얼 번호입니다.');
+                    } else {
+                        alert('검색 결과가 없습니다.');
+                    }
+                    return;
+                }
+                
+                window.lastSearchData = data;
                 displayResults(data, deptCode);
+                endDebugTimer('결과 표시');
             })
-            .catch(error => console.error('Error:', error));
-
-            // console.log('Searching records for:', startDate, endDate, serialNumber, deptCode);
+            .catch(error => {
+                endDebugTimer('검색 요청');
+                console.error('Error:', error);
+                alert('검색 중 오류가 발생했습니다.');
+            });
         }
 
         // 검색 결과 표시 함수
         function displayResults(data, deptCode) {
+            startDebugTimer('데이터 정렬');
+            const sortedData = sortResults(data);
+            endDebugTimer('데이터 정렬');
+
+            startDebugTimer('테이블 렌더링');
             var resultsDiv = document.getElementById('results');
             resultsDiv.innerHTML = '';
             // 에러 처리    
@@ -539,10 +599,6 @@
                 resultsDiv.innerHTML = `<p>Error: ${data.error}</p>`;
                 return;
             }
-            
-            // 데이터 정렬
-            const sortedData = sortResults(data);
-            // console.log('정렬된 데이터:', sortedData);
             
             // 페이지네이션 설정
             const itemsPerPage = 10;
@@ -613,7 +669,7 @@
                     tableHtml += `<button onclick="changePage(${i})" ${i === page ? 'class="active"' : ''}>${i}</button>`;
                 }
 
-                // 마지막 페이지 버튼 표시 (현재 그룹이 마지막 그룹이 아닌 경우)
+                // 마지막 페이지 버튼 표시 (현재 그룹이 마지막 그룹이 아��� 경우)
                 if (groupEnd < totalPages) {
                     if (groupEnd < totalPages - 1) {
                         tableHtml += '<span>...</span>';
@@ -637,6 +693,7 @@
 
             // 초기 페이지 렌더링
             renderPage(currentPage);
+            endDebugTimer('테이블 렌더링');
         }
 
         // 날짜 형식 변환 함수
@@ -731,10 +788,38 @@
             return true;
         }
 
-        // 시리얼 번호 유효성 검사 함수
-        function validateSerialInput(input) {
-            // 영문 대문자와 숫자만 허용하고 대문자로 변환
-            input.value = input.value.replace(/[^A-Z0-9]/gi, '').toUpperCase();
+        // 시간 측정을 위한 전역 변수 추가
+        let debugTimings = {
+            startTime: null,
+            endTime: null,
+            logs: []
+        };
+
+        // 시간 측정 시작 함수
+        function startDebugTimer(label) {
+            debugTimings.startTime = performance.now();
+            console.log(`[DEBUG] ${label} 시작`);
+        }
+
+        // 시간 측정 종료 함수
+        function endDebugTimer(label) {
+            debugTimings.endTime = performance.now();
+            const duration = debugTimings.endTime - debugTimings.startTime;
+            debugTimings.logs.push({
+                label: label,
+                duration: duration
+            });
+            console.log(`[DEBUG] ${label} 종료: ${duration.toFixed(2)}ms`);
+        }
+
+        // 전체 로그 확인
+        console.table(debugTimings.logs);
+
+        // 특정 작업의 평균 시간 확인
+        function getAverageTime(label) {
+            const logs = debugTimings.logs.filter(log => log.label === label);
+            const avg = logs.reduce((acc, curr) => acc + curr.duration, 0) / logs.length;
+            console.log(`${label} 평균 실행 시간: ${avg.toFixed(2)}ms`);
         }
     </script>
 </body>

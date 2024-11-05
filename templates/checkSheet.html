@@ -126,7 +126,7 @@
             width: 250px; /* 확장된 상태의 사이드 너비 */
         }
         .sidebar.collapsed + #main {
-            margin-left: 50px; /* 사이드바가 축소되었을 때의 marginLeft */
+            margin-left: 50px; /* 사바가 축소되었을 때의 marginLeft */
         }
 
         .sidebar:not(.collapsed) + #main {
@@ -462,6 +462,7 @@
 
         // 체크시트 저장 및 완료 처리 함수 분리
         function saveCheckSheet(selectedProcess) {
+            startDebugTimer('체크시트 저장');
             let anyCrossed = false;
 
             // 체크박스 상태 확인
@@ -501,6 +502,8 @@
             })
             .then(response => response.json())
             .then(data => {
+                endDebugTimer('체크시트 저장');
+                startDebugTimer('이미지 저장');
                 console.log('Checkbox states and positions saved:', data);
                 // 이미지 저장 로직
                 const baseImageCanvas = document.getElementById('baseImageCanvas');
@@ -538,8 +541,9 @@
                 });
             })
             .catch(error => {
-                console.error('Error saving checkbox states and positions:', error);
-                showMessage('체크박스 상태와 위치 저장에 실패했습니다. 다시 시도해 주세요.', 'error');
+                endDebugTimer('체크시트 저장');
+                console.error('Error:', error);
+                showMessage('체크시트 저장 중 오류가 발생했습니다.', 'error');
             });
         }
 
@@ -564,7 +568,7 @@
                 if (barcodeInput.value.length === 6) {
                     const selectedProcess = document.getElementById('processSelect').value;
                     
-                    // 이전 공정 체크 로직 제거 및 직접 바코드 처리
+                    // 이전 공정 체크 로직 제거 및 직접 바코 처리
                     processBarcode(barcodeInput.value);
                     barcodeInput.value = '';
                     event.preventDefault();
@@ -591,6 +595,7 @@
             
         // 바코드가 6자리 입력되면 호출되는 함수
         function fetchIndexNo(barcode) {
+            startDebugTimer('제품 정보 조회');
             const selectedProcess = document.getElementById('processSelect').value;
             const deptCode = document.getElementById('deptInfo').textContent.split(' ')[0];
 
@@ -604,10 +609,10 @@
             })
             .then(response => response.json())
             .then(productData => {
-                // 제품 정보를 화면에 표시
+                endDebugTimer('제품 정보 조회');
+                startDebugTimer('이미지 로드');
                 handleResponse(productData);
-
-                // 부품SET(08)와 단자체결기(06) 공정은 바로 이미지 로드
+                
                 if (selectedProcess === '08' || selectedProcess === '06') {
                     fetchProductInfoAndImage(barcode);
                 } else {
@@ -635,6 +640,7 @@
                         }
                     })
                     .catch(error => {
+                        endDebugTimer('이전 공정 체크');
                         console.error('이전 공정 체크 중 오류:', error);
                         showMessage('이전 공정 확인 중 오류가 발생했습니다.', 'error');
                         barcodeInput.value = '';
@@ -642,14 +648,15 @@
                 }
             })
             .catch(error => {
-                console.error('제품 정보 가져오기 오류:', error);
-                showMessage('제품 정보를 가져오는 중 오류가 발생했습니다.', 'error');
-                barcodeInput.value = '';
+                endDebugTimer('제품 정보 조회');
+                console.error('Error:', error);
+                errorDisplay.textContent = 'DB에서 정보를 조회할 수 없습니다.';
             });
         }
 
         // 제품 정보와 이미지를 가져오는 함수를 분리
         function fetchProductInfoAndImage(barcode) {
+            startDebugTimer('이미지 로드');
             fetch('/get_product_info', {
                 method: 'POST',
                 headers: {
@@ -660,7 +667,6 @@
             .then(response => response.json())
             .then(data => {
                 handleResponse(data);
-                
                 if (data.Serial_No) {
                     // 제품 정보 컨테이너와 체크 완료 버튼을 함께 표시
                     document.getElementById('productInfoContainer').style.display = 'flex';
@@ -717,10 +723,12 @@
                         errorDisplay.textContent = '요청한 이미지가 존재하지 않습니다. Index No 바코드 혹은 공정을 확인해주세요.';
                     });
                 }
+                endDebugTimer('이미지 로드');
             })
             .catch(error => {
-                console.error('Index No 가져오기 오류:', error);
-                errorDisplay.textContent = 'DB에서 정보를 조회할 수 없습니다.';
+                endDebugTimer('이미지 로드');
+                console.error('Error:', error);
+                showMessage('제품 정보를 가져오는 중 오류가 발생했습니다.', 'error');
             });
         }
 
@@ -1087,6 +1095,42 @@
                 console.error('Error:', error);
                 showMessage('제품 정보를 가져오는 중 오류가 발생했습니다.', 'error');
             });
+        }
+
+        // 시간 측정을 위한 전역 변수 추가
+        let debugTimings = {
+            startTime: null,
+            endTime: null,
+            logs: []
+        };
+
+        // 시간 측정 시작 함수
+        function startDebugTimer(label) {
+            debugTimings.startTime = performance.now();
+            console.log(`[DEBUG] ${label} 시작`);
+        }
+
+        // 시간 측정 종료 함수
+        function endDebugTimer(label) {
+            debugTimings.endTime = performance.now();
+            const duration = debugTimings.endTime - debugTimings.startTime;
+            debugTimings.logs.push({
+                label: label,
+                duration: duration
+            });
+            console.log(`[DEBUG] ${label} 종료: ${duration.toFixed(2)}ms`);
+        }
+
+        // 전체 로그 확인
+        function showDebugLogs() {
+            console.table(debugTimings.logs);
+        }
+
+        // 특정 작업의 평균 시간 확인
+        function getAverageTime(label) {
+            const logs = debugTimings.logs.filter(log => log.label === label);
+            const avg = logs.reduce((acc, curr) => acc + curr.duration, 0) / logs.length;
+            console.log(`${label} 평균 실행 시간: ${avg.toFixed(2)}ms`);
         }
     </script>
 </body>
