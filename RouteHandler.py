@@ -23,26 +23,51 @@ class RouteHandler:
         self.register_routes()
 
     def register_routes(self):
-        # 라우트 등록 메서드
-        self.app.route('/config', methods=['GET'])(self.send_config)
-        self.app.route('/', methods=['GET', 'POST'])(self.login)
-        self.app.route('/login', methods=['GET', 'POST'])(self.login)
-        self.app.route('/logout')(self.logout)
-        self.app.route('/get_employee_name', methods=['POST'])(self.get_employee_name)
-        self.app.route('/save_checked_image', methods=['POST'])(self.save_checked_image)
-        self.app.route('/checkSheet')(self.checkSheet)
-        # self.app.route('/mount-label')(self.mount_label)
-        self.app.route('/upload_image/<serial_process>', methods=['GET'])(self.upload_image)
-        self.app.route('/get_product_info', methods=['POST'])(self.get_product_info)
-        self.app.route('/search_history', methods=['POST'])(self.search_history)
-        self.app.route('/checksheet-history')(self.checksheet_history)
-        self.app.route('/files/list/<path:directory>')(self.list_files)
-        self.app.route('/files/get/<path:filepath>')(self.serve_file)
-        self.app.route('/check_login_status', methods=['GET'])(self.check_login_status)
-        # self.app.route('/save_mount_label_image', methods=['POST'])(self.save_mount_label_image)
-        self.app.route('/save_checkbox_states', methods=['POST'])(self.save_checkbox_states)
-        self.app.route('/get_checkbox_states', methods=['GET'])(self.get_checkbox_states)
-        self.app.route('/check_previous_process', methods=['POST'])(self.check_previous_process)
+        routes = [
+            ('/', self.login, ['GET', 'POST']),
+            ('/login', self.login, ['GET', 'POST']),
+            ('/logout', self.logout, ['GET']),
+            ('/config', self.send_config, ['GET']),
+            ('/get_employee_name', self.get_employee_name, ['POST']),
+            ('/save_checked_image', self.save_checked_image, ['POST']),
+            ('/checkSheet', self.checkSheet, ['GET']),
+            ('/checksheet-history', self.checksheet_history, ['GET']),  # 대시 포함된 URL
+            ('/upload_image/<serial_process>', self.upload_image, ['GET']),
+            ('/get_product_info', self.get_product_info, ['POST']),
+            ('/search_history', self.search_history, ['POST']),
+            ('/files/list/<path:directory>', self.list_files, ['GET']),
+            ('/files/get/<path:filepath>', self.serve_file, ['GET']),
+            ('/check_login_status', self.check_login_status, ['GET']),
+            ('/save_checkbox_states', self.save_checkbox_states, ['POST']),
+            ('/get_checkbox_states', self.get_checkbox_states, ['GET']),
+            ('/check_previous_process', self.check_previous_process, ['POST'])
+        ]
+
+        # 라우트 등록 시 view_func를 데코레이터로 감싸서 등록
+        for path, view_func, methods in routes:
+            endpoint = view_func.__name__
+            self.app.add_url_rule(
+                path,
+                endpoint=endpoint,
+                view_func=view_func,
+                methods=methods,
+                strict_slashes=False  # URL 끝의 슬래시 유무 무시
+            )
+
+        # 404 에러 핸들러 등록
+        @self.app.errorhandler(404)
+        def not_found_error(error):
+            if request.path.startswith('/checksheet-history'):
+                return self.checksheet_history()
+            return jsonify({
+                'error': 'Requested URL not found',
+                'url': request.url
+            }), 404
+
+        # 등록된 모든 라우트 로깅
+        logging.info("Registered routes:")
+        for rule in self.app.url_map.iter_rules():
+            logging.info(f"Route: {rule.rule} [{', '.join(rule.methods)}] -> {rule.endpoint}")
 
     def login(self):
         # 로그인 페이지 렌더링
@@ -84,7 +109,6 @@ class RouteHandler:
             self.db_manager_1.close()
 
     def save_checked_image(self):
-        # 체크된 이미지 저장 메서드
         if 'image' not in request.files:
             return jsonify({'error': 'No image part in the request'}), 400
 
@@ -107,44 +131,76 @@ class RouteHandler:
         if not os.path.exists(daily_folder):
             os.makedirs(daily_folder)
         save_path = os.path.join(daily_folder, filename)
-        file.save(save_path)
-
-        if os.path.exists(save_path):
-            # 데이터베이스에 정보 삽입
-            connection = self.db_manager_2.connect()
-            cursor = connection.cursor()
-
-            sql = """
-                MERGE INTO DCS_HISTORY USING dual
-                ON (INDEX_NO = :1 AND INDEX_NO_SFIX = :2 AND SERIAL_NO = :3 AND DEPT_CODE = :4 AND PROCESS_CODE = :5)
-                WHEN MATCHED THEN
-                    UPDATE SET STATUS = :6, EMP_NO = :7, RENEWAL_D = :8, RENEWAL_BY = :9
-                WHEN NOT MATCHED THEN
-                    INSERT (INDEX_NO, INDEX_NO_SFIX, SERIAL_NO, DEPT_CODE, PROCESS_CODE, STATUS, EMP_NO, ENTRY_D, ENTRY_BY)
-                    VALUES (:1, :2, :3, :4, :5, :6, :7, :8, :9)
-            """
-
-            # SQL 바인드 파라미터를 위치 기반으로 정의
-            params = (indexNo, indexNo_sfix, serial_no, deptCode, process_code, result, empNo, date_str, pc_name)
-
-            try:
+        
+        db_success = False
+        file_success = False
+        
+        try:
+            # 파일 저장 시도
+            file.save(save_path)
+            if os.path.exists(save_path):
+                file_success = True
+                
+                # DB 저장 시도
+                connection = self.db_manager_2.connect()
+                cursor = connection.cursor()
+                
+                sql = """
+                    MERGE INTO DCS_HISTORY USING dual
+                    ON (INDEX_NO = :1 AND INDEX_NO_SFIX = :2 AND SERIAL_NO = :3 AND DEPT_CODE = :4 AND PROCESS_CODE = :5)
+                    WHEN MATCHED THEN
+                        UPDATE SET STATUS = :6, EMP_NO = :7, RENEWAL_D = :8, RENEWAL_BY = :9
+                    WHEN NOT MATCHED THEN
+                        INSERT (INDEX_NO, INDEX_NO_SFIX, SERIAL_NO, DEPT_CODE, PROCESS_CODE, STATUS, EMP_NO, ENTRY_D, ENTRY_BY)
+                        VALUES (:1, :2, :3, :4, :5, :6, :7, :8, :9)
+                """
+                
+                params = (indexNo, indexNo_sfix, serial_no, deptCode, process_code, result, empNo, date_str, pc_name)
+                
                 cursor.execute(sql, params)
                 connection.commit()
-                return jsonify({'message': f'Image successfully saved at {save_path} and data recorded in database'})
-            except Exception as e:
+                db_success = True
+                
+                if db_success and file_success:
+                    return jsonify({
+                        'success': True,
+                        'message': '체크시트가 성공적으로 저장되었습니다.',
+                        'db_saved': True,
+                        'file_saved': True
+                    })
+                
+            else:
+                return jsonify({
+                    'success': False,
+                    'message': '이미지 파일 저장에 실패했습니다.',
+                    'db_saved': False,
+                    'file_saved': False
+                }), 500
+                
+        except Exception as e:
+            # 에러 발생 시 롤백 처리
+            if 'connection' in locals():
                 connection.rollback()
-                logging.error("Failed to insert image data into database", exc_info=True)
+            if file_success:
                 try:
-                    os.remove(save_path)  # 파일 삭제 시도
-                    logging.info(f"Removed failed upload file at {save_path}")
-                except OSError as os_error:
-                    logging.error(f"Failed to remove file at {save_path}: {os_error}")
-                return jsonify({'error': str(e)}), 500
-            finally:
+                    os.remove(save_path)
+                except OSError:
+                    pass
+            
+            error_message = '데이터베이스 저장 중 오류가 발생했습니다.' if file_success else '이미지 파일 저장 중 오류가 발생했습니다.'
+            return jsonify({
+                'success': False,
+                'message': error_message,
+                'db_saved': db_success,
+                'file_saved': file_success,
+                'error': str(e)
+            }), 500
+            
+        finally:
+            if 'cursor' in locals():
                 cursor.close()
+            if 'connection' in locals():
                 connection.close()
-
-        return jsonify({'message': f'Image successfully saved at {save_path}'})
 
     def login_required(f):
         # 로그인 필요 데코레이터
@@ -329,48 +385,62 @@ class RouteHandler:
 
     @login_required
     def search_history(self):
-        # 검색 기록 조회
         start_date = request.form.get('startDate')
         end_date = request.form.get('endDate')
         serial_number = request.form.get('serialNumber', '').strip()
         deptCode = request.form.get('deptSelect')
         process_codes_str = request.form.get('processCodes', '')
 
+        logging.info(f"검색 파라미터: serial={serial_number}, dept={deptCode}, process_codes={process_codes_str}")
+
         connection = self.db_manager_2.connect()
         cursor = connection.cursor()
         try:
             case_statements = []
             process_codes = {code.split(':')[0]: code.split(':')[1] for code in process_codes_str.split(',') if code}
+            
             for code, name in process_codes.items():
                 case_statements.append(f"MAX(CASE WHEN PROCESS_CODE = '{code}' THEN '{name}' END) AS \"{name}\"")
                 case_statements.append(f"MAX(CASE WHEN PROCESS_CODE = '{code}' THEN COALESCE(TO_CHAR(RENEWAL_D, 'Dy, dd Mon yyyy hh24:mi:ss'), TO_CHAR(ENTRY_D, 'Dy, dd Mon yyyy hh24:mi:ss')) END) AS \"{name} 시간\"")
                 case_statements.append(f"MAX(CASE WHEN PROCESS_CODE = '{code}' THEN STATUS END) AS \"{name} 상태\"")
                 case_statements.append(f"MAX(CASE WHEN PROCESS_CODE = '{code}' THEN EMP_NO END) AS \"{name} 작업자 번호\"")
 
-            where_clauses = ["DEPT_CODE LIKE :dept_code"]  # 부서 코드로 필터링
-            params = {'dept_code': f"%{deptCode}%"}  # 부서 코드 매개변수 설정
-
-            # 날짜 필터가 제공되면 조건부로 추가
+            # 서브쿼리로 날짜 조건에 맞는 시리얼 번호를 먼저 찾습니다
+            date_conditions = []
             if start_date:
-                where_clauses.append("ENTRY_D >= TO_DATE(:start_date, 'YYYY-MM-DD')")
+                date_conditions.append("ENTRY_D >= TO_DATE(:start_date, 'YYYY-MM-DD')")
+            if end_date:
+                date_conditions.append("ENTRY_D <= TO_DATE(:end_date, 'YYYY-MM-DD') + 1")
+
+            date_where_clause = " AND ".join(date_conditions) if date_conditions else "1=1"
+            
+            sql = f"""
+            WITH FILTERED_SERIALS AS (
+                SELECT DISTINCT SERIAL_NO
+                FROM DCS_HISTORY
+                WHERE DEPT_CODE LIKE :dept_code
+                AND {date_where_clause}
+                {f"AND SERIAL_NO LIKE :serial_number" if serial_number else ""}
+            )
+            SELECT h.SERIAL_NO, {', '.join(case_statements)}
+            FROM DCS_HISTORY h
+            INNER JOIN FILTERED_SERIALS fs ON h.SERIAL_NO = fs.SERIAL_NO
+            WHERE h.DEPT_CODE LIKE :dept_code
+            GROUP BY h.SERIAL_NO
+            """
+
+            params = {'dept_code': f"%{deptCode}%"}
+            if start_date:
                 params['start_date'] = start_date
             if end_date:
-                where_clauses.append("ENTRY_D <= TO_DATE(:end_date, 'YYYY-MM-DD') + 1")
                 params['end_date'] = end_date
             if serial_number:
-                where_clauses.append("SERIAL_NO LIKE :serial_number")
-                params['serial_number'] = f"%{serial_number}%"  # Serial number 필터링
-            # SQL 쿼리 생성 
-            sql = f"""
-            SELECT SERIAL_NO, {', '.join(case_statements)}
-            FROM DCS_HISTORY
-            WHERE {' AND '.join(where_clauses)}
-            GROUP BY SERIAL_NO
-            """
+                params['serial_number'] = f"%{serial_number}%"
 
             cursor.execute(sql, params)
             results = cursor.fetchall()
             formatted_results = []
+            
             for result in results:
                 result_dict = dict(zip([key[0] for key in cursor.description], result))
                 for process in process_codes.values():
@@ -557,7 +627,7 @@ class RouteHandler:
 
         connection = self.db_manager_2.connect()
         cursor = connection.cursor()
-        # SQL 쿼리 생성 - Y_POSITION으로 먼저 정렬하고, 같은 Y값을 가진 항목들은 X_POSITION으로 정렬
+        # SQL 쿼리 생성 - Y_POSITION으로 먼저 ���렬하고, 같은 Y값을 가진 항목들은 X_POSITION으로 정렬
         sql = """
             SELECT CHECKBOX_INDEX, STATE 
             FROM CHECKBOX_STATES 
@@ -588,7 +658,7 @@ class RouteHandler:
         except ValueError:
             return jsonify({'error': '유효하지 않은 바코드 형식입니다.', 'previousCompleted': False}), 400
         
-        # 10진수를 문자열로 변환하고 앞의 8자리와 뒤의 2자리로 분리
+        # 10진수를 문자열로 변환하고 앞의 8자리와 뒤의 2자리로 ���리
         index_no_str = str(index_no_decimal).zfill(10)
         index_no = index_no_str[:8]
         index_no_sfix = index_no_str[8:]

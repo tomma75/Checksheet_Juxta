@@ -395,7 +395,7 @@
                 sidebar.classList.remove('collapsed');
                 sidebar.style.width = "250px";
                 main.style.marginLeft = "250px";
-                openbtn.innerHTML = "×"; // 'X' 아이콘으로 변경
+                openbtn.innerHTML = "×"; // 'X' 아이콘으 변경
             } else {
                 sidebar.classList.add('collapsed');
                 sidebar.style.width = "50px";
@@ -464,6 +464,8 @@
         function saveCheckSheet(selectedProcess) {
             startDebugTimer('체크시트 저장');
             let anyCrossed = false;
+            let checkboxSaveSuccess = false;
+            let imageSaveSuccess = false;
 
             // 체크박스 상태 확인
             checkBoxes.forEach((box, index) => {
@@ -502,9 +504,13 @@
             })
             .then(response => response.json())
             .then(data => {
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                checkboxSaveSuccess = true;
                 endDebugTimer('체크시트 저장');
                 startDebugTimer('이미지 저장');
-                console.log('Checkbox states and positions saved:', data);
+                
                 // 이미지 저장 로직
                 const baseImageCanvas = document.getElementById('baseImageCanvas');
                 const drawingCanvas = document.getElementById('drawingCanvas');
@@ -530,20 +536,31 @@
                         body: formData
                     })
                     .then(response => response.json())
-                    .then(imageData => {
-                        console.log('Image saved:', imageData);
-                        showMessage('체크시트가 성공적으로 저장되었습니다.', 'success');
+                    .then(data => {
+                        if (data.success) {
+                            showMessage(data.message, 'success');
+                        } else {
+                            let errorMsg = data.message;
+                            if (!data.db_saved && !data.file_saved) {
+                                errorMsg = '체크시트 저장에 실패했습니다.';
+                            } else if (!data.db_saved) {
+                                errorMsg = '데이터베이스 저장에 실패했습니다.';
+                            } else if (!data.file_saved) {
+                                errorMsg = '이미지 파일 저장에 실패했습니다.';
+                            }
+                            showMessage(errorMsg, 'error');
+                        }
                     })
                     .catch(error => {
-                        console.error('Error saving image:', error);
-                        showMessage('이미지 저장 중 오류가 발생했습니다.', 'error');
+                        console.error('Error:', error);
+                        showMessage('체크시트 저장 중 오류가 발생했습니다.', 'error');
                     });
                 });
             })
             .catch(error => {
                 endDebugTimer('체크시트 저장');
                 console.error('Error:', error);
-                showMessage('체크시트 저장 중 오류가 발생했습니다.', 'error');
+                showMessage('체크박스 데이터 저장 중 오류가 발생했습니다.', 'error');
             });
         }
 
@@ -972,7 +989,7 @@
             drawingCtx.clearRect(checkBox.x - 20, checkBox.y - 10, checkBox.width + 40, checkBox.height + 20);
         }
 
-        // 지우개 기능을 수행하는 함수
+        // 지우개 기능을 수행하��� 함수
         function eraseLine(x0, y0, x1, y1) {
             drawingCtx.globalCompositeOperation = 'destination-out';  // 현재 그려진 내용 지우기
             drawingCtx.beginPath();

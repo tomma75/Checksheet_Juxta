@@ -1,5 +1,9 @@
-2024-11-05 09:04:51,196 - ERROR - 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
-(<class 'werkzeug.exceptions.NotFound'>, <NotFound '404: Not Found'>, <traceback object at 0x000001321892B200>)
+2024-11-08 11:35:47,012 - web_service - INFO - Starting server...
+2024-11-08 11:35:47,128 - web_service - INFO - Server starting on https://0.0.0.0:8000
+2024-11-08 11:35:48,180 - web_service - INFO - 
+2024-11-08 11:35:48,223 - web_service - INFO - 
+2024-11-08 11:35:48,474 - web_service - INFO - 
+2024-11-08 11:35:48,477 - web_service - ERROR - 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
 Traceback (most recent call last):
   File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\flask\app.py", line 1513, in full_dispatch_request
     rv = self.dispatch_request()
@@ -15,8 +19,11 @@ Traceback (most recent call last):
   File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\werkzeug\routing.py", line 2032, in match
     raise NotFound()
 werkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
-2024-11-05 09:04:54,075 - ERROR - 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
-(<class 'werkzeug.exceptions.NotFound'>, <NotFound '404: Not Found'>, <traceback object at 0x0000013218AB7880>)
+2024-11-08 11:35:50,267 - web_service - INFO - 
+2024-11-08 11:35:51,181 - web_service - INFO - 
+2024-11-08 11:35:51,333 - web_service - INFO - 
+2024-11-08 11:35:51,468 - web_service - INFO - 
+2024-11-08 11:35:51,469 - web_service - ERROR - 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
 Traceback (most recent call last):
   File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\flask\app.py", line 1513, in full_dispatch_request
     rv = self.dispatch_request()
@@ -32,8 +39,10 @@ Traceback (most recent call last):
   File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\werkzeug\routing.py", line 2032, in match
     raise NotFound()
 werkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
-2024-11-05 09:04:56,623 - ERROR - 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
-(<class 'werkzeug.exceptions.NotFound'>, <NotFound '404: Not Found'>, <traceback object at 0x0000013218AB60C0>)
+2024-11-08 11:35:52,340 - web_service - INFO - 
+2024-11-08 11:35:52,459 - web_service - INFO - 
+2024-11-08 11:35:52,466 - web_service - INFO - 
+2024-11-08 11:35:52,467 - web_service - ERROR - 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
 Traceback (most recent call last):
   File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\flask\app.py", line 1513, in full_dispatch_request
     rv = self.dispatch_request()
@@ -49,8 +58,15 @@ Traceback (most recent call last):
   File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\werkzeug\routing.py", line 2032, in match
     raise NotFound()
 werkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
-2024-11-05 09:04:59,005 - ERROR - 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
-(<class 'werkzeug.exceptions.NotFound'>, <NotFound '404: Not Found'>, <traceback object at 0x0000013218AC6440>)
+2024-11-08 11:35:57,977 - web_service - INFO - 
+2024-11-08 11:49:12,057 - web_service - INFO - 
+2024-11-08 11:51:35,647 - web_service - INFO - 
+2024-11-08 11:57:20,146 - web_service - INFO - Starting server...
+2024-11-08 11:57:20,210 - web_service - INFO - Server starting on https://0.0.0.0:8000
+2024-11-08 11:57:41,465 - web_service - INFO - 
+2024-11-08 11:57:41,528 - web_service - INFO - 
+2024-11-08 11:57:41,626 - web_service - INFO - 
+2024-11-08 11:57:41,627 - web_service - ERROR - 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
 Traceback (most recent call last):
   File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\flask\app.py", line 1513, in full_dispatch_request
     rv = self.dispatch_request()
@@ -66,8 +82,11 @@ Traceback (most recent call last):
   File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\werkzeug\routing.py", line 2032, in match
     raise NotFound()
 werkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
-2024-11-05 09:04:59,586 - ERROR - 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
-(<class 'werkzeug.exceptions.NotFound'>, <NotFound '404: Not Found'>, <traceback object at 0x0000013218AC72C0>)
+2024-11-08 11:57:43,012 - web_service - INFO - 
+2024-11-08 11:57:43,914 - web_service - INFO - 
+2024-11-08 11:57:44,043 - web_service - INFO - 
+2024-11-08 11:57:44,124 - web_service - INFO - 
+2024-11-08 11:57:44,125 - web_service - ERROR - 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
 Traceback (most recent call last):
   File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\flask\app.py", line 1513, in full_dispatch_request
     rv = self.dispatch_request()
@@ -83,8 +102,10 @@ Traceback (most recent call last):
   File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\werkzeug\routing.py", line 2032, in match
     raise NotFound()
 werkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
-2024-11-05 09:07:43,754 - ERROR - 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
-(<class 'werkzeug.exceptions.NotFound'>, <NotFound '404: Not Found'>, <traceback object at 0x000001D65CD951C0>)
+2024-11-08 11:57:45,307 - web_service - INFO - 
+2024-11-08 11:57:45,403 - web_service - INFO - 
+2024-11-08 11:57:45,409 - web_service - INFO - 
+2024-11-08 11:57:45,410 - web_service - ERROR - 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
 Traceback (most recent call last):
   File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\flask\app.py", line 1513, in full_dispatch_request
     rv = self.dispatch_request()
@@ -100,8 +121,16 @@ Traceback (most recent call last):
   File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\werkzeug\routing.py", line 2032, in match
     raise NotFound()
 werkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
-2024-11-05 09:07:45,910 - ERROR - 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
-(<class 'werkzeug.exceptions.NotFound'>, <NotFound '404: Not Found'>, <traceback object at 0x000001D65CF07F80>)
+2024-11-08 11:57:49,889 - web_service - INFO - 
+2024-11-08 11:58:03,885 - web_service - INFO - 
+2024-11-08 11:58:09,117 - web_service - INFO - 
+2024-11-08 11:58:32,541 - web_service - INFO - 
+2024-11-08 11:59:43,611 - web_service - INFO - Starting server...
+2024-11-08 11:59:43,668 - web_service - INFO - Server starting on https://0.0.0.0:8000
+2024-11-08 11:59:45,019 - web_service - INFO - 
+2024-11-08 11:59:45,066 - web_service - INFO - 
+2024-11-08 11:59:45,169 - web_service - INFO - 
+2024-11-08 11:59:45,171 - web_service - ERROR - 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
 Traceback (most recent call last):
   File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\flask\app.py", line 1513, in full_dispatch_request
     rv = self.dispatch_request()
@@ -117,8 +146,11 @@ Traceback (most recent call last):
   File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\werkzeug\routing.py", line 2032, in match
     raise NotFound()
 werkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
-2024-11-05 09:07:47,109 - ERROR - 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
-(<class 'werkzeug.exceptions.NotFound'>, <NotFound '404: Not Found'>, <traceback object at 0x000001D65CF05BC0>)
+2024-11-08 11:59:46,640 - web_service - INFO - 
+2024-11-08 11:59:49,481 - web_service - INFO - 
+2024-11-08 11:59:53,720 - web_service - INFO - 
+2024-11-08 11:59:53,820 - web_service - INFO - 
+2024-11-08 11:59:53,821 - web_service - ERROR - 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
 Traceback (most recent call last):
   File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\flask\app.py", line 1513, in full_dispatch_request
     rv = self.dispatch_request()
@@ -134,8 +166,10 @@ Traceback (most recent call last):
   File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\werkzeug\routing.py", line 2032, in match
     raise NotFound()
 werkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
-2024-11-05 09:08:15,518 - ERROR - 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
-(<class 'werkzeug.exceptions.NotFound'>, <NotFound '404: Not Found'>, <traceback object at 0x000001EEE2B56680>)
+2024-11-08 11:59:55,079 - web_service - INFO - 
+2024-11-08 11:59:55,206 - web_service - INFO - 
+2024-11-08 11:59:55,214 - web_service - INFO - 
+2024-11-08 11:59:55,215 - web_service - ERROR - 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
 Traceback (most recent call last):
   File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\flask\app.py", line 1513, in full_dispatch_request
     rv = self.dispatch_request()
@@ -151,8 +185,13 @@ Traceback (most recent call last):
   File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\werkzeug\routing.py", line 2032, in match
     raise NotFound()
 werkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
-2024-11-05 09:08:17,936 - ERROR - 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
-(<class 'werkzeug.exceptions.NotFound'>, <NotFound '404: Not Found'>, <traceback object at 0x000001EEE2C33DC0>)
+2024-11-08 11:59:59,845 - web_service - INFO - 
+2024-11-08 12:05:25,042 - INFO - Starting server...
+2024-11-08 12:05:25,093 - INFO - Server starting on https://0.0.0.0:8000
+2024-11-08 12:05:34,963 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/checksheet-history
+2024-11-08 12:05:35,012 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/
+2024-11-08 12:05:35,140 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/favicon.ico
+2024-11-08 12:05:35,141 - ERROR - 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
 Traceback (most recent call last):
   File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\flask\app.py", line 1513, in full_dispatch_request
     rv = self.dispatch_request()
@@ -168,8 +207,11 @@ Traceback (most recent call last):
   File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\werkzeug\routing.py", line 2032, in match
     raise NotFound()
 werkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
-2024-11-05 09:08:19,137 - ERROR - 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
-(<class 'werkzeug.exceptions.NotFound'>, <NotFound '404: Not Found'>, <traceback object at 0x000001EEE2C32940>)
+2024-11-08 12:05:37,434 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/get_employee_name
+2024-11-08 12:05:38,228 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/get_employee_name
+2024-11-08 12:05:38,371 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/checkSheet
+2024-11-08 12:05:38,489 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/favicon.ico
+2024-11-08 12:05:38,490 - ERROR - 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
 Traceback (most recent call last):
   File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\flask\app.py", line 1513, in full_dispatch_request
     rv = self.dispatch_request()
@@ -185,8 +227,10 @@ Traceback (most recent call last):
   File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\werkzeug\routing.py", line 2032, in match
     raise NotFound()
 werkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
-2024-11-05 09:14:12,724 - ERROR - 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
-(<class 'werkzeug.exceptions.NotFound'>, <NotFound '404: Not Found'>, <traceback object at 0x000001822D2E2680>)
+2024-11-08 12:05:42,466 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/checksheet-history
+2024-11-08 12:05:42,559 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/config
+2024-11-08 12:05:42,566 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/favicon.ico
+2024-11-08 12:05:42,567 - ERROR - 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
 Traceback (most recent call last):
   File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\flask\app.py", line 1513, in full_dispatch_request
     rv = self.dispatch_request()
@@ -202,8 +246,10 @@ Traceback (most recent call last):
   File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\werkzeug\routing.py", line 2032, in match
     raise NotFound()
 werkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
-2024-11-05 09:14:15,239 - ERROR - 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
-(<class 'werkzeug.exceptions.NotFound'>, <NotFound '404: Not Found'>, <traceback object at 0x000001822D3C7A80>)
+2024-11-08 12:05:48,814 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/search_history
+2024-11-08 12:05:58,388 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/files/list/3165/Checked/T11B16047/
+2024-11-08 12:05:58,411 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/favicon.ico
+2024-11-08 12:05:58,413 - ERROR - 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
 Traceback (most recent call last):
   File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\flask\app.py", line 1513, in full_dispatch_request
     rv = self.dispatch_request()
@@ -219,8 +265,9 @@ Traceback (most recent call last):
   File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\werkzeug\routing.py", line 2032, in match
     raise NotFound()
 werkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
-2024-11-05 09:14:17,219 - ERROR - 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
-(<class 'werkzeug.exceptions.NotFound'>, <NotFound '404: Not Found'>, <traceback object at 0x000001822D3C4A00>)
+2024-11-08 12:05:58,467 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/files/get/3165/Checked/T11B16047/0835247100_T11B16047_06.png
+2024-11-08 12:05:58,799 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/favicon.ico
+2024-11-08 12:05:58,800 - ERROR - 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
 Traceback (most recent call last):
   File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\flask\app.py", line 1513, in full_dispatch_request
     rv = self.dispatch_request()
@@ -236,8 +283,13 @@ Traceback (most recent call last):
   File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\werkzeug\routing.py", line 2032, in match
     raise NotFound()
 werkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
-2024-11-05 09:41:10,645 - ERROR - 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
-(<class 'werkzeug.exceptions.NotFound'>, <NotFound '404: Not Found'>, <traceback object at 0x0000027071542740>)
+2024-11-08 12:06:22,625 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/search_history
+2024-11-08 12:08:41,741 - INFO - Starting server...
+2024-11-08 12:08:41,794 - INFO - Server starting on https://0.0.0.0:8000
+2024-11-08 12:08:47,303 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/checksheet-history
+2024-11-08 12:08:47,355 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/
+2024-11-08 12:08:47,459 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/favicon.ico
+2024-11-08 12:08:47,460 - ERROR - 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
 Traceback (most recent call last):
   File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\flask\app.py", line 1513, in full_dispatch_request
     rv = self.dispatch_request()
@@ -253,8 +305,11 @@ Traceback (most recent call last):
   File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\werkzeug\routing.py", line 2032, in match
     raise NotFound()
 werkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
-2024-11-05 09:41:14,102 - ERROR - 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
-(<class 'werkzeug.exceptions.NotFound'>, <NotFound '404: Not Found'>, <traceback object at 0x0000027071663AC0>)
+2024-11-08 12:08:49,236 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/get_employee_name
+2024-11-08 12:08:49,910 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/get_employee_name
+2024-11-08 12:08:50,031 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/checkSheet
+2024-11-08 12:08:50,112 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/favicon.ico
+2024-11-08 12:08:50,113 - ERROR - 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
 Traceback (most recent call last):
   File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\flask\app.py", line 1513, in full_dispatch_request
     rv = self.dispatch_request()
@@ -270,8 +325,10 @@ Traceback (most recent call last):
   File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\werkzeug\routing.py", line 2032, in match
     raise NotFound()
 werkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
-2024-11-05 09:45:10,568 - ERROR - 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
-(<class 'werkzeug.exceptions.NotFound'>, <NotFound '404: Not Found'>, <traceback object at 0x000002707170EFC0>)
+2024-11-08 12:08:51,029 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/checksheet-history
+2024-11-08 12:08:51,111 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/config
+2024-11-08 12:08:51,117 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/favicon.ico
+2024-11-08 12:08:51,118 - ERROR - 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
 Traceback (most recent call last):
   File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\flask\app.py", line 1513, in full_dispatch_request
     rv = self.dispatch_request()
@@ -287,8 +344,17 @@ Traceback (most recent call last):
   File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\werkzeug\routing.py", line 2032, in match
     raise NotFound()
 werkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
-2024-11-05 10:17:32,983 - ERROR - 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
-(<class 'werkzeug.exceptions.NotFound'>, <NotFound '404: Not Found'>, <traceback object at 0x000002916BEF2300>)
+2024-11-08 12:08:54,790 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/search_history
+2024-11-08 12:11:10,594 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/search_history
+2024-11-08 12:11:15,345 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/search_history
+2024-11-08 12:13:29,979 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/search_history
+2024-11-08 12:13:50,323 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/search_history
+2024-11-08 12:14:06,859 - INFO - Starting server...
+2024-11-08 12:14:06,910 - INFO - Server starting on https://0.0.0.0:8000
+2024-11-08 12:14:21,656 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/checksheet-history
+2024-11-08 12:14:21,715 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/
+2024-11-08 12:14:21,811 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/favicon.ico
+2024-11-08 12:14:21,812 - ERROR - 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
 Traceback (most recent call last):
   File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\flask\app.py", line 1513, in full_dispatch_request
     rv = self.dispatch_request()
@@ -304,8 +370,11 @@ Traceback (most recent call last):
   File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\werkzeug\routing.py", line 2032, in match
     raise NotFound()
 werkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
-2024-11-05 10:17:35,273 - ERROR - 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
-(<class 'werkzeug.exceptions.NotFound'>, <NotFound '404: Not Found'>, <traceback object at 0x000002916C037D40>)
+2024-11-08 12:14:23,160 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/get_employee_name
+2024-11-08 12:14:23,893 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/get_employee_name
+2024-11-08 12:14:24,026 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/checkSheet
+2024-11-08 12:14:24,109 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/favicon.ico
+2024-11-08 12:14:24,110 - ERROR - 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
 Traceback (most recent call last):
   File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\flask\app.py", line 1513, in full_dispatch_request
     rv = self.dispatch_request()
@@ -321,8 +390,10 @@ Traceback (most recent call last):
   File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\werkzeug\routing.py", line 2032, in match
     raise NotFound()
 werkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
-2024-11-05 10:17:36,658 - ERROR - 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
-(<class 'werkzeug.exceptions.NotFound'>, <NotFound '404: Not Found'>, <traceback object at 0x000002916C034A00>)
+2024-11-08 12:14:25,201 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/checksheet-history
+2024-11-08 12:14:25,324 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/config
+2024-11-08 12:14:25,330 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/favicon.ico
+2024-11-08 12:14:25,331 - ERROR - 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
 Traceback (most recent call last):
   File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\flask\app.py", line 1513, in full_dispatch_request
     rv = self.dispatch_request()
@@ -338,8 +409,14 @@ Traceback (most recent call last):
   File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\werkzeug\routing.py", line 2032, in match
     raise NotFound()
 werkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
-2024-11-05 10:19:56,816 - ERROR - 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
-(<class 'werkzeug.exceptions.NotFound'>, <NotFound '404: Not Found'>, <traceback object at 0x000002D74FA729C0>)
+2024-11-08 12:14:27,228 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/search_history
+2024-11-08 12:15:12,255 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/search_history
+2024-11-08 13:50:10,386 - INFO - Starting server...
+2024-11-08 13:50:10,439 - INFO - Server starting on https://0.0.0.0:8000
+2024-11-08 13:50:13,946 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/checksheet-history
+2024-11-08 13:50:13,995 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/
+2024-11-08 13:50:14,145 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/favicon.ico
+2024-11-08 13:50:14,146 - ERROR - 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
 Traceback (most recent call last):
   File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\flask\app.py", line 1513, in full_dispatch_request
     rv = self.dispatch_request()
@@ -355,8 +432,11 @@ Traceback (most recent call last):
   File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\werkzeug\routing.py", line 2032, in match
     raise NotFound()
 werkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
-2024-11-05 10:19:59,806 - ERROR - 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
-(<class 'werkzeug.exceptions.NotFound'>, <NotFound '404: Not Found'>, <traceback object at 0x000002D74FB53E00>)
+2024-11-08 13:50:15,516 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/get_employee_name
+2024-11-08 13:50:16,199 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/get_employee_name
+2024-11-08 13:50:16,335 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/checkSheet
+2024-11-08 13:50:16,425 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/favicon.ico
+2024-11-08 13:50:16,426 - ERROR - 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
 Traceback (most recent call last):
   File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\flask\app.py", line 1513, in full_dispatch_request
     rv = self.dispatch_request()
@@ -372,8 +452,10 @@ Traceback (most recent call last):
   File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\werkzeug\routing.py", line 2032, in match
     raise NotFound()
 werkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
-2024-11-05 10:20:01,033 - ERROR - 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
-(<class 'werkzeug.exceptions.NotFound'>, <NotFound '404: Not Found'>, <traceback object at 0x000002D74FB50980>)
+2024-11-08 13:50:17,856 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/checksheet-history
+2024-11-08 13:50:17,952 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/config
+2024-11-08 13:50:17,957 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/favicon.ico
+2024-11-08 13:50:17,958 - ERROR - 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
 Traceback (most recent call last):
   File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\flask\app.py", line 1513, in full_dispatch_request
     rv = self.dispatch_request()
@@ -389,8 +471,10 @@ Traceback (most recent call last):
   File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\werkzeug\routing.py", line 2032, in match
     raise NotFound()
 werkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
-2024-11-05 10:40:05,475 - ERROR - 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
-(<class 'werkzeug.exceptions.NotFound'>, <NotFound '404: Not Found'>, <traceback object at 0x000002D74FB53980>)
+2024-11-08 13:50:22,944 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/search_history
+2024-11-08 13:50:29,597 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/files/list/3165/Checked/T11B14623/
+2024-11-08 13:50:29,609 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/favicon.ico
+2024-11-08 13:50:29,610 - ERROR - 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
 Traceback (most recent call last):
   File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\flask\app.py", line 1513, in full_dispatch_request
     rv = self.dispatch_request()
@@ -406,8 +490,9 @@ Traceback (most recent call last):
   File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\werkzeug\routing.py", line 2032, in match
     raise NotFound()
 werkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
-2024-11-05 10:40:06,505 - ERROR - 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
-(<class 'werkzeug.exceptions.NotFound'>, <NotFound '404: Not Found'>, <traceback object at 0x000002D74FB55740>)
+2024-11-08 13:50:29,665 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/files/get/3165/Checked/T11B14623/0835248400_T11B14623_06.png
+2024-11-08 13:50:30,037 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/favicon.ico
+2024-11-08 13:50:30,037 - ERROR - 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
 Traceback (most recent call last):
   File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\flask\app.py", line 1513, in full_dispatch_request
     rv = self.dispatch_request()
@@ -423,8 +508,12 @@ Traceback (most recent call last):
   File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\werkzeug\routing.py", line 2032, in match
     raise NotFound()
 werkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
-2024-11-05 12:18:37,665 - ERROR - 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
-(<class 'werkzeug.exceptions.NotFound'>, <NotFound '404: Not Found'>, <traceback object at 0x000002D74FB57540>)
+2024-11-08 13:59:50,709 - INFO - Starting server...
+2024-11-08 13:59:50,765 - INFO - Server starting on https://0.0.0.0:8000
+2024-11-08 13:59:52,387 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/checksheet-history
+2024-11-08 13:59:52,440 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/
+2024-11-08 13:59:52,539 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/favicon.ico
+2024-11-08 13:59:52,540 - ERROR - 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
 Traceback (most recent call last):
   File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\flask\app.py", line 1513, in full_dispatch_request
     rv = self.dispatch_request()
@@ -440,8 +529,11 @@ Traceback (most recent call last):
   File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\werkzeug\routing.py", line 2032, in match
     raise NotFound()
 werkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
-2024-11-05 12:18:38,548 - ERROR - 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
-(<class 'werkzeug.exceptions.NotFound'>, <NotFound '404: Not Found'>, <traceback object at 0x000002D74FB68540>)
+2024-11-08 13:59:53,851 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/get_employee_name
+2024-11-08 13:59:54,538 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/get_employee_name
+2024-11-08 13:59:54,673 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/checkSheet
+2024-11-08 13:59:54,766 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/favicon.ico
+2024-11-08 13:59:54,767 - ERROR - 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
 Traceback (most recent call last):
   File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\flask\app.py", line 1513, in full_dispatch_request
     rv = self.dispatch_request()
@@ -457,8 +549,10 @@ Traceback (most recent call last):
   File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\werkzeug\routing.py", line 2032, in match
     raise NotFound()
 werkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
-2024-11-05 12:18:39,847 - ERROR - 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
-(<class 'werkzeug.exceptions.NotFound'>, <NotFound '404: Not Found'>, <traceback object at 0x000002D74FB699C0>)
+2024-11-08 13:59:55,693 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/checksheet-history
+2024-11-08 13:59:55,817 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/config
+2024-11-08 13:59:55,823 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/favicon.ico
+2024-11-08 13:59:55,824 - ERROR - 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
 Traceback (most recent call last):
   File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\flask\app.py", line 1513, in full_dispatch_request
     rv = self.dispatch_request()
@@ -474,8 +568,11 @@ Traceback (most recent call last):
   File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\werkzeug\routing.py", line 2032, in match
     raise NotFound()
 werkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
-2024-11-05 12:18:41,291 - ERROR - 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
-(<class 'werkzeug.exceptions.NotFound'>, <NotFound '404: Not Found'>, <traceback object at 0x000002D74FB6AE00>)
+2024-11-08 14:00:00,381 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/search_history
+2024-11-08 14:00:10,376 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/checksheet-history
+2024-11-08 14:00:10,452 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/config
+2024-11-08 14:00:10,458 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/favicon.ico
+2024-11-08 14:00:10,459 - ERROR - 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
 Traceback (most recent call last):
   File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\flask\app.py", line 1513, in full_dispatch_request
     rv = self.dispatch_request()
@@ -491,54 +588,48 @@ Traceback (most recent call last):
   File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\werkzeug\routing.py", line 2032, in match
     raise NotFound()
 werkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
-2024-11-08 11:27:50,472 - ERROR - 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
-(<class 'werkzeug.exceptions.NotFound'>, <NotFound '404: Not Found'>, <traceback object at 0x000001B110749740>)
-Traceback (most recent call last):
-  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\flask\app.py", line 1513, in full_dispatch_request
-    rv = self.dispatch_request()
-         ^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\flask\app.py", line 1489, in dispatch_request
-    self.raise_routing_exception(req)
-  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\flask\app.py", line 1471, in raise_routing_exception
-    raise request.routing_exception  # type: ignore
-    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\flask\ctx.py", line 367, in match_request
-    result = self.url_adapter.match(return_rule=True)  # type: ignore
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\werkzeug\routing.py", line 2032, in match
-    raise NotFound()
-werkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
-2024-11-08 11:27:53,643 - ERROR - 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
-(<class 'werkzeug.exceptions.NotFound'>, <NotFound '404: Not Found'>, <traceback object at 0x000001B1108CBC00>)
-Traceback (most recent call last):
-  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\flask\app.py", line 1513, in full_dispatch_request
-    rv = self.dispatch_request()
-         ^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\flask\app.py", line 1489, in dispatch_request
-    self.raise_routing_exception(req)
-  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\flask\app.py", line 1471, in raise_routing_exception
-    raise request.routing_exception  # type: ignore
-    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\flask\ctx.py", line 367, in match_request
-    result = self.url_adapter.match(return_rule=True)  # type: ignore
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\werkzeug\routing.py", line 2032, in match
-    raise NotFound()
-werkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
-2024-11-08 11:28:05,830 - ERROR - 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
-(<class 'werkzeug.exceptions.NotFound'>, <NotFound '404: Not Found'>, <traceback object at 0x000001B1108CAAC0>)
-Traceback (most recent call last):
-  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\flask\app.py", line 1513, in full_dispatch_request
-    rv = self.dispatch_request()
-         ^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\flask\app.py", line 1489, in dispatch_request
-    self.raise_routing_exception(req)
-  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\flask\app.py", line 1471, in raise_routing_exception
-    raise request.routing_exception  # type: ignore
-    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\flask\ctx.py", line 367, in match_request
-    result = self.url_adapter.match(return_rule=True)  # type: ignore
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\werkzeug\routing.py", line 2032, in match
-    raise NotFound()
-werkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
+2024-11-08 14:01:36,249 - INFO - Starting server...
+2024-11-08 14:01:36,303 - INFO - Server starting on https://0.0.0.0:8000
+2024-11-08 14:01:46,667 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/checksheet-history
+2024-11-08 14:01:46,730 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/
+2024-11-08 14:01:46,831 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/favicon.ico
+2024-11-08 14:01:48,537 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/get_employee_name
+2024-11-08 14:01:49,220 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/get_employee_name
+2024-11-08 14:01:49,360 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/checkSheet
+2024-11-08 14:01:54,726 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/checkSheet
+2024-11-08 14:01:56,432 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/checksheet-history
+2024-11-08 14:01:56,519 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/config
+2024-11-08 14:01:58,236 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/checksheet-history
+2024-11-08 14:01:58,308 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/config
+2024-11-08 14:02:01,452 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/checkSheet
+2024-11-08 14:16:03,170 - INFO - Starting server...
+2024-11-08 14:16:03,227 - INFO - Server starting on https://0.0.0.0:8000
+2024-11-08 14:16:06,837 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/checkSheet
+2024-11-08 14:16:06,896 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/
+2024-11-08 14:16:48,602 - INFO - Starting server...
+2024-11-08 14:16:48,654 - INFO - Server starting on https://0.0.0.0:8000
+2024-11-08 14:16:48,815 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/
+2024-11-08 14:16:50,211 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/get_employee_name
+2024-11-08 14:16:51,092 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/get_employee_name
+2024-11-08 14:16:51,279 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/checkSheet
+2024-11-08 14:16:53,667 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/checksheet-history
+2024-11-08 14:16:53,758 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/config
+2024-11-08 14:16:54,520 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/checkSheet
+2024-11-08 14:16:57,107 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/get_product_info
+2024-11-08 14:16:57,407 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/get_product_info
+2024-11-08 14:16:57,620 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/upload_image/0926632300_3165_T11132573_08_0
+2024-11-08 14:16:57,628 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/static/icon/pen-tool.png
+2024-11-08 14:16:58,182 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/get_checkbox_states?indexNo=0926632300&serialNo=T11132573&processCode=08&deptCode=3165
+2024-11-08 14:17:02,555 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/get_product_info
+2024-11-08 14:17:02,795 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/check_previous_process
+2024-11-08 14:17:02,980 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/get_product_info
+2024-11-08 14:17:03,226 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/upload_image/0926632300_3165_T11132573_11_2
+2024-11-08 14:17:03,539 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/get_checkbox_states?indexNo=0926632300&serialNo=T11132573&processCode=11&deptCode=3165
+2024-11-08 14:18:23,878 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/checkSheet
+2024-11-08 14:18:27,172 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/get_product_info
+2024-11-08 14:18:27,362 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/get_product_info
+2024-11-08 14:18:27,554 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/upload_image/0926632300_3165_T11132573_08_0
+2024-11-08 14:18:27,576 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/static/icon/pen-tool.png
+2024-11-08 14:18:28,071 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/get_checkbox_states?indexNo=0926632300&serialNo=T11132573&processCode=08&deptCode=3165
+2024-11-08 14:25:44,718 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/save_checkbox_states
+2024-11-08 14:25:44,990 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/save_checked_image
