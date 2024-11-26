@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>체크시트 페이지</title>
     <!-- Font Awesome 아이콘 라이브러리 추가 -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"> <!-- Font Awesome 추가 -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/font-awesome.min.css') }}">
     <style>
         /* 전체 페이지 스타일 설정 */
         body, input, button, select {
@@ -989,7 +989,7 @@
             drawingCtx.clearRect(checkBox.x - 20, checkBox.y - 10, checkBox.width + 40, checkBox.height + 20);
         }
 
-        // 지우개 기능을 수행하��� 함수
+        // 지우개 기능을 수행하 함수
         function eraseLine(x0, y0, x1, y1) {
             drawingCtx.globalCompositeOperation = 'destination-out';  // 현재 그려진 내용 지우기
             drawingCtx.beginPath();
@@ -1149,6 +1149,32 @@
             const avg = logs.reduce((acc, curr) => acc + curr.duration, 0) / logs.length;
             console.log(`${label} 평균 실행 시간: ${avg.toFixed(2)}ms`);
         }
+
+        // 모든 페이지의 공통 스크립트에 추가
+        function refreshSession() {
+            fetch('/refresh_session', { 
+                method: 'POST',
+                credentials: 'same-origin'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (!data.valid) {
+                    alert('세션이 만료되었습니다. 다시 로그인해주세요.');
+                    window.location.href = '/login';
+                }
+            });
+        }
+
+        // 5분마다 세션 갱신
+        setInterval(refreshSession, 300000);
+
+        // 모든 AJAX 요청에 대한 전역 에러 핸들러
+        $(document).ajaxError(function(event, jqXHR, settings, error) {
+            if (jqXHR.status === 401 || jqXHR.status === 403) {
+                alert('세션이 만료되었습니다. 다시 로그인해주세요.');
+                window.location.href = '/login';
+            }
+        });
     </script>
 </body>
 </html>

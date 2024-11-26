@@ -633,3 +633,699 @@ werkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on 
 2024-11-08 14:18:28,071 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/get_checkbox_states?indexNo=0926632300&serialNo=T11132573&processCode=08&deptCode=3165
 2024-11-08 14:25:44,718 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/save_checkbox_states
 2024-11-08 14:25:44,990 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/save_checked_image
+2024-11-08 14:33:35,947 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/save_checkbox_states
+2024-11-08 14:33:37,168 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/save_checked_image
+2024-11-11 11:36:31,415 - INFO - Starting server...
+2024-11-11 11:36:31,474 - INFO - Server starting on https://0.0.0.0:8000
+2024-11-11 11:37:05,990 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/checkSheet
+2024-11-11 11:37:06,038 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/
+2024-11-11 11:37:06,165 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/static/css/font-awesome.min.css
+2024-11-11 11:37:06,769 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/static/fonts/fontawesome-webfont.woff2?v=4.7.0
+2024-11-11 11:37:06,881 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/favicon.ico
+2024-11-11 11:37:09,251 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/get_employee_name
+2024-11-11 11:37:10,126 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/get_employee_name
+2024-11-11 11:37:10,302 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/checkSheet
+2024-11-11 11:37:10,384 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/static/css/font-awesome.min.css
+2024-11-11 11:37:11,551 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/checksheet-history
+2024-11-11 11:37:11,639 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/static/css/font-awesome.min.css
+2024-11-11 11:37:11,705 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/config
+2024-11-11 11:37:12,797 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/search_history
+2024-11-11 11:42:00,735 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/checkSheet
+2024-11-11 11:42:00,815 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/static/css/font-awesome.min.css
+2024-11-11 11:42:00,870 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/static/fonts/fontawesome-webfont.woff2?v=4.7.0
+2024-11-11 11:42:03,268 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/checksheet-history
+2024-11-11 11:42:03,336 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/static/css/font-awesome.min.css
+2024-11-11 11:42:03,400 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/config
+2024-11-22 09:54:26,811 - INFO - Starting server...
+2024-11-22 09:54:26,916 - INFO - Server starting on https://0.0.0.0:8000
+2024-11-22 09:54:42,736 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/checkSheet
+2024-11-22 09:54:42,799 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/
+2024-11-22 09:54:42,921 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/static/css/font-awesome.min.css
+2024-11-22 09:54:43,176 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/static/fonts/fontawesome-webfont.woff2?v=4.7.0
+2024-11-22 09:54:43,238 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/favicon.ico
+2024-11-22 09:54:45,544 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/get_employee_name
+2024-11-22 09:54:46,296 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/get_employee_name
+2024-11-22 09:54:46,473 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/checkSheet
+2024-11-22 09:54:46,556 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/static/css/font-awesome.min.css
+2024-11-22 09:54:49,114 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/checksheet-history
+2024-11-22 09:54:49,197 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/static/css/font-awesome.min.css
+2024-11-22 09:54:49,250 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/config
+2024-11-22 09:54:50,118 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/checkSheet
+2024-11-22 09:54:50,210 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/static/css/font-awesome.min.css
+2024-11-22 09:54:53,740 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/get_product_info
+2024-11-22 09:54:53,981 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/get_product_info
+2024-11-22 09:54:54,169 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/upload_image/0926632300_3165_T11132573_08_0
+2024-11-22 09:54:54,186 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/static/icon/pen-tool.png
+2024-11-22 09:54:57,528 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/get_checkbox_states?indexNo=0926632300&serialNo=T11132573&processCode=08&deptCode=3165
+2024-11-22 09:59:50,332 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/refresh_session
+2024-11-22 10:04:50,335 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/refresh_session
+2024-11-22 10:09:50,351 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/refresh_session
+2024-11-22 10:14:50,356 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/refresh_session
+2024-11-22 10:19:50,366 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/refresh_session
+2024-11-22 10:24:50,362 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/refresh_session
+2024-11-22 10:29:50,365 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/refresh_session
+2024-11-22 10:34:50,355 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/refresh_session
+2024-11-22 10:39:50,365 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/refresh_session
+2024-11-22 10:44:50,386 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/refresh_session
+2024-11-22 10:49:50,374 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/refresh_session
+2024-11-22 10:54:50,402 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/refresh_session
+2024-11-22 10:59:50,396 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/refresh_session
+2024-11-22 11:04:50,410 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/refresh_session
+2024-11-22 11:09:50,411 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/refresh_session
+2024-11-22 11:14:50,408 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/refresh_session
+2024-11-22 11:19:50,419 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/refresh_session
+2024-11-22 11:24:50,420 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/refresh_session
+2024-11-22 11:29:50,431 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/refresh_session
+2024-11-22 11:34:50,440 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/refresh_session
+2024-11-22 11:39:50,425 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/refresh_session
+2024-11-22 11:44:50,440 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/refresh_session
+2024-11-22 11:49:50,457 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/refresh_session
+2024-11-22 11:54:50,453 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/refresh_session
+2024-11-22 11:59:50,454 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/refresh_session
+2024-11-22 12:04:50,468 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/refresh_session
+2024-11-22 12:09:50,463 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/refresh_session
+2024-11-22 12:14:50,472 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/refresh_session
+2024-11-22 12:19:50,454 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/refresh_session
+2024-11-22 12:24:50,481 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/refresh_session
+2024-11-22 12:29:50,489 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/refresh_session
+2024-11-22 12:34:50,473 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/refresh_session
+2024-11-22 12:39:50,506 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/refresh_session
+2024-11-22 12:44:50,488 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/refresh_session
+2024-11-22 12:49:50,503 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/refresh_session
+2024-11-22 12:54:50,511 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/refresh_session
+2024-11-22 12:59:50,519 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/refresh_session
+2024-11-22 13:04:50,515 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/refresh_session
+2024-11-22 13:09:50,523 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/refresh_session
+2024-11-22 13:14:50,540 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/refresh_session
+2024-11-22 13:19:50,514 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/refresh_session
+2024-11-22 13:24:50,533 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/refresh_session
+2024-11-22 13:29:50,518 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/refresh_session
+2024-11-22 13:34:50,521 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/refresh_session
+2024-11-22 13:39:50,544 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/refresh_session
+2024-11-22 13:44:50,547 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/refresh_session
+2024-11-22 13:49:50,545 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/refresh_session
+2024-11-22 13:54:50,567 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/refresh_session
+2024-11-22 13:59:51,750 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/refresh_session
+2024-11-22 14:00:47,526 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/get_product_info
+2024-11-22 14:00:47,950 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/get_product_info
+2024-11-22 14:00:48,205 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/upload_image/0926632300_3165_T11132573_08_0
+2024-11-22 14:00:48,815 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/get_checkbox_states?indexNo=0926632300&serialNo=T11132573&processCode=08&deptCode=3165
+2024-11-22 14:02:22,719 - INFO - Starting server...
+2024-11-22 14:02:22,768 - INFO - Server starting on https://0.0.0.0:8000
+2024-11-22 14:04:50,462 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/refresh_session
+2024-11-22 14:05:21,700 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/login
+2024-11-22 14:05:21,868 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/static/css/font-awesome.min.css
+2024-11-22 14:05:22,115 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/static/fonts/fontawesome-webfont.woff2?v=4.7.0
+2024-11-26 10:49:10,688 - INFO - Starting server...
+2024-11-26 10:49:10,759 - INFO - Server starting on https://0.0.0.0:8000
+2024-11-26 10:49:49,078 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/checkSheet
+2024-11-26 10:49:49,131 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/
+2024-11-26 10:49:49,267 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/static/css/font-awesome.min.css
+2024-11-26 10:49:49,505 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/static/fonts/fontawesome-webfont.woff2?v=4.7.0
+2024-11-26 10:49:49,570 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/favicon.ico
+2024-11-26 10:49:51,327 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/get_employee_name
+2024-11-26 10:49:52,173 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/get_employee_name
+2024-11-26 10:49:52,327 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/checkSheet
+2024-11-26 10:49:52,460 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/static/css/font-awesome.min.css
+2024-11-26 10:49:53,558 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/checksheet-history
+2024-11-26 10:49:53,683 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/static/css/font-awesome.min.css
+2024-11-26 10:49:53,733 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/config
+2024-11-26 10:49:54,775 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/search_history
+2024-11-26 11:00:03,870 - INFO - Starting server...
+2024-11-26 11:00:03,924 - INFO - Server starting on https://0.0.0.0:8000
+2024-11-26 11:00:07,340 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/checksheet-history
+2024-11-26 11:00:07,396 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/
+2024-11-26 11:00:07,529 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/static/css/font-awesome.min.css
+2024-11-26 11:00:09,332 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/get_employee_name
+2024-11-26 11:00:10,285 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/get_employee_name
+2024-11-26 11:00:10,412 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/checkSheet
+2024-11-26 11:00:10,521 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/static/css/font-awesome.min.css
+2024-11-26 11:00:11,590 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/checksheet-history
+2024-11-26 11:00:11,671 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/static/css/font-awesome.min.css
+2024-11-26 11:00:11,730 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/config
+2024-11-26 11:00:12,460 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/search_history
+2024-11-26 11:01:13,821 - INFO - Starting server...
+2024-11-26 11:01:13,871 - INFO - Server starting on https://0.0.0.0:8000
+2024-11-26 11:01:16,285 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/checksheet-history
+2024-11-26 11:01:16,341 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/
+2024-11-26 11:01:16,457 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/static/css/font-awesome.min.css
+2024-11-26 11:01:17,907 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/get_employee_name
+2024-11-26 11:01:18,578 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/get_employee_name
+2024-11-26 11:01:18,716 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/checkSheet
+2024-11-26 11:01:18,822 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/static/css/font-awesome.min.css
+2024-11-26 11:01:19,517 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/checksheet-history
+2024-11-26 11:01:19,623 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/static/css/font-awesome.min.css
+2024-11-26 11:01:19,684 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/config
+2024-11-26 11:01:20,256 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/search_history
+2024-11-26 11:01:40,861 - INFO - Starting server...
+2024-11-26 11:01:40,911 - INFO - Server starting on https://0.0.0.0:8000
+2024-11-26 11:01:42,038 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/checksheet-history
+2024-11-26 11:01:42,088 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/
+2024-11-26 11:01:42,196 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/static/css/font-awesome.min.css
+2024-11-26 11:01:43,745 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/get_employee_name
+2024-11-26 11:01:44,443 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/get_employee_name
+2024-11-26 11:01:44,593 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/checkSheet
+2024-11-26 11:01:44,701 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/static/css/font-awesome.min.css
+2024-11-26 11:01:45,873 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/checksheet-history
+2024-11-26 11:01:45,979 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/static/css/font-awesome.min.css
+2024-11-26 11:01:46,044 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/config
+2024-11-26 11:01:46,699 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/search_history
+2024-11-26 11:03:47,348 - INFO - Starting server...
+2024-11-26 11:03:47,396 - INFO - Server starting on https://0.0.0.0:8000
+2024-11-26 11:03:49,423 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/checksheet-history
+2024-11-26 11:03:49,487 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/
+2024-11-26 11:03:49,595 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/static/css/font-awesome.min.css
+2024-11-26 11:03:50,957 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/get_employee_name
+2024-11-26 11:03:51,772 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/get_employee_name
+2024-11-26 11:03:51,920 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/checkSheet
+2024-11-26 11:03:52,005 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/static/css/font-awesome.min.css
+2024-11-26 11:03:52,921 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/checksheet-history
+2024-11-26 11:03:53,001 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/static/css/font-awesome.min.css
+2024-11-26 11:03:53,055 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/config
+2024-11-26 11:03:54,029 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/search_history
+2024-11-26 11:16:49,971 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/search_history
+2024-11-26 11:16:57,180 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/checksheet-history
+2024-11-26 11:16:57,255 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/static/css/font-awesome.min.css
+2024-11-26 11:16:57,277 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/static/fonts/fontawesome-webfont.woff2?v=4.7.0
+2024-11-26 11:16:57,282 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/config
+2024-11-26 11:16:58,666 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/search_history
+2024-11-26 12:30:43,901 - INFO - Starting server...
+2024-11-26 12:30:43,979 - INFO - Server starting on https://0.0.0.0:8000
+2024-11-26 12:33:08,321 - INFO - Starting server...
+2024-11-26 12:33:08,369 - INFO - Server starting on https://0.0.0.0:8000
+2024-11-26 12:33:22,744 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/checkSheet
+2024-11-26 12:33:22,797 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/
+2024-11-26 12:33:22,928 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/static/css/font-awesome.min.css
+2024-11-26 12:33:23,180 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/static/fonts/fontawesome-webfont.woff2?v=4.7.0
+2024-11-26 12:33:24,982 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/get_employee_name
+2024-11-26 12:33:25,805 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/get_employee_name
+2024-11-26 12:33:25,925 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/checkSheet
+2024-11-26 12:33:26,015 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/static/css/font-awesome.min.css
+2024-11-26 12:33:26,947 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/checksheet-history
+2024-11-26 12:33:27,040 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/static/css/font-awesome.min.css
+2024-11-26 12:33:27,094 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/config
+2024-11-26 12:33:28,116 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/search_history
+2024-11-26 12:33:31,453 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/files/list/3165/Checked/T11B19257/
+2024-11-26 12:33:31,527 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/check_network_file
+2024-11-26 12:33:34,570 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/files/list/3165/Checked/T11B27461/
+2024-11-26 12:33:34,635 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/files/get/3165/Checked/T11B27461/0835839100_T11B27461_11.png
+2024-11-26 12:33:39,203 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/files/list/3165/Checked/T12107455/
+2024-11-26 12:33:39,256 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/files/get/3165/Checked/T12107455/0836195900_T12107455_06.png
+2024-11-26 12:33:50,934 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/files/list/3165/Checked/T11B19257/
+2024-11-26 12:33:50,997 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/check_network_file
+2024-11-26 12:33:53,079 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/files/list/3165/Checked/T11B19257/
+2024-11-26 12:33:53,140 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/check_network_file
+2024-11-26 12:33:55,197 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/files/list/3165/Checked/T11B27461/
+2024-11-26 12:33:55,233 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/files/get/3165/Checked/T11B27461/0835839100_T11B27461_11.png
+2024-11-26 12:34:15,620 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/files/list/3165/Checked/T11B27461/
+2024-11-26 12:34:15,686 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/files/get/3165/Checked/T11B27461/0835839100_T11B27461_06.png
+2024-11-26 12:34:24,458 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/files/list/3165/Checked/T11B19257/
+2024-11-26 12:34:24,538 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/files/get/3165/Checked/T11B19257/0835541900_T11B19257_06.png
+2024-11-26 12:34:27,309 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/files/list/3165/Checked/T11B19257/
+2024-11-26 12:34:29,393 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/files/get/3165/Checked/T11B19257/0835541900_T11B19257_11.png
+2024-11-26 12:34:53,957 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/search_history
+2024-11-26 12:34:56,146 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/files/list/3165/Checked/T11A02477/
+2024-11-26 12:34:56,203 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/files/get/3165/Checked/T11A02477/0833412900_T11A02477_06.png
+2024-11-26 12:35:08,170 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/files/list/3165/Checked/T11A02477/
+2024-11-26 12:35:08,228 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/files/get/3165/Checked/T11A02477/0833412900_T11A02477_06.png
+2024-11-26 12:35:12,387 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/files/list/3165/Checked/T11A02477/
+2024-11-26 12:35:12,432 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/files/get/3165/Checked/T11A02477/0833412900_T11A02477_06.png
+2024-11-26 12:35:36,126 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/static/css/font-awesome.min.css
+2024-11-26 12:36:28,453 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/files/list/3165/Checked/T11A02477/
+2024-11-26 12:36:54,955 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/files/list/3165/Checked/T11A02477/
+2024-11-26 12:38:21,134 - INFO - Starting server...
+2024-11-26 12:38:21,185 - INFO - Server starting on https://0.0.0.0:8000
+2024-11-26 12:39:21,040 - INFO - Starting server...
+2024-11-26 12:39:22,207 - ERROR - 네트워크 드라이브 연결 실패: 시스템 오류 1219이(가) 생겼습니다.
+
+동일한 사용자가 둘 이상의 사용자 이름으로 서버 또는 공유 리소스에 다중 연결할 수 없습니다. 서버나 공유 리소스에 대한 이전 연결을 모두 끊고 다시 시도하십시오.
+
+
+2024-11-26 12:39:22,260 - INFO - Server starting on https://0.0.0.0:8000
+2024-11-26 12:40:14,453 - INFO - Starting server...
+2024-11-26 12:40:18,563 - ERROR - 네트워크 드라이브 연결 실패: 시스템 오류 1219이(가) 생겼습니다.
+
+동일한 사용자가 둘 이상의 사용자 이름으로 서버 또는 공유 리소스에 다중 연결할 수 없습니다. 서버나 공유 리소스에 대한 이전 연결을 모두 끊고 다시 시도하십시오.
+
+
+2024-11-26 12:40:18,624 - INFO - Server starting on https://0.0.0.0:8000
+2024-11-26 13:40:39,532 - INFO - Starting server...
+2024-11-26 13:40:47,829 - ERROR - 네트워크 드라이브 연결 실패: 시스템 오류 1219이(가) 생겼습니다.
+
+동일한 사용자가 둘 이상의 사용자 이름으로 서버 또는 공유 리소스에 다중 연결할 수 없습니다. 서버나 공유 리소스에 대한 이전 연결을 모두 끊고 다시 시도하십시오.
+
+
+2024-11-26 13:40:47,862 - ERROR - 현재 네트워크 연결 상태:
+새 연결 정보가 저장됩니다.
+
+목록에 항목이 없습니다.
+
+
+2024-11-26 13:40:47,914 - INFO - Server starting on https://0.0.0.0:8000
+2024-11-26 13:41:55,490 - INFO - Starting server...
+2024-11-26 13:41:59,618 - INFO - 연결 시도 전 상태:
+새 연결 정보가 저장됩니다.
+
+목록에 항목이 없습니다.
+
+
+2024-11-26 13:41:59,756 - ERROR - 네트워크 드라이브 연결 실패: 시스템 오류 1219이(가) 생겼습니다.
+
+동일한 사용자가 둘 이상의 사용자 이름으로 서버 또는 공유 리소스에 다중 연결할 수 없습니다. 서버나 공유 리소스에 대한 이전 연결을 모두 끊고 다시 시도하십시오.
+
+
+2024-11-26 13:41:59,782 - ERROR - 연결 시도 후 상태:
+새 연결 정보가 저장됩니다.
+
+목록에 항목이 없습니다.
+
+
+2024-11-26 13:41:59,830 - INFO - Server starting on https://0.0.0.0:8000
+2024-11-26 13:42:57,892 - INFO - Starting server...
+2024-11-26 13:43:02,003 - INFO - 연결 시도 전 상태:
+새 연결 정보가 저장됩니다.
+
+목록에 항목이 없습니다.
+
+
+2024-11-26 13:43:05,187 - ERROR - 네트워크 드라이브 연결 실패: 시스템 오류 1219이(가) 생겼습니다.
+
+동일한 사용자가 둘 이상의 사용자 이름으로 서버 또는 공유 리소스에 다중 연결할 수 없습니다. 서버나 공유 리소스에 대한 이전 연결을 모두 끊고 다시 시도하십시오.
+
+
+2024-11-26 13:43:05,188 - ERROR - 명령어: net use \\10.36.15.198\CheckSheet Supervis0r /user:ymfkadmin /persistent:no /y
+2024-11-26 13:43:05,189 - ERROR - 반환 코드: 2
+2024-11-26 13:43:05,190 - ERROR - 표준 출력: 
+2024-11-26 13:43:05,191 - ERROR - 표준 에러: 시스템 오류 1219이(가) 생겼습니다.
+
+동일한 사용자가 둘 이상의 사용자 이름으로 서버 또는 공유 리소스에 다중 연결할 수 없습니다. 서버나 공유 리소스에 대한 이전 연결을 모두 끊고 다시 시도하십시오.
+
+
+2024-11-26 13:43:05,221 - ERROR - 연결 시도 후 상태:
+새 연결 정보가 저장됩니다.
+
+목록에 항목이 없습니다.
+
+
+2024-11-26 13:43:05,305 - INFO - Server starting on https://0.0.0.0:8000
+2024-11-26 13:45:41,613 - INFO - Starting server...
+2024-11-26 13:45:41,619 - ERROR - 네트워크 드라이브 연결 중 오류 발생: name 'disconnect_existing_connections' is not defined
+2024-11-26 13:45:41,695 - INFO - Server starting on https://0.0.0.0:8000
+2024-11-26 13:46:28,011 - INFO - Starting server...
+2024-11-26 13:46:33,778 - ERROR - 네트워크 드라이브 연결 실패: 시스템 오류 1219이(가) 생겼습니다.
+
+동일한 사용자가 둘 이상의 사용자 이름으로 서버 또는 공유 리소스에 다중 연결할 수 없습니다. 서버나 공유 리소스에 대한 이전 연결을 모두 끊고 다시 시도하십시오.
+
+
+2024-11-26 13:46:33,828 - INFO - Server starting on https://0.0.0.0:8000
+2024-11-26 13:47:59,802 - INFO - Starting server...
+2024-11-26 13:47:59,850 - INFO - 모든 기존 연결이 성공적으로 삭제되었습니다.
+2024-11-26 13:48:17,239 - INFO - Starting server...
+2024-11-26 13:48:17,290 - INFO - 모든 기존 연결이 성공적으로 삭제되었습니다.
+2024-11-26 13:48:22,449 - ERROR - 네트워크 드라이브 연결 실패: 시스템 오류 1219이(가) 생겼습니다.
+
+동일한 사용자가 둘 이상의 사용자 이름으로 서버 또는 공유 리소스에 다중 연결할 수 없습니다. 서버나 공유 리소스에 대한 이전 연결을 모두 끊고 다시 시도하십시오.
+
+
+2024-11-26 13:48:22,505 - INFO - Server starting on https://0.0.0.0:8000
+2024-11-26 13:52:05,222 - INFO - Starting server...
+2024-11-26 13:52:05,266 - INFO - 모든 네트워크 연결이 성공적으로 삭제되었습니다.
+2024-11-26 13:52:10,427 - ERROR - 네트워크 드라이브 연결 실패: 시스템 오류 1219이(가) 생겼습니다.
+
+동일한 사용자가 둘 이상의 사용자 이름으로 서버 또는 공유 리소스에 다중 연결할 수 없습니다. 서버나 공유 리소스에 대한 이전 연결을 모두 끊고 다시 시도하십시오.
+
+
+2024-11-26 13:52:10,478 - INFO - Server starting on https://0.0.0.0:8000
+2024-11-26 13:55:47,478 - INFO - Starting server...
+2024-11-26 13:55:47,534 - INFO - Server starting on https://0.0.0.0:8000
+2024-11-26 13:55:52,970 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/checksheet-history
+2024-11-26 13:55:53,024 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/
+2024-11-26 13:55:53,149 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/static/css/font-awesome.min.css
+2024-11-26 13:55:53,397 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/static/fonts/fontawesome-webfont.woff2?v=4.7.0
+2024-11-26 13:55:55,502 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/get_employee_name
+2024-11-26 13:55:56,477 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/get_employee_name
+2024-11-26 13:55:56,665 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/checkSheet
+2024-11-26 13:55:56,753 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/static/css/font-awesome.min.css
+2024-11-26 13:55:58,453 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/checksheet-history
+2024-11-26 13:55:58,553 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/static/css/font-awesome.min.css
+2024-11-26 13:55:58,616 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/config
+2024-11-26 13:56:00,312 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/search_history
+2024-11-26 13:56:03,816 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/files/list/3165/Checked/T11B19257/
+2024-11-26 13:56:03,946 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/files/get/3165/Checked/T11B19257/0835541900_T11B19257_06.png
+2024-11-26 13:56:19,228 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/search_history
+2024-11-26 13:56:24,250 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/files/list/3165/Checked/T11A02477/
+2024-11-26 13:56:51,556 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/files/list/3165/Checked/T11A02477/
+2024-11-26 13:57:36,018 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/files/list/3165/Checked/T11A02477/
+2024-11-26 13:57:51,287 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/files/list/3165/Checked/T11A02477/
+2024-11-26 13:58:18,048 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/files/list/3165/Checked/T11A02477/
+2024-11-26 14:04:20,566 - INFO - Starting server...
+2024-11-26 14:04:20,622 - INFO - Server starting on https://0.0.0.0:8000
+2024-11-26 14:04:26,694 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/checksheet-history
+2024-11-26 14:04:26,747 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/
+2024-11-26 14:04:26,870 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/static/css/font-awesome.min.css
+2024-11-26 14:04:28,550 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/get_employee_name
+2024-11-26 14:04:29,268 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/get_employee_name
+2024-11-26 14:04:29,446 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/checkSheet
+2024-11-26 14:04:29,551 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/static/css/font-awesome.min.css
+2024-11-26 14:04:30,704 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/checksheet-history
+2024-11-26 14:04:30,800 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/static/css/font-awesome.min.css
+2024-11-26 14:04:30,865 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/config
+2024-11-26 14:04:40,080 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/search_history
+2024-11-26 14:04:41,896 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/files/list/3165/Checked/T11A02477/
+2024-11-26 14:04:48,328 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/check_network_file
+2024-11-26 14:04:48,329 - ERROR - RouteHandler.check_network_file() missing 3 required positional arguments: 'dept_code', 'serial_no', and 'process_value'
+Traceback (most recent call last):
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\flask\app.py", line 1513, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\flask\app.py", line 1499, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**req.view_args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: RouteHandler.check_network_file() missing 3 required positional arguments: 'dept_code', 'serial_no', and 'process_value'
+2024-11-26 14:05:35,946 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/files/list/3165/Checked/T11A02477/
+2024-11-26 14:10:46,429 - INFO - Starting server...
+2024-11-26 14:10:46,492 - INFO - Server starting on https://0.0.0.0:8000
+2024-11-26 14:10:53,728 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/checksheet-history
+2024-11-26 14:10:53,729 - ERROR - 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
+Traceback (most recent call last):
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\flask\app.py", line 1513, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\flask\app.py", line 1489, in dispatch_request
+    self.raise_routing_exception(req)
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\flask\app.py", line 1471, in raise_routing_exception
+    raise request.routing_exception  # type: ignore
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\flask\ctx.py", line 367, in match_request
+    result = self.url_adapter.match(return_rule=True)  # type: ignore
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\werkzeug\routing.py", line 2032, in match
+    raise NotFound()
+werkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
+2024-11-26 14:11:03,580 - INFO - Starting server...
+2024-11-26 14:11:03,634 - INFO - Server starting on https://0.0.0.0:8000
+2024-11-26 14:11:04,483 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/checksheet-history
+2024-11-26 14:11:04,484 - ERROR - 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
+Traceback (most recent call last):
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\flask\app.py", line 1513, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\flask\app.py", line 1489, in dispatch_request
+    self.raise_routing_exception(req)
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\flask\app.py", line 1471, in raise_routing_exception
+    raise request.routing_exception  # type: ignore
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\flask\ctx.py", line 367, in match_request
+    result = self.url_adapter.match(return_rule=True)  # type: ignore
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\werkzeug\routing.py", line 2032, in match
+    raise NotFound()
+werkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
+2024-11-26 14:12:58,447 - INFO - Starting server...
+2024-11-26 14:12:58,504 - INFO - Server starting on https://0.0.0.0:8000
+2024-11-26 14:12:58,771 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/checksheet-history
+2024-11-26 14:12:58,828 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/
+2024-11-26 14:12:58,936 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/static/css/font-awesome.min.css
+2024-11-26 14:12:59,077 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/static/fonts/fontawesome-webfont.woff2?v=4.7.0
+2024-11-26 14:13:00,681 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/get_employee_name
+2024-11-26 14:13:01,403 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/get_employee_name
+2024-11-26 14:13:01,561 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/checkSheet
+2024-11-26 14:13:01,673 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/static/css/font-awesome.min.css
+2024-11-26 14:13:02,592 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/checksheet-history
+2024-11-26 14:13:02,703 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/static/css/font-awesome.min.css
+2024-11-26 14:13:02,759 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/config
+2024-11-26 14:13:03,931 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/search_history
+2024-11-26 14:18:27,724 - INFO - Starting server...
+2024-11-26 14:18:27,772 - INFO - Server starting on https://0.0.0.0:8000
+2024-11-26 14:18:28,025 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/checksheet-history
+2024-11-26 14:18:28,078 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/
+2024-11-26 14:18:28,200 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/static/css/font-awesome.min.css
+2024-11-26 14:18:30,158 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/get_employee_name
+2024-11-26 14:18:30,956 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/get_employee_name
+2024-11-26 14:18:31,149 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/checkSheet
+2024-11-26 14:18:31,251 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/static/css/font-awesome.min.css
+2024-11-26 14:18:32,104 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/checksheet-history
+2024-11-26 14:18:32,191 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/static/css/font-awesome.min.css
+2024-11-26 14:18:32,257 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/config
+2024-11-26 14:18:36,618 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/search_history
+2024-11-26 14:18:36,840 - ERROR - name 'cursor' is not defined
+Traceback (most recent call last):
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\flask\app.py", line 1513, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\flask\app.py", line 1499, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**req.view_args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\Documents\GitHub\eCheckSheet\RouteHandler.py", line 214, in decorated_function
+    return f(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\Documents\GitHub\eCheckSheet\RouteHandler.py", line 485, in search_history
+    cursor.close()
+    ^^^^^^
+NameError: name 'cursor' is not defined. Did you mean: 'cursor1'?
+2024-11-26 14:18:59,294 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/search_history
+2024-11-26 14:18:59,600 - ERROR - name 'cursor' is not defined
+Traceback (most recent call last):
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\flask\app.py", line 1513, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\flask\app.py", line 1499, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**req.view_args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\Documents\GitHub\eCheckSheet\RouteHandler.py", line 214, in decorated_function
+    return f(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\Documents\GitHub\eCheckSheet\RouteHandler.py", line 485, in search_history
+    cursor.close()
+    ^^^^^^
+NameError: name 'cursor' is not defined. Did you mean: 'cursor1'?
+2024-11-26 14:21:19,548 - INFO - Starting server...
+2024-11-26 14:21:19,616 - INFO - Server starting on https://0.0.0.0:8000
+2024-11-26 14:21:20,635 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/checksheet-history
+2024-11-26 14:21:20,689 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/
+2024-11-26 14:21:20,801 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/static/css/font-awesome.min.css
+2024-11-26 14:21:22,530 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/get_employee_name
+2024-11-26 14:21:23,308 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/get_employee_name
+2024-11-26 14:21:23,480 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/checkSheet
+2024-11-26 14:21:23,568 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/static/css/font-awesome.min.css
+2024-11-26 14:21:24,277 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/checksheet-history
+2024-11-26 14:21:24,363 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/static/css/font-awesome.min.css
+2024-11-26 14:21:24,414 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/config
+2024-11-26 14:21:25,714 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/search_history
+2024-11-26 14:22:51,759 - INFO - Starting server...
+2024-11-26 14:22:51,814 - INFO - Server starting on https://0.0.0.0:8000
+2024-11-26 14:22:53,240 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/checksheet-history
+2024-11-26 14:22:53,290 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/
+2024-11-26 14:22:53,408 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/static/css/font-awesome.min.css
+2024-11-26 14:22:54,950 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/get_employee_name
+2024-11-26 14:22:55,675 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/get_employee_name
+2024-11-26 14:22:55,821 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/checkSheet
+2024-11-26 14:22:55,941 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/static/css/font-awesome.min.css
+2024-11-26 14:22:56,616 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/checksheet-history
+2024-11-26 14:22:56,710 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/static/css/font-awesome.min.css
+2024-11-26 14:22:56,775 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/config
+2024-11-26 14:22:57,531 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/search_history
+2024-11-26 14:23:00,119 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/files/list/3165/Checked/T11B19257/
+2024-11-26 14:23:02,471 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/files/get/3165/Checked/T11B19257/0835541900_T11B19257_06.png
+2024-11-26 14:23:15,642 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/search_history
+2024-11-26 14:23:17,009 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/files/list/3165/Checked/T11A02477/
+2024-11-26 14:24:06,752 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/files/list/3165/Checked/T11A02477/
+2024-11-26 14:28:20,436 - INFO - Starting server...
+2024-11-26 14:28:20,486 - INFO - Server starting on https://0.0.0.0:8000
+2024-11-26 14:28:23,298 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/checksheet-history
+2024-11-26 14:28:23,349 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/
+2024-11-26 14:28:23,476 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/static/css/font-awesome.min.css
+2024-11-26 14:28:24,915 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/get_employee_name
+2024-11-26 14:28:25,862 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/get_employee_name
+2024-11-26 14:28:26,001 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/checkSheet
+2024-11-26 14:28:26,104 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/static/css/font-awesome.min.css
+2024-11-26 14:28:27,014 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/checksheet-history
+2024-11-26 14:28:27,122 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/static/css/font-awesome.min.css
+2024-11-26 14:28:27,182 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/config
+2024-11-26 14:28:33,284 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/search_history
+2024-11-26 14:28:34,855 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/files/list/3165/Checked/T11A02477/
+2024-11-26 14:28:34,913 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/network/files/list/3165/Checked/T11A02477/
+2024-11-26 14:28:34,914 - ERROR - RouteHandler.list_network_files() got an unexpected keyword argument 'dept_code'
+Traceback (most recent call last):
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\flask\app.py", line 1513, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\flask\app.py", line 1499, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**req.view_args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: RouteHandler.list_network_files() got an unexpected keyword argument 'dept_code'
+2024-11-26 14:30:03,408 - INFO - Starting server...
+2024-11-26 14:30:03,457 - INFO - Server starting on https://0.0.0.0:8000
+2024-11-26 14:30:05,526 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/checksheet-history
+2024-11-26 14:30:05,571 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/
+2024-11-26 14:30:05,702 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/static/css/font-awesome.min.css
+2024-11-26 14:30:07,464 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/get_employee_name
+2024-11-26 14:30:08,206 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/get_employee_name
+2024-11-26 14:30:08,409 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/checkSheet
+2024-11-26 14:30:08,499 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/static/css/font-awesome.min.css
+2024-11-26 14:30:09,082 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/checksheet-history
+2024-11-26 14:30:09,194 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/static/css/font-awesome.min.css
+2024-11-26 14:30:09,252 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/config
+2024-11-26 14:30:11,566 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/search_history
+2024-11-26 14:30:12,708 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/files/list/3165/Checked/T11A02477/
+2024-11-26 14:30:12,768 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/network/files/list/3165/Checked/T11A02477/
+2024-11-26 14:30:12,769 - ERROR - RouteHandler.list_network_files() got an unexpected keyword argument 'serial_no'
+Traceback (most recent call last):
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\flask\app.py", line 1513, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\flask\app.py", line 1499, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**req.view_args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\Documents\GitHub\eCheckSheet\RouteHandler.py", line 214, in decorated_function
+    return f(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^
+TypeError: RouteHandler.list_network_files() got an unexpected keyword argument 'serial_no'
+2024-11-26 14:33:28,710 - INFO - Starting server...
+2024-11-26 14:33:28,761 - INFO - Server starting on https://0.0.0.0:8000
+2024-11-26 14:33:29,853 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/checksheet-history
+2024-11-26 14:33:29,911 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/
+2024-11-26 14:33:30,034 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/static/css/font-awesome.min.css
+2024-11-26 14:33:31,733 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/get_employee_name
+2024-11-26 14:33:32,468 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/get_employee_name
+2024-11-26 14:33:32,665 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/checkSheet
+2024-11-26 14:33:32,788 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/static/css/font-awesome.min.css
+2024-11-26 14:33:33,505 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/checksheet-history
+2024-11-26 14:33:33,630 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/static/css/font-awesome.min.css
+2024-11-26 14:33:33,682 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/config
+2024-11-26 14:33:35,671 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/search_history
+2024-11-26 14:33:36,855 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/files/list/3165/Checked/T11A02477/
+2024-11-26 14:33:36,910 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/network/files/list/3165/Checked/T11A02477/
+2024-11-26 14:33:36,912 - ERROR - RouteHandler.list_network_files() got an unexpected keyword argument 'serial_no'
+Traceback (most recent call last):
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\flask\app.py", line 1513, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\flask\app.py", line 1499, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**req.view_args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\Documents\GitHub\eCheckSheet\RouteHandler.py", line 214, in decorated_function
+    return f(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^
+TypeError: RouteHandler.list_network_files() got an unexpected keyword argument 'serial_no'
+2024-11-26 14:34:01,814 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/files/list/3165/Checked/T11A02477/
+2024-11-26 14:34:01,869 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/network/files/list/3165/Checked/T11A02477/
+2024-11-26 14:34:01,870 - ERROR - RouteHandler.list_network_files() got an unexpected keyword argument 'serial_no'
+Traceback (most recent call last):
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\flask\app.py", line 1513, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\flask\app.py", line 1499, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**req.view_args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\Documents\GitHub\eCheckSheet\RouteHandler.py", line 214, in decorated_function
+    return f(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^
+TypeError: RouteHandler.list_network_files() got an unexpected keyword argument 'serial_no'
+2024-11-26 14:34:59,680 - INFO - Starting server...
+2024-11-26 14:34:59,736 - INFO - Server starting on https://0.0.0.0:8000
+2024-11-26 14:35:00,832 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/checksheet-history
+2024-11-26 14:35:00,893 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/
+2024-11-26 14:35:01,006 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/static/css/font-awesome.min.css
+2024-11-26 14:35:02,439 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/get_employee_name
+2024-11-26 14:35:03,146 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/get_employee_name
+2024-11-26 14:35:03,349 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/checkSheet
+2024-11-26 14:35:03,456 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/static/css/font-awesome.min.css
+2024-11-26 14:35:04,320 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/checksheet-history
+2024-11-26 14:35:04,426 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/static/css/font-awesome.min.css
+2024-11-26 14:35:04,485 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/config
+2024-11-26 14:35:06,048 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/search_history
+2024-11-26 14:35:07,311 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/files/list/3165/Checked/T11A02477/
+2024-11-26 14:35:14,377 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/network/files/list/3165/Checked/T11A02477/
+2024-11-26 14:35:24,594 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/files/list/3165/Checked/T11A02477/
+2024-11-26 14:35:25,193 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/network/files/list/3165/Checked/T11A02477/
+2024-11-26 14:43:37,808 - INFO - Starting server...
+2024-11-26 14:43:37,861 - INFO - Server starting on https://0.0.0.0:8000
+2024-11-26 14:43:39,583 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/checksheet-history
+2024-11-26 14:43:39,636 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/
+2024-11-26 14:43:39,775 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/static/css/font-awesome.min.css
+2024-11-26 14:43:39,899 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/static/fonts/fontawesome-webfont.woff2?v=4.7.0
+2024-11-26 14:43:41,045 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/get_employee_name
+2024-11-26 14:43:42,319 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/get_employee_name
+2024-11-26 14:43:42,805 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/checkSheet
+2024-11-26 14:43:42,926 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/static/css/font-awesome.min.css
+2024-11-26 14:43:43,956 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/checksheet-history
+2024-11-26 14:43:44,049 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/static/css/font-awesome.min.css
+2024-11-26 14:43:44,109 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/config
+2024-11-26 14:43:46,542 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/search_history
+2024-11-26 14:43:48,368 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/files/list/3165/Checked/T11A02477/
+2024-11-26 14:43:48,546 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/network/files/list/3165/Checked/T11A02477/
+2024-11-26 14:43:51,038 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/network/files/get/3165/Checked/T11A02477/0833412900_T11A02477_06.png
+2024-11-26 14:44:22,267 - INFO - Starting server...
+2024-11-26 14:44:22,318 - INFO - Server starting on https://0.0.0.0:8000
+2024-11-26 14:44:24,192 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/checksheet-history
+2024-11-26 14:44:24,258 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/
+2024-11-26 14:44:24,367 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/static/css/font-awesome.min.css
+2024-11-26 14:44:25,920 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/get_employee_name
+2024-11-26 14:44:26,645 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/get_employee_name
+2024-11-26 14:44:26,788 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/checkSheet
+2024-11-26 14:44:26,891 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/static/css/font-awesome.min.css
+2024-11-26 14:44:28,250 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/checksheet-history
+2024-11-26 14:44:28,339 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/static/css/font-awesome.min.css
+2024-11-26 14:44:28,398 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/config
+2024-11-26 14:44:30,708 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/search_history
+2024-11-26 14:44:32,290 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/files/list/3165/Checked/T11A02477/
+2024-11-26 14:44:32,347 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/network/files/list/3165/Checked/T11A02477/
+2024-11-26 14:44:32,412 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/network/files/get/3165/Checked/T11A02477/0833412900_T11A02477_06.png
+2024-11-26 14:56:40,069 - INFO - Starting server...
+2024-11-26 14:56:40,128 - INFO - Server starting on https://0.0.0.0:8000
+2024-11-26 14:56:41,829 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/checksheet-history
+2024-11-26 14:56:41,890 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/
+2024-11-26 14:56:42,029 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/static/css/font-awesome.min.css
+2024-11-26 14:56:42,204 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/static/fonts/fontawesome-webfont.woff2?v=4.7.0
+2024-11-26 14:56:45,542 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/get_employee_name
+2024-11-26 14:57:01,943 - INFO - Starting server...
+2024-11-26 14:57:01,992 - INFO - Server starting on https://0.0.0.0:8000
+2024-11-26 14:57:04,305 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/
+2024-11-26 14:57:04,417 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/static/css/font-awesome.min.css
+2024-11-26 14:57:06,858 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/get_employee_name
+2024-11-26 14:58:16,197 - INFO - Starting server...
+2024-11-26 14:58:16,253 - INFO - Server starting on https://0.0.0.0:8000
+2024-11-26 14:58:18,475 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/
+2024-11-26 14:58:18,608 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/static/css/font-awesome.min.css
+2024-11-26 14:58:20,966 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/get_employee_name
+2024-11-26 15:57:13,682 - INFO - Starting server...
+2024-11-26 15:57:13,753 - INFO - Server starting on https://0.0.0.0:8000
+2024-11-26 15:57:16,781 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/
+2024-11-26 15:57:16,914 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/static/css/font-awesome.min.css
+2024-11-26 15:57:17,155 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/static/fonts/fontawesome-webfont.woff2?v=4.7.0
+2024-11-26 15:57:18,214 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/get_employee_name
+2024-11-26 15:57:19,012 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/get_employee_name
+2024-11-26 15:57:19,170 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/checkSheet
+2024-11-26 15:57:19,279 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/static/css/font-awesome.min.css
+2024-11-26 15:57:20,962 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/checksheet-history
+2024-11-26 15:57:21,061 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/static/css/font-awesome.min.css
+2024-11-26 15:57:21,117 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/config
+2024-11-26 15:57:23,380 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/checkSheet
+2024-11-26 15:57:23,470 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/static/css/font-awesome.min.css
+2024-11-26 15:59:52,099 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/get_product_info
+2024-11-26 15:59:54,137 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/get_product_info
+2024-11-26 15:59:54,333 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/upload_image/0926632300_3165_T11132573_08_0
+2024-11-26 15:59:54,355 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/static/icon/pen-tool.png
+2024-11-26 15:59:55,083 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/get_checkbox_states?indexNo=0926632300&serialNo=T11132573&processCode=08&deptCode=3165
+2024-11-26 16:00:40,370 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/get_product_info
+2024-11-26 16:00:40,548 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/get_product_info
+2024-11-26 16:00:40,733 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/upload_image/0926632300_3165_T11132573_08_0
+2024-11-26 16:01:05,324 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/get_checkbox_states?indexNo=0926632300&serialNo=T11132573&processCode=08&deptCode=3165
+2024-11-26 16:02:03,735 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/get_product_info
+2024-11-26 16:02:03,976 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/get_product_info
+2024-11-26 16:02:04,153 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/upload_image/0833412900_3165_T11A02477_08_0
+2024-11-26 16:02:21,456 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/get_checkbox_states?indexNo=0833412900&serialNo=T11A02477&processCode=08&deptCode=3165
+2024-11-26 16:02:23,502 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/refresh_session
+2024-11-26 16:05:10,444 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/save_checkbox_states
+2024-11-26 16:05:10,781 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/save_checked_image
+2024-11-26 16:05:20,321 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/get_product_info
+2024-11-26 16:05:20,558 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/get_product_info
+2024-11-26 16:05:20,792 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/upload_image/0833412900_3165_T11A02477_08_0
+2024-11-26 16:05:24,248 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/get_checkbox_states?indexNo=0833412900&serialNo=T11A02477&processCode=08&deptCode=3165
+2024-11-26 16:05:36,982 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/get_product_info
+2024-11-26 16:05:37,216 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/get_product_info
+2024-11-26 16:05:37,432 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/upload_image/0926632300_3165_T11132573_08_0
+2024-11-26 16:05:37,726 - INFO - [10.36.12.101]  GET https://10.36.12.101:8000/get_checkbox_states?indexNo=0926632300&serialNo=T11132573&processCode=08&deptCode=3165
+2024-11-26 16:07:24,321 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/refresh_session
+2024-11-26 16:12:24,285 - INFO - [10.36.12.101]  POST https://10.36.12.101:8000/refresh_session

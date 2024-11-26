@@ -2,6 +2,7 @@ from flask import Flask
 from dotenv import load_dotenv
 import os
 import ssl
+from datetime import timedelta
 
 # .env 파일에서 환경 변수 로드하기
 load_dotenv()
@@ -16,6 +17,9 @@ class FlaskApp:
     def setup_config(self):
         # 환경 변수에서 업로드 폴더 설정
         self.app.config['UPLOAD_FOLDER'] = os.getenv('UPLOAD_FOLDER', './CheckSheet')
+        self.app.config['NETWORK_PATH'] = os.getenv('NETWORK_PATH', './NetworkPath')  # 네트워크 경로 추가
+        self.app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=8)  # 세션 유효 시간 설정
+        self.app.config['SESSION_PERMANENT'] = True  # 영구 세션 활성화
 
     def get_app(self):
         return self.app

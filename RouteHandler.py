@@ -1,4 +1,4 @@
-from flask import render_template, request, jsonify, url_for, send_from_directory, redirect, session
+from flask import render_template, request, jsonify, url_for, send_from_directory, redirect, session, send_file
 import logging
 from werkzeug.utils import secure_filename, safe_join
 from datetime import datetime
@@ -31,7 +31,7 @@ class RouteHandler:
             ('/get_employee_name', self.get_employee_name, ['POST']),
             ('/save_checked_image', self.save_checked_image, ['POST']),
             ('/checkSheet', self.checkSheet, ['GET']),
-            ('/checksheet-history', self.checksheet_history, ['GET']),  # 대시 포함된 URL
+            ('/checksheet-history', self.checksheet_history, ['GET']),
             ('/upload_image/<serial_process>', self.upload_image, ['GET']),
             ('/get_product_info', self.get_product_info, ['POST']),
             ('/search_history', self.search_history, ['POST']),
@@ -40,7 +40,10 @@ class RouteHandler:
             ('/check_login_status', self.check_login_status, ['GET']),
             ('/save_checkbox_states', self.save_checkbox_states, ['POST']),
             ('/get_checkbox_states', self.get_checkbox_states, ['GET']),
-            ('/check_previous_process', self.check_previous_process, ['POST'])
+            ('/check_previous_process', self.check_previous_process, ['POST']),
+            ('/refresh_session', self.refresh_session, ['POST']),
+            ('/network/files/list/<dept_code>/Checked/<serial_no>/', self.list_network_files, ['GET']),
+            ('/network/files/get/<dept_code>/Checked/<serial_no>/<filename>', self.get_network_file, ['GET'])
         ]
 
         # 라우트 등록 시 view_func를 데코레이터로 감싸서 등록
@@ -103,7 +106,7 @@ class RouteHandler:
                 logging.info(f"Session after login: {session}")
                 return jsonify({'employeeName': session['employee_name'], 'deptInfo': session['dept_info']})
             else:
-                return jsonify({'error': 'DB에 없는 사원번호입니다.'}), 404
+                return jsonify({'error': '사원번호가 존재하지 않습니다.\n유저 등록 및 조회는 K-Prism에서 가능합니다.'}), 404
         finally:
             cursor.close()
             self.db_manager_1.close()
@@ -239,31 +242,57 @@ class RouteHandler:
         if index != 0:
             index = int(parts[-1]) - 1
 
-        # 체크 완료된 이미지 경로 확인
+        # 체크 완료된 이미지 경로 확인 (로컬)
         checked_filename = f"{indexNo}_{serial}_{process}.png"
         checked_file_path = os.path.join(self.app.config['UPLOAD_FOLDER'], dept, 'Checked', serial, checked_filename)
+        network_checked_path = os.path.join(self.app.config['NETWORK_PATH'], dept, 'Checked', serial, checked_filename)
 
+        # Process 파일 경로 확인 (로컬 및 네트워크)
+        process_filename = f'{serial}_{index}.png'
+        process_file_path = os.path.join(self.app.config['UPLOAD_FOLDER'], dept, 'Process', serial, process_filename)
+        network_process_path = os.path.join(self.app.config['NETWORK_PATH'], dept, 'Process', serial, process_filename)
+
+        # Master 파일 경로 확인 (로컬 및 네트워크)
+        master_pdf_path = os.path.join(self.app.config['UPLOAD_FOLDER'], dept, 'Master', f'{serial}.pdf')
+        network_master_path = os.path.join(self.app.config['NETWORK_PATH'], dept, 'Master', f'{serial}.pdf')
+
+        # 체크 완료된 이미지 확인
         if os.path.exists(checked_file_path):
-            # 체크 완료된 이미지 경로 확인
             file_path = checked_file_path
             is_checked_image = True
+        elif os.path.exists(network_checked_path):
+            file_path = network_checked_path
+            is_checked_image = True
         else:
-            # Process 내의 파일에서 사각형 인식
-            directory = os.path.join(self.app.config['UPLOAD_FOLDER'], dept, 'Process', serial)
-            os.makedirs(directory, exist_ok=True)
-            filename = f'{serial}_{index}.png'
-            file_path = os.path.join(directory, filename)
             is_checked_image = False
+            # Process 파일 확인
+            if os.path.exists(process_file_path):
+                file_path = process_file_path
+            elif os.path.exists(network_process_path):
+                file_path = network_process_path
+            else:
+                # index가 0이고 Process 파일이 없는 경우 Master PDF 확인
+                if index == 0:
+                    if os.path.exists(master_pdf_path):
+                        master_path = master_pdf_path
+                    elif os.path.exists(network_master_path):
+                        master_path = network_master_path
+                    else:
+                        return jsonify({'error': 'Requested master PDF does not exist.'}), 404
 
-            if index == 0 and not os.path.exists(file_path):
-                master_pdf_path = os.path.join(self.app.config['UPLOAD_FOLDER'], dept, 'Master', f'{serial}.pdf')
-                if os.path.exists(master_pdf_path):
-                    images = convert_from_path(master_pdf_path, dpi=150)
+                    # Master PDF를 이미지로 변환
+                    images = convert_from_path(master_path, dpi=150)
                     master_jpg_path = os.path.join(self.app.config['UPLOAD_FOLDER'], dept, 'Master', f'{serial}.jpg')
                     images[0].save(master_jpg_path, 'JPEG')
                     self.image_processor.split_image_by_horizontal_lines(master_jpg_path)
+                    
+                    # 변환 후 Process 파일 다시 확인
+                    if os.path.exists(process_file_path):
+                        file_path = process_file_path
+                    else:
+                        return jsonify({'error': 'Failed to create process image from master PDF.'}), 500
                 else:
-                    return jsonify({'error': 'Requested master PDF does not exist.'}), 404
+                    return jsonify({'error': 'Requested image does not exist.'}), 404
 
         if not os.path.exists(file_path):
             logging.error(f'Image not found: {file_path}')
@@ -357,7 +386,7 @@ class RouteHandler:
             # 32진수를 10진수로 변환
             index_no_decimal = int(index_no_hex, 32)
             logging.debug(f"Converted IndexNo to Decimal: {index_no_decimal}")
-            # 10진수를 문자열로 변환
+            # 10진수를 문열로 변환
             index_no_str = str(index_no_decimal)
             # 문자열 앞에 0을 채워서 10자리로 만들고 마지막 두 자리를 추출
             index_no = index_no_str.zfill(10)[:-2]
@@ -393,17 +422,39 @@ class RouteHandler:
 
         logging.info(f"검색 파라미터: serial={serial_number}, dept={deptCode}, process_codes={process_codes_str}")
 
-        connection = self.db_manager_2.connect()
-        cursor = connection.cursor()
+        # 두 데이터베이스 연결
+        connection1 = self.db_manager_1.connect()
+        connection2 = self.db_manager_2.connect()
+        cursor1 = connection1.cursor()
+        cursor2 = connection2.cursor()
+        
         try:
             case_statements = []
             process_codes = {code.split(':')[0]: code.split(':')[1] for code in process_codes_str.split(',') if code}
             
+            # 먼저 DCS_HISTORY에서 작업자 번호 목록을 가져옴
+            emp_no_sql = f"""
+            SELECT DISTINCT h.EMP_NO
+            FROM DCS_HISTORY h
+            WHERE h.DEPT_CODE LIKE :dept_code
+            AND h.EMP_NO IS NOT NULL
+            """
+            cursor2.execute(emp_no_sql, {'dept_code': f"%{deptCode}%"})
+            emp_nos = [row[0] for row in cursor2.fetchall()]
+
+            # EMPM에서 작업자 정보를 가져와 딕셔너리로 저장
+            emp_info = {}
+            if emp_nos:
+                emp_list = ",".join(f"'{no}'" for no in emp_nos)
+                emp_sql = f"SELECT EMP_NO, EMP_NAMEK FROM EMPM WHERE EMP_NO IN ({emp_list})"
+                cursor1.execute(emp_sql)
+                emp_info = {row[0]: row[1] for row in cursor1.fetchall()}
+
             for code, name in process_codes.items():
                 case_statements.append(f"MAX(CASE WHEN PROCESS_CODE = '{code}' THEN '{name}' END) AS \"{name}\"")
                 case_statements.append(f"MAX(CASE WHEN PROCESS_CODE = '{code}' THEN COALESCE(TO_CHAR(RENEWAL_D, 'Dy, dd Mon yyyy hh24:mi:ss'), TO_CHAR(ENTRY_D, 'Dy, dd Mon yyyy hh24:mi:ss')) END) AS \"{name} 시간\"")
                 case_statements.append(f"MAX(CASE WHEN PROCESS_CODE = '{code}' THEN STATUS END) AS \"{name} 상태\"")
-                case_statements.append(f"MAX(CASE WHEN PROCESS_CODE = '{code}' THEN EMP_NO END) AS \"{name} 작업자 번호\"")
+                case_statements.append(f"MAX(CASE WHEN PROCESS_CODE = '{code}' THEN h.EMP_NO END) AS \"{name} 작업자 번호\"")
 
             # 서브쿼리로 날짜 조건에 맞는 시리얼 번호를 먼저 찾습니다
             date_conditions = []
@@ -437,24 +488,30 @@ class RouteHandler:
             if serial_number:
                 params['serial_number'] = f"%{serial_number}%"
 
-            cursor.execute(sql, params)
-            results = cursor.fetchall()
+            cursor2.execute(sql, params)
+            results = cursor2.fetchall()
             formatted_results = []
             
             for result in results:
-                result_dict = dict(zip([key[0] for key in cursor.description], result))
+                result_dict = dict(zip([key[0] for key in cursor2.description], result))
                 for process in process_codes.values():
                     if result_dict[f"{process} 시간"] is None:
                         result_dict[f"{process} 상태"] = 0
                         result_dict[f"{process} 시간"] = "-"
                         result_dict[f"{process} 작업자 번호"] = "-"
+                        result_dict[f"{process} 작업자 이름"] = "-"
+                    else:
+                        emp_no = result_dict[f"{process} 작업자 번호"]
+                        result_dict[f"{process} 작업자 이름"] = emp_info.get(emp_no, "-") if emp_no else "-"
                 formatted_results.append(result_dict)
             return jsonify(formatted_results)
         except Exception as e:
             return jsonify({'error': str(e)}), 500
         finally:
-            cursor.close()
-            connection.close()
+            cursor1.close()
+            cursor2.close()
+            connection1.close()
+            connection2.close()
 
     @login_required
     def checksheet_history(self):
@@ -476,7 +533,7 @@ class RouteHandler:
 
     @login_required
     def serve_file(self, filepath):
-        """지정된 파일을 클라이언트에 제공합니다."""
+        """지정된 파일을 클라이언트에 제공합다."""
         # 네트워크 저장 경로
         network_path = self.app.config['UPLOAD_FOLDER']
 
@@ -627,7 +684,7 @@ class RouteHandler:
 
         connection = self.db_manager_2.connect()
         cursor = connection.cursor()
-        # SQL 쿼리 생성 - Y_POSITION으로 먼저 ���렬하고, 같은 Y값을 가진 항목들은 X_POSITION으로 정렬
+        # SQL 쿼리 생성 - Y_POSITION으로 먼저 렬하고, 같은 Y값을 가진 항목들은 X_POSITION으로 정렬
         sql = """
             SELECT CHECKBOX_INDEX, STATE 
             FROM CHECKBOX_STATES 
@@ -658,7 +715,7 @@ class RouteHandler:
         except ValueError:
             return jsonify({'error': '유효하지 않은 바코드 형식입니다.', 'previousCompleted': False}), 400
         
-        # 10진수를 문자열로 변환하고 앞의 8자리와 뒤의 2자리로 ���리
+        # 10진수를 문자열로 변환하고 앞의 8자리와 뒤의 2자리로 리
         index_no_str = str(index_no_decimal).zfill(10)
         index_no = index_no_str[:8]
         index_no_sfix = index_no_str[8:]
@@ -701,6 +758,50 @@ class RouteHandler:
         finally:
             cursor.close()
             connection.close()
+
+    def refresh_session(self):
+        if 'logged_in' in session and session['logged_in']:
+            session.modified = True
+            return jsonify({'valid': True})
+        return jsonify({'valid': False})
+
+    @login_required
+    def list_network_files(self, dept_code, serial_no):
+        try:
+            if not serial_no:
+                return jsonify({'error': '시리얼 번호가 필요합니다.'}), 400
+
+            network_path = os.path.join(self.app.config['NETWORK_PATH'], dept_code, 'Checked', serial_no)
+            
+            if not os.path.exists(network_path):
+                return jsonify([])
+
+            files = [f for f in os.listdir(network_path) if os.path.isfile(os.path.join(network_path, f))]
+            return jsonify(files)
+
+        except Exception as e:
+            logging.error(f"네트워크 파일 목록 조회 중 오류 발생: {str(e)}")
+            return jsonify({'error': str(e)}), 500
+
+    @login_required
+    def get_network_file(self, dept_code, serial_no, filename):
+        try:
+            # 네트워크 경로 구성
+            file_path = os.path.join(
+                self.app.config['NETWORK_PATH'],
+                dept_code,
+                'Checked',
+                serial_no,
+                filename
+            )
+            
+            if os.path.exists(file_path):
+                return send_file(file_path)
+            else:
+                return jsonify({'error': 'File not found'}), 404
+                
+        except Exception as e:
+            return jsonify({'error': str(e)}), 500
 
 
 

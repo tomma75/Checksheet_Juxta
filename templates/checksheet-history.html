@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>체크시트 이력 조회</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/font-awesome.min.css') }}">
     <style>
         body, input, button, select {
             font-size: 20px;
@@ -616,8 +616,8 @@
                 });
                 tableHtml += '</tr><tr>';
                 Object.keys(processMap).forEach(process => {
-                    if (process !== '마운트라벨') { // 마운트라벨 제외
-                        tableHtml += '<td>진행상태</td><td>작업 시간</td><td>작업자 사번</td>';
+                    if (process !== '마운트라벨') {
+                        tableHtml += '<td>진행상태</td><td>작업 시간</td><td style="width: 120px;">작업자</td>';
                     }
                 });
                 tableHtml += '</tr>';
@@ -634,11 +634,19 @@
                         if (process !== '마운트라벨') { // 마운트라벨 제외
                             let statusText = item[process + ' 상태'] === 1 ? 'OK' : item[process + ' 상태'] === 0 ? '미진행' : 'NG';
                             let statusClass = statusText === 'OK' ? 'status-ok' : statusText === 'NG' ? 'status-ng' : 'status-pending';
-                            let statusLink = statusText === '미진행' ? `<span class="status-link ${statusClass}">${statusText}</span>` : `<a href="#" class="status-link ${statusClass}" onclick="openFirstImage('${deptCode}', '${formatDateForPath(item[process + ' 시간'])}', '${item['SERIAL_NO']}', '${process}')">${statusText}</a>`;
+                            let statusLink = statusText === '미진행' ? 
+                                `<span class="status-link ${statusClass}">${statusText}</span>` : 
+                                `<a href="#" class="status-link ${statusClass}" onclick="openFirstImage('${deptCode}', '${formatDateForPath(item[process + ' 시간'])}', '${item['SERIAL_NO']}', '${process}')">${statusText}</a>`;
                             let workTime = statusText === '미진행' ? '-' : formatDate(item[process + ' 시간']);
+                            let empNo = item[process + ' 작업자 번호'] ? item[process + ' 작업자 번호'].trim() : '-';
+                            let empName = item[process + ' 작업자 이름'] || '-';
+                            
                             tableHtml += `<td>${statusLink}</td>`;
                             tableHtml += `<td>${workTime}</td>`;
-                            tableHtml += `<td>${item[process + ' 작업자 번호'].trim()}</td>`;
+                            tableHtml += `<td style="text-align: center;">
+                                <div style="font-weight: bold;">${empNo}</div>
+                                <div style="font-size: 0.9em; color: #666;">${empName}</div>
+                            </td>`;
                         }
                     });
                     tableHtml += '</tr>';
@@ -669,7 +677,7 @@
                     tableHtml += `<button onclick="changePage(${i})" ${i === page ? 'class="active"' : ''}>${i}</button>`;
                 }
 
-                // 마지막 페이지 버튼 표시 (현재 그룹이 마지막 그룹이 아��� 경우)
+                // 마지막 페이지 버튼 표시 (현재 그룹이 마지막 그룹이 아 경우)
                 if (groupEnd < totalPages) {
                     if (groupEnd < totalPages - 1) {
                         tableHtml += '<span>...</span>';
@@ -726,54 +734,59 @@
         // 이미지 열기 함수
         function openFirstImage(deptCode, datePath, serialNo, processName) {
             const processValue = processMap[processName];
-            const listPath = `/files/list/${deptCode}/Checked/${serialNo}/`;
+            const localListPath = `/files/list/${deptCode}/Checked/${serialNo}/`;
+            const networkListPath = `/network/files/list/${deptCode}/Checked/${serialNo}/`;
 
-            // 체크시트 이미지 열기
-            fetch(listPath)
-                .then(response => response.json())
+            // 먼저 로컬 경로에서 체크시트 이미지 확인
+            fetch(localListPath)
+                .then(response => {
+                    if (!response.ok) {
+                        // 로컬 경로에서 파일을 찾지 못한 경우 네트워크 경로 확인
+                        throw new Error('로컬 파일 없음');
+                    }
+                    return response.json();
+                })
                 .then(files => {
+                    if (!Array.isArray(files)) {
+                        throw new Error('로컬 파일 없음');
+                    }
                     const regexPattern = new RegExp(`${serialNo}_${processValue}\\.png$`);
                     const targetFile = files.find(file => regexPattern.test(file));
 
                     if (targetFile) {
                         const filePath = `/files/get/${deptCode}/Checked/${serialNo}/${targetFile}`;
-                        // console.log(`Opening file from: ${filePath}`);
                         window.open(filePath, '_blank');
                     } else {
-                        console.error('No matching files found.', files);
-                        alert('No matching files found.');
+                        throw new Error('로컬 파일 없음');
                     }
                 })
                 .catch(error => {
-                    console.error('Error fetching file list:', error);
-                    alert('Error fetching file list: ' + error.message);
-                });
-        }
-
-        // 마운트 라벨 이미지 열기 함수
-        function openMountLabelImage(deptCode, datePath, serialNo, processName) {
-            const processValue = processMap[processName];
-            const listPath = `/files/list/${deptCode}/MountLabel/${serialNo}/`;
-
-            // 마운트 라벨 이미지 열기
-            fetch(listPath)
-                .then(response => response.json())
-                .then(files => {
-                    const regexPattern = new RegExp(`${serialNo}_${processValue}\\.png$`);
-                    const targetFile = files.find(file => regexPattern.test(file));
-
-                    if (targetFile) {
-                        const filePath = `/files/get/${deptCode}/MountLabel/${serialNo}/${targetFile}`;
-                        // console.log(`Opening file from: ${filePath}`);
-                        window.open(filePath, '_blank');
-                    } else {
-                        console.error('No matching files found.', files);
-                        alert('No matching files found.');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error fetching file list:', error);
-                    alert('Error fetching file list: ' + error.message);
+                    // 로컬 파일이 없는 경우 네트워크 경로 확인
+                    fetch(networkListPath)
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('네트워크 파일 없음');
+                            }
+                            return response.json();
+                        })
+                        .then(networkFiles => {
+                            if (!Array.isArray(networkFiles)) {
+                                throw new Error('네트워크 파일 없음');
+                            }
+                            const regexPattern = new RegExp(`${serialNo}_${processValue}\\.png$`);
+                            const networkTargetFile = networkFiles.find(file => regexPattern.test(file));
+                            
+                            if (networkTargetFile) {
+                                const networkFilePath = `/network/files/get/${deptCode}/Checked/${serialNo}/${networkTargetFile}`;
+                                window.open(networkFilePath, '_blank');
+                            } else {
+                                throw new Error('네트워크 파일 없음');
+                            }
+                        })
+                        .catch(networkError => {
+                            console.error('파일을 찾을 수 없습니다 (로컬 및 네트워크)');
+                            alert('해당하는 체크시트 이미지를 찾을 수 없습니다.');
+                        });
                 });
         }
 
