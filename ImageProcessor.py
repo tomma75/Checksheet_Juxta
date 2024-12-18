@@ -37,10 +37,18 @@ class ImageProcessor:
 
     @staticmethod
     def split_image_by_horizontal_lines(image_path, threshold=200, min_row_height=10):
+        """
+        이미지에서 수평선을 기준으로 이미지를 분할합니다.
+        
+        :param image_path: 이미지를 분할할 이미지 파일의 경로
+        :param threshold: 수평선 검출을 위한 임계값
+        :param min_row_height: 최소 행 높이
+        :return: 분할된 이미지들의 경로 리스트
+        """
         # 이미지 로드
         img = cv2.imread(image_path, cv2.IMREAD_COLOR)
         if img is None:
-            print(f"이미지를 로드할 수 없습니다: {image_path}")
+            print(f"이미지를 불러올 수 없습니다: {image_path}")
             return []
 
         # 회색조로 변환
@@ -112,7 +120,7 @@ class ImageProcessor:
                 print(f"유효하지 않은 크롭 영역: start={start}, end={end}, left_margin={left_margin}, right_margin={right_margin}")
             start = end
 
-        # 이미지 저장 로직 (이전과 동일)
+        # 이미지 저장 로직
         base_directory = os.path.dirname(os.path.dirname(image_path))
         serial_directory = os.path.join(base_directory, 'process')
         serial = os.path.basename(image_path).split('.')[0]
@@ -130,3 +138,44 @@ class ImageProcessor:
                 print(f"빈 이미지를 건너뜁니다: index {index}")
 
         return saved_paths
+
+    @staticmethod
+    def merge_checksheet_images(image_paths, output_path, target_width=800):
+        """
+        모든 체크시트 이미지를 하나의 이미지로 세로로 합칩니다.
+        
+        :param image_paths: 합칠 이미지들의 경로 리스트
+        :param output_path: 합쳐진 이미지를 저장할 경로
+        :param target_width: 모든 이미지의 동일한 너비
+        """
+        images = []
+        # 이미지 불러오기 및 크기 조정
+        for path in image_paths:
+            try:
+                img = Image.open(path)
+                # 비율을 유지하며 높비를 target_width로 조정
+                aspect_ratio = target_width / img.width
+                new_height = int(img.height * aspect_ratio)
+                img = img.resize((target_width, new_height), Image.LANCZOS)
+                images.append(img)
+            except Exception as e:
+                print(f"이미지를 불러오는 중 오류 발생: {path}, 오류: {e}")
+
+        if not images:
+            print("합칠 이미지가 없습니다.")
+            return
+
+        # 모든 이미지의 총 너이 계산
+        total_height = sum(img.height for img in images)
+        # 합쳐질 이미지의 크기 설정
+        merged_image = Image.new('RGB', (target_width, total_height))
+
+        # 이미지 순서대로 합치기
+        current_y = 0
+        for img in images:
+            merged_image.paste(img, (0, current_y))
+            current_y += img.height
+
+        # 합쳐진 이미지 저장
+        merged_image.save(output_path)
+        print(f"체크시트가 성공적으로 합쳐졌습니다: {output_path}")

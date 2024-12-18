@@ -11,7 +11,8 @@ import numpy as np
 import socket
 from functools import wraps
 from PIL import ImageDraw
-
+from ImageProcessor import ImageProcessor
+import json
 
 class RouteHandler:
     def __init__(self, app, db_manager_1, db_manager_2, image_processor):
@@ -20,6 +21,7 @@ class RouteHandler:
         self.db_manager_1 = db_manager_1
         self.db_manager_2 = db_manager_2
         self.image_processor = image_processor
+        self.settings_path = 'Settings.json'  # settings.json 파일 경로 추가
         self.register_routes()
 
     def register_routes(self):
@@ -43,7 +45,8 @@ class RouteHandler:
             ('/check_previous_process', self.check_previous_process, ['POST']),
             ('/refresh_session', self.refresh_session, ['POST']),
             ('/network/files/list/<dept_code>/Checked/<serial_no>/', self.list_network_files, ['GET']),
-            ('/network/files/get/<dept_code>/Checked/<serial_no>/<filename>', self.get_network_file, ['GET'])
+            ('/network/files/get/<dept_code>/Checked/<serial_no>/<filename>', self.get_network_file, ['GET']),
+            ('/get_settings', self.get_settings, ['GET']),  # 새로운 라우트 추가
         ]
 
         # 라우트 등록 시 view_func를 데코레이터로 감싸서 등록
@@ -106,12 +109,17 @@ class RouteHandler:
                 logging.info(f"Session after login: {session}")
                 return jsonify({'employeeName': session['employee_name'], 'deptInfo': session['dept_info']})
             else:
-                return jsonify({'error': '사원번호가 존재하지 않습니다.\n유저 등록 및 조회는 K-Prism에서 가능합니다.'}), 404
+                return jsonify({'error': '사원번호가 존재하지 않��니다.\n유저 등록 및 조회는 K-Prism에서 가능합니다.'}), 404
         finally:
             cursor.close()
             self.db_manager_1.close()
 
     def save_checked_image(self):
+        """
+        체크시트 이미지를 저장하고, 모든 공정이 완료되었을 경우 이미지를 합칩니다.
+        
+        :return: JSON 응답 객체
+        """
         if 'image' not in request.files:
             return jsonify({'error': 'No image part in the request'}), 400
 
@@ -165,13 +173,51 @@ class RouteHandler:
                 db_success = True
                 
                 if db_success and file_success:
+                    # 모든 공정이 완료되었는지 확인 (부품SET 제외)
+                    if self.is_all_process_completed(indexNo, deptCode, serial_no):
+                        # Merged 폴더 경로 설정
+                        merged_folder = os.path.join(self.app.config['UPLOAD_FOLDER'], deptCode, 'Merged')
+                        if not os.path.exists(merged_folder):
+                            os.makedirs(merged_folder)
+                        
+                        # 합쳐질 이미지의 경로 설정 (시리얼 번호로 저장)
+                        merged_image_path = os.path.join(merged_folder, f"{serial_no}.png")
+                        
+                        # 모든 체크시트 이미지 경로 수집 (부품SET 제외)
+                        image_folder = os.path.join(self.app.config['UPLOAD_FOLDER'], deptCode, 'Checked', serial_no)
+                        image_files = sorted([
+                            os.path.join(image_folder, f) for f in os.listdir(image_folder)
+                            if f.startswith(indexNo) and f.endswith('.png') and not f.endswith('08.png')
+                        ])
+                        
+                        # 이미지 합치기 실행
+                        ImageProcessor.merge_checksheet_images(image_files, merged_image_path, target_width=800)
+                        
+                        try:
+                            # Checked 폴더의 이미지 삭제
+                            checked_folder = os.path.join(self.app.config['UPLOAD_FOLDER'], deptCode, 'Checked', serial_no)
+                            if os.path.exists(checked_folder):
+                                for file in os.listdir(checked_folder):
+                                    file_path = os.path.join(checked_folder, file)
+                                    os.remove(file_path)
+                                os.rmdir(checked_folder)  # 빈 폴더 삭제
+                            
+                            # Process 폴더의 이미지 삭제
+                            process_folder = os.path.join(self.app.config['UPLOAD_FOLDER'], deptCode, 'Process', serial_no)
+                            if os.path.exists(process_folder):
+                                for file in os.listdir(process_folder):
+                                    file_path = os.path.join(process_folder, file)
+                                    os.remove(file_path)
+                                os.rmdir(process_folder)  # 빈 폴더 삭제
+                            
+                        except Exception as e:
+                            logging.error(f"이미지 삭제 중 오류 발생: {str(e)}")
+                            # 이미지 삭제 실패해도 저장 성공 메시지는 반환
+                        
                     return jsonify({
                         'success': True,
-                        'message': '체크시트가 성공적으로 저장되었습니다.',
-                        'db_saved': True,
-                        'file_saved': True
+                        'message': '체크시트가 성공적으로 저장되었습니다.'
                     })
-                
             else:
                 return jsonify({
                     'success': False,
@@ -189,8 +235,8 @@ class RouteHandler:
                     os.remove(save_path)
                 except OSError:
                     pass
-            
-            error_message = '데이터베이스 저장 중 오류가 발생했습니다.' if file_success else '이미지 파일 저장 중 오류가 발생했습니다.'
+
+            error_message = '데이터베이스 저장 중 오류가 발생했습니다.' if db_success else '이미지 파일 저장 중 오류가 발생했습니다.'
             return jsonify({
                 'success': False,
                 'message': error_message,
@@ -802,6 +848,66 @@ class RouteHandler:
                 
         except Exception as e:
             return jsonify({'error': str(e)}), 500
+
+    def is_all_process_completed(self, indexNo, deptCode, serial_no):
+        """
+        모든 공정이 완료되었는지 확인하는 함수 (부품SET 제외)
+        
+        :param indexNo: 인덱스 번호
+        :param deptCode: 부서 코드
+        :param serial_no: 시리얼 번호
+        :return: 모든 공정이 완료되었으면 True, 아니면 False
+        """
+        process_order = ['06', '11', '15']  # 부품SET 제외 후 공정 순서
+        try:
+            connection = self.db_manager_2.connect()
+            cursor = connection.cursor()
+            
+            # 각 필수 공정별 상태 확인
+            completed_processes = {}
+            sql = """
+                SELECT PROCESS_CODE, STATUS 
+                FROM DCS_HISTORY 
+                WHERE INDEX_NO = :1 
+                  AND SERIAL_NO = :2 
+                  AND DEPT_CODE = :3
+                  AND PROCESS_CODE = :4
+            """
+            
+            # 각 필수 공정에 대해 상태 확인
+            for process in process_order:
+                cursor.execute(sql, (indexNo, serial_no, deptCode, process))
+                result = cursor.fetchone()
+                if not result or result[1] != 1:  # 공정이 없거나 STATUS가 1이 아닌 경우
+                    return False
+                    
+            return True  # 모든 필수 공정이 STATUS 1로 확인된 경우
+            
+        except Exception as e:
+            print(f"모든 공정 완료 확인 중 오류 발생: {e}")
+            return False
+        finally:
+            cursor.close()
+            connection.close()
+
+    def get_settings(self):
+        """설정 파일을 읽어서 반환하는 메서드"""
+        try:
+            if not os.path.exists(self.settings_path):
+                # 설정 파일이 없으면 기본값으로 생성
+                default_settings = {
+                    "autoCompleteCode": "AAAAAA"
+                }
+                with open(self.settings_path, 'w', encoding='utf-8') as f:
+                    json.dump(default_settings, f, indent=4)
+                return jsonify(default_settings)
+
+            with open(self.settings_path, 'r', encoding='utf-8') as f:
+                settings = json.load(f)
+                return jsonify(settings)
+        except Exception as e:
+            return jsonify({'error': str(e)}), 500
+
 
 
 

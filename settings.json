@@ -3,5 +3,6 @@
     "neuron_port": "1521",
     "neuron_sid": "NEURON",
     "neuron_username": "ymfk_user",
-    "neuron_password": "ymfk_user"
+    "neuron_password": "ymfk_user",
+    "autoCompleteCode": "AAAAAA"
 }

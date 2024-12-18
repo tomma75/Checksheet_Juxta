@@ -9,17 +9,13 @@ set "LOCAL_BASE=%~dp0CheckSheet"
 set "NETWORK_BASE=\\10.36.15.198\CheckSheet"
 
 :: ===== 최신 파일 날짜 찾기 =====
-:: 초기값을 0으로 설정
 set "LATEST_DATE=0"
-:: /r 옵션으로 하위 디렉토리를 포함한 모든 파일을 검색
 for /r "%LOCAL_BASE%" %%F in (*.*) do (
-    :: %%~tF는 파일의 타임스탬프를 반환
-    :: tokens=1-3은 MM/DD/YYYY 형식에서 월/일/년을 분리
-    for /f "tokens=1-3 delims=/" %%a in ('echo %%~tF') do (
-        :: YYYYMMDD 형식으로 날짜를 숫자화
-        :: %%c=년, %%a=월, %%b=일
-        set /a FILE_DATE=%%c*10000 + %%a*100 + %%b
-        :: 현재 파일이 더 최신이면 LATEST_DATE 업데이트
+    for /f "tokens=1-3 delims=- " %%a in ('echo %%~tF') do (
+        set "YEAR=%%a"
+        set "MONTH=%%b"
+        set "DAY=%%c"
+        set /a "FILE_DATE=!YEAR!*10000 + !MONTH!*100 + !DAY!"
         if !FILE_DATE! GTR !LATEST_DATE! (
             set "LATEST_DATE=!FILE_DATE!"
         )
@@ -41,9 +37,11 @@ for /r "%LOCAL_BASE%" %%F in (*.*) do (
     set "REL_PATH=!FULL_PATH:%LOCAL_BASE%=!"
     
     :: 현재 처리중인 파일의 날짜 정보 추출
-    for /f "tokens=1-3 delims=/" %%a in ('echo %%~tF') do (
-        :: 현재 파일의 날짜를 YYYYMMDD 형식으로 변환
-        set /a CURRENT_FILE_DATE=%%c*10000 + %%a*100 + %%b
+    for /f "tokens=1-3 delims=- " %%a in ('echo %%~tF') do (
+        set "YEAR=%%a"
+        set "MONTH=%%b"
+        set "DAY=%%c"
+        set /a "CURRENT_FILE_DATE=!YEAR!*10000 + !MONTH!*100 + !DAY!"
         
         :: 파일이 기준일보다 오래된 경우 처리
         if !CURRENT_FILE_DATE! LSS !TARGET_DATE! (

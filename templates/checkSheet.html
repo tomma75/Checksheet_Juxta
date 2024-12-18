@@ -283,6 +283,7 @@
         const drawingCtx = drawingCanvas.getContext('2d');
 
         let is_checked_image = false;
+        let isCheckSheetModified = false;
 
         // 이벤트 리스너 추가
         document.addEventListener('DOMContentLoaded', function() {
@@ -294,11 +295,17 @@
             drawingCanvas.addEventListener('contextmenu', function(e) {
                 e.preventDefault();
             });
+            
+            drawingCanvas.addEventListener('pointerup', function() {
+                isCheckSheetModified = true;
+            });
 
             // 체크박스 클릭 이벤트 핸들러
             drawingCanvas.addEventListener('click', function(event) {
                 event.preventDefault(); // 기본 동작 방지
                 event.stopPropagation(); // 이벤트 버블링 방지
+
+                isCheckSheetModified = true;
                 
                 const rect = drawingCanvas.getBoundingClientRect();
                 const x = event.clientX - rect.left;
@@ -438,9 +445,31 @@
         }
 
         function processBarcode(barcode) {
-            clearAllDisplays();
             if (barcode.length === 6) {
-                fetchIndexNo(barcode);
+                // 공정 선택 드롭다운에서 마지막 공정 값을 가져옴
+                const processSelect = document.getElementById('processSelect');
+                const lastProcessValue = processSelect.options[processSelect.options.length - 1].value;
+                const currentProcessValue = processSelect.value;
+
+                // Settings.json에서 설정 가져오기
+                fetch('/get_settings')
+                .then(response => response.json())
+                .then(settings => {
+                    // 현재 선택된 공정이 마지막 공정이고 자동완료 코드가 입력된 경우
+                    if (currentProcessValue === lastProcessValue && barcode === settings.autoCompleteCode) {
+                        const checkCompleteBtn = document.getElementById('checkCompleteButton');
+                        if (checkCompleteBtn) {
+                            checkCompleteBtn.click();
+                        }
+                        return;
+                    }
+                    
+                    fetchIndexNo(barcode);
+                })
+                .catch(error => {
+                    console.error('설정 로드 오류:', error);
+                    fetchIndexNo(barcode);
+                });
             } else {
                 errorDisplay.textContent = '6자리의 Index No를 입력해주세요.';
             }
@@ -466,6 +495,9 @@
             let anyCrossed = false;
             let checkboxSaveSuccess = false;
             let imageSaveSuccess = false;
+            
+            // 현재 Serial No를 저장
+            const currentSerialNo = serialNoDisplay.textContent;
 
             // 체크박스 상태 확인
             checkBoxes.forEach((box, index) => {
@@ -538,7 +570,8 @@
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
-                            showMessage(data.message, 'success');
+                            showMessage(data.message, 'success', currentSerialNo);
+                            isCheckSheetModified = false;
                         } else {
                             let errorMsg = data.message;
                             if (!data.db_saved && !data.file_saved) {
@@ -612,64 +645,93 @@
             
         // 바코드가 6자리 입력되면 호출되는 함수
         function fetchIndexNo(barcode) {
+            if (isCheckSheetModified) {
+                if (confirm('현재 체크시트가 완료되지 않았습니다. 저장하시겠습니까?')) {
+                    // 현재 바코드 값을 임시 저장
+                    const newBarcode = barcode;
+                    
+                    // 체크완료 버튼 클릭 이벤트를 직접 실행하고 완료될 때까지 대기
+                    const checkCompleteBtn = document.getElementById('checkCompleteButton');
+                    if (checkCompleteBtn) {
+                        // 저장 프로세스 완료 후 새 바코드 처리를 위한 Promise 생성
+                        new Promise((resolve) => {
+                            checkCompleteBtn.addEventListener('click', function handler() {
+                                checkCompleteBtn.removeEventListener('click', handler);
+                                setTimeout(resolve, 1000); // 저장 프로세스 완료 대기
+                            });
+                            checkCompleteBtn.click();
+                        }).then(() => {
+                            // 저장이 완료된 후에 새 바코드 처리
+                            clearAllDisplays(); // 화면 초기화
+                            processNewBarcode(newBarcode);
+                        });
+                    }
+                }
+            } else {
+                processNewBarcode(barcode);
+            }
+        }
+
+        function processNewBarcode(barcode) {
             startDebugTimer('제품 정보 조회');
             const selectedProcess = document.getElementById('processSelect').value;
             const deptCode = document.getElementById('deptInfo').textContent.split(' ')[0];
 
-            // 먼저 제품 정보를 가져옵니다
-            fetch('/get_product_info', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: new URLSearchParams({'indexNo': barcode})
-            })
-            .then(response => response.json())
-            .then(productData => {
-                endDebugTimer('제품 정보 조회');
-                startDebugTimer('이미지 로드');
-                handleResponse(productData);
-                
-                if (selectedProcess === '08' || selectedProcess === '06') {
-                    fetchProductInfoAndImage(barcode);
-                } else {
-                    // 그 외 공정은 이전 공정 체크 후 진행
-                    fetch('/check_previous_process', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            serialNo: barcode,
-                            currentProcessCode: selectedProcess,
-                            deptCode: deptCode
+                // 기존의 fetchIndexNo 로직
+                fetch('/get_product_info', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams({'indexNo': barcode})
+                })
+                .then(response => response.json())
+                .then(productData => {
+                    endDebugTimer('제품 정보 조회');
+                    startDebugTimer('이미지 로드');
+                    handleResponse(productData);
+                    hideMessage();
+                    
+                    if (selectedProcess === '08' || selectedProcess === '06') {
+                        fetchProductInfoAndImage(barcode);
+                    } else {
+                        // 그 외 공정은 이전 공정 체크 후 진행
+                        fetch('/check_previous_process', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                serialNo: barcode,
+                                currentProcessCode: selectedProcess,
+                                deptCode: deptCode
+                            })
                         })
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.previousCompleted) {
-                            fetchProductInfoAndImage(barcode);
-                        } else {
-                            showMessage('이전 공정이 완료되지 않았습니다. 이전 공정을 먼저 완료해주세요.', 'error');
-                            // 제품 정보는 유지하고 이미지만 숨깁니다
-                            document.getElementById('canvasContainer').style.display = 'none';
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.previousCompleted) {
+                                fetchProductInfoAndImage(barcode);
+                            } else {
+                                showMessage('이전 공정이 완료되지 않았습니다. 이전 공정을 먼저 완료해주세요.', 'error');
+                                // 제품 정보는 유지하고 이미지만 숨깁니다
+                                document.getElementById('canvasContainer').style.display = 'none';
+                                barcodeInput.value = '';
+                            }
+                        })
+                        .catch(error => {
+                            endDebugTimer('이전 공정 체크');
+                            console.error('이전 공정 체크 중 오류:', error);
+                            showMessage('이전 공정 확인 중 오류가 발생했습니다.', 'error');
                             barcodeInput.value = '';
-                        }
-                    })
-                    .catch(error => {
-                        endDebugTimer('이전 공정 체크');
-                        console.error('이전 공정 체크 중 오류:', error);
-                        showMessage('이전 공정 확인 중 오류가 발생했습니다.', 'error');
-                        barcodeInput.value = '';
-                    });
-                }
-            })
-            .catch(error => {
-                endDebugTimer('제품 정보 조회');
-                console.error('Error:', error);
-                errorDisplay.textContent = 'DB에서 정보를 조회할 수 없습니다.';
-            });
-        }
+                        });
+                    }
+                })
+                .catch(error => {
+                    endDebugTimer('제품 정보 조회');
+                    console.error('Error:', error);
+                    errorDisplay.textContent = 'DB에서 정보를 조회할 수 없습니다.';
+                });
+        }   
 
         // 제품 정보와 이미지를 가져오는 함수를 분리
         function fetchProductInfoAndImage(barcode) {
@@ -758,10 +820,10 @@
             const alphanumericRegex = /[^A-Z0-9]/g;
             input.value = input.value.replace(alphanumericRegex, '');
             
-            // 입력 길이가 변경되면 기존 정보 초기화
-            if (input.value.length === 0 || input.value.length > 0) {
-                clearAllDisplays();
-            }
+            // // 입력 길이가 변경되면 기존 정보 초기화
+            // if (input.value.length === 0 || input.value.length > 0) {
+            //     clearAllDisplays();
+            // }
         }
 
         const LONG_PRESS_TIME = 1000; // 길게 누르기로 간주할 시간 (밀리초)
@@ -1051,7 +1113,7 @@
                 });
         }
 
-        function showMessage(message, type = 'error') {
+        function showMessage(message, type = 'error', serialNo = null) {
             const messagesContainer = document.getElementById('messages-container');
             if (!messagesContainer) {
                 console.error('messages-container 요소를 찾을 수 없습니다.');
@@ -1073,11 +1135,11 @@
                 messageDiv.style.backgroundColor = '#f44336'; // 기본 빨간색
             }
 
-            // Serial No 가져오기
-            const serialNo = document.getElementById('serialNo').textContent || 'N/A';
+            // 전달받은 Serial No 사용 또는 현재 표시된 Serial No 사용
+            const displaySerialNo = serialNo || document.getElementById('serialNo').textContent || 'N/A';
 
             // 메시지와 Serial No를 함께 표시
-            messageDiv.innerHTML = `<p>${message}</p><p><strong>Serial No:</strong> ${serialNo}</p>`;
+            messageDiv.innerHTML = `<p>${message}</p><p><strong>Serial No:</strong> ${displaySerialNo}</p>`;
             messagesContainer.appendChild(messageDiv);
         }
 
@@ -1165,6 +1227,13 @@
             });
         }
 
+        // 메시지 숨기는 함수 추가
+        function hideMessage() {
+            const messageElement = document.querySelector('.message');
+            if (messageElement) {
+                messageElement.remove();
+            }
+        }
         // 5분마다 세션 갱신
         setInterval(refreshSession, 300000);
 

@@ -267,7 +267,7 @@
                         <label for="sortOrder">정렬 순서:</label>
                         <select id="sortOrder" name="sortOrder">
                             <option value="asc">오름차순</option>
-                            <option value="desc">내림차</option>
+                            <option value="desc">내림차순</option>
                         </select>
                     </div>
                 </div>
@@ -629,9 +629,9 @@
 
                 // 페이지 데이터 반복
                 pageData.forEach(item => {
-                    tableHtml += `<tr><td>${item['SERIAL_NO']}</td>`;
+                    tableHtml += `<tr><td><a href="#" onclick="openMergedImage('${deptCode}', '${item['SERIAL_NO']}')">${item['SERIAL_NO']}</a></td>`;
                     Object.keys(processMap).forEach(process => {
-                        if (process !== '마운트라벨') { // 마운트라벨 제외
+                        if (process !== '마운트라벨') {
                             let statusText = item[process + ' 상태'] === 1 ? 'OK' : item[process + ' 상태'] === 0 ? '미진행' : 'NG';
                             let statusClass = statusText === 'OK' ? 'status-ok' : statusText === 'NG' ? 'status-ng' : 'status-pending';
                             let statusLink = statusText === '미진행' ? 
@@ -677,7 +677,7 @@
                     tableHtml += `<button onclick="changePage(${i})" ${i === page ? 'class="active"' : ''}>${i}</button>`;
                 }
 
-                // 마지막 페이지 버튼 표시 (현재 그룹이 마지막 그룹이 아 경우)
+                // 마지막 페이지 버튼 표시 (현재 그룹이 마지막 그룹이 아닌 경우)
                 if (groupEnd < totalPages) {
                     if (groupEnd < totalPages - 1) {
                         tableHtml += '<span>...</span>';
@@ -834,6 +834,55 @@
             const avg = logs.reduce((acc, curr) => acc + curr.duration, 0) / logs.length;
             console.log(`${label} 평균 실행 시간: ${avg.toFixed(2)}ms`);
         }
+
+        // 병합된 이미지를 여는 함수 수정
+        function openMergedImage(deptCode, serialNo) {
+            const mergedImagePathLocal = `/files/get/${deptCode}/merged/${serialNo}.png`;
+            const mergedImagePathNetwork = `/network/files/get/${deptCode}/merged/${serialNo}.png`;
+
+            // 로컬 경로에서 병합된 이미지 확인
+            fetch(`/files/list/${deptCode}/merged/`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('로컬 파일 없음');
+                    }
+                    return response.json();
+                })
+                .then(files => {
+                    const targetFile = `${serialNo}.png`;
+                    if (files.includes(targetFile)) {
+                        const filePath = `/files/get/${deptCode}/merged/${targetFile}`;
+                        window.open(filePath, '_blank');
+                    } else {
+                        throw new Error('로컬 파일 없음');
+                    }
+                })
+                .catch(() => {
+                    // 로컬에 없으면 네트워크 경로에서 병합된 이미지 확인
+                    fetch(`/network/files/list/${deptCode}/merged/`)
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('네트워크 파일 없음');
+                            }
+                            return response.json();
+                        })
+                        .then(networkFiles => {
+                            const targetFile = `${serialNo}.png`;
+                            if (networkFiles.includes(targetFile)) {
+                                const networkFilePath = `/network/files/get/${deptCode}/merged/${targetFile}`;
+                                window.open(networkFilePath, '_blank');
+                            } else {
+                                throw new Error('네트워크 파일 없음');
+                            }
+                        })
+                        .catch(() => {
+                            console.error('병합된 이미지를 찾을 수 없습니다 (로컬 및 네트워크)');
+                            alert('해당 시리얼 번호의 병합된 이미지를 찾을 수 없습니다.');
+                        });
+                });
+        }
+
+        
     </script>
 </body>
 </html>
