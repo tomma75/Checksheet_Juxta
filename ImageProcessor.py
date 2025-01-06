@@ -5,7 +5,7 @@ import numpy as np
 
 class ImageProcessor:
     @staticmethod
-    def find_checkboxes(image):
+    def find_checkboxes(image, process_code=None):
         gray = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
         blurred = cv2.GaussianBlur(gray, (3, 3), 0)
         edges = cv2.Canny(blurred, 50, 150)
@@ -20,6 +20,12 @@ class ImageProcessor:
                 if 0.9 <= aspect_ratio <= 1.13:  # 정사각형에 가까운 비율
                     # 작은 사각형만 선택 (예: 10x10 ~ 30x30 픽셀)
                     if 7 <= w <= 25 and 7 <= h <= 25:
+                        # 단자체결기 공정(06)일 경우 제외 영역 체크
+                        if process_code == '06':
+                            # 제외 영역에 있는 체크박스는 건너뜀
+                            if 800 <= x <= image.shape[1] and 200 <= y <= 380:
+                                continue
+                        
                         # 내부 영역의 균일성 검사
                         mask = np.zeros(gray.shape, np.uint8)
                         cv2.drawContours(mask, [cnt], 0, 255, -1)

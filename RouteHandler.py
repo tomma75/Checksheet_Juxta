@@ -109,7 +109,7 @@ class RouteHandler:
                 logging.info(f"Session after login: {session}")
                 return jsonify({'employeeName': session['employee_name'], 'deptInfo': session['dept_info']})
             else:
-                return jsonify({'error': '사원번호가 존재하지 않��니다.\n유저 등록 및 조회는 K-Prism에서 가능합니다.'}), 404
+                return jsonify({'error': '사원번호가 존재하지 않습니다.\n유저 등록 및 조회는 K-Prism에서 가능합니다.'}), 404
         finally:
             cursor.close()
             self.db_manager_1.close()
@@ -287,7 +287,7 @@ class RouteHandler:
         index = int(parts[-1])
         if index != 0:
             index = int(parts[-1]) - 1
-
+        
         # 체크 완료된 이미지 경로 확인 (로컬)
         checked_filename = f"{indexNo}_{serial}_{process}.png"
         checked_file_path = os.path.join(self.app.config['UPLOAD_FOLDER'], dept, 'Checked', serial, checked_filename)
@@ -382,7 +382,8 @@ class RouteHandler:
             # Process 내의 파일에서 사각형 인식
             numpy_image = np.array(pil_image)
             numpy_image = numpy_image[:, :, [2, 1, 0]]
-            result_pil_image, boxes = self.image_processor.find_checkboxes(numpy_image)
+            # process 코드를 전달하여 체크박스 찾기
+            result_pil_image, boxes = self.image_processor.find_checkboxes(numpy_image, process)
             # 비슷한 위치의 박스를 통합하는 함수
             def merge_similar_boxes(boxes, threshold=20):
                 merged_boxes = []
