@@ -13,6 +13,9 @@ from functools import wraps
 from PIL import ImageDraw
 from ImageProcessor import ImageProcessor
 import json
+from apscheduler.schedulers.background import BackgroundScheduler
+import shutil
+import pytz
 
 class RouteHandler:
     def __init__(self, app, db_manager_1, db_manager_2, image_processor):
@@ -23,6 +26,16 @@ class RouteHandler:
         self.image_processor = image_processor
         self.settings_path = 'Settings.json'  # settings.json 파일 경로 추가
         self.register_routes()
+        
+        # 스케줄러 초기화 및 작업 등록 (한국 시간대 설정)
+        self.scheduler = BackgroundScheduler(timezone=pytz.timezone('Asia/Seoul'))
+        self.scheduler.add_job(
+            self.cleanup_processed_files,
+            'cron',
+            hour=6,
+            minute=0
+        )
+        self.scheduler.start()
 
     def register_routes(self):
         routes = [
@@ -47,6 +60,8 @@ class RouteHandler:
             ('/network/files/list/<dept_code>/Checked/<serial_no>/', self.list_network_files, ['GET']),
             ('/network/files/get/<dept_code>/Checked/<serial_no>/<filename>', self.get_network_file, ['GET']),
             ('/get_settings', self.get_settings, ['GET']),  # 새로운 라우트 추가
+            ('/update_and_insert_product_info', self.update_and_insert_product_info, ['POST']),
+            ('/check_index_in_dcs_history', self.check_index_in_dcs_history, ['POST']),
         ]
 
         # 라우트 등록 시 view_func를 데코레이터로 감싸서 등록
@@ -193,27 +208,6 @@ class RouteHandler:
                         # 이미지 합치기 실행
                         ImageProcessor.merge_checksheet_images(image_files, merged_image_path, target_width=800)
                         
-                        try:
-                            # Checked 폴더의 이미지 삭제
-                            checked_folder = os.path.join(self.app.config['UPLOAD_FOLDER'], deptCode, 'Checked', serial_no)
-                            if os.path.exists(checked_folder):
-                                for file in os.listdir(checked_folder):
-                                    file_path = os.path.join(checked_folder, file)
-                                    os.remove(file_path)
-                                os.rmdir(checked_folder)  # 빈 폴더 삭제
-                            
-                            # Process 폴더의 이미지 삭제
-                            process_folder = os.path.join(self.app.config['UPLOAD_FOLDER'], deptCode, 'Process', serial_no)
-                            if os.path.exists(process_folder):
-                                for file in os.listdir(process_folder):
-                                    file_path = os.path.join(process_folder, file)
-                                    os.remove(file_path)
-                                os.rmdir(process_folder)  # 빈 폴더 삭제
-                            
-                        except Exception as e:
-                            logging.error(f"이미지 삭제 중 오류 발생: {str(e)}")
-                            # 이미지 삭제 실패해도 저장 성공 메시지는 반환
-                        
                     return jsonify({
                         'success': True,
                         'message': '체크시트가 성공적으로 저장되었습니다.'
@@ -269,16 +263,6 @@ class RouteHandler:
         dept_info = session.get('dept_info', 'Unknown')
         pen_cursor_url = url_for('static', filename='icon/pen-tool.png')
         return render_template('checkSheet.html', employee_name=employee_name, dept_info=dept_info, pen_cursor_url=pen_cursor_url)
-
-    # @login_required
-    # def mount_label(self):
-    #     # 마운트 라벨 페이지 렌더링
-    #     if 'employee_name' not in session or 'dept_info' not in session:
-    #         return redirect(url_for('login'))
-    #     employee_name = session.get('employee_name', 'Unknown')
-    #     dept_info = session.get('dept_info', 'Unknown')
-    #     pen_cursor_url = url_for('static', filename='icon/pen-tool.png')
-    #     return render_template('mount-label.html', employee_name=employee_name, dept_info=dept_info, pen_cursor_url=pen_cursor_url)
 
     @login_required
     def upload_image(self, serial_process):
@@ -610,72 +594,6 @@ class RouteHandler:
             return jsonify({'loggedIn': True})
         return jsonify({'loggedIn': False})
 
-    # def save_mount_label_image(self):
-    #     """ 마운트 라벨 이미지 저장 """ 
-    #     if 'image' not in request.files:
-    #         return jsonify({'error': 'No image part in the request'}), 400
-    #     # 파일 저장
-    #     file = request.files['image']
-    #     serial_no = request.form['serialNo']
-    #     process_code = request.form['processCode']
-    #     deptCode = request.form['deptCode']
-    #     empNo = request.form['empNo']
-    #     indexNo = request.form['indexNo'][:-2]
-    #     indexNo_sfix = request.form['indexNo'][-2:]
-    #     # 파일 이름 생성
-    #     filename = f"{indexNo}{indexNo_sfix}_{serial_no}_{process_code}.png"
-    #     # 날짜 문자열 생성
-    #     date_str = datetime.now().strftime('%Y-%m-%d')
-    #     pc_name = socket.gethostname()
-    #     # 일일 폴더 생성
-    #     daily_folder = os.path.join(self.app.config['UPLOAD_FOLDER'], deptCode, 'MountLabel', serial_no)
-    #     # 일일 폴더 존재 여부 확인 및 생성
-    #     if not os.path.exists(daily_folder):
-    #         os.makedirs(daily_folder)
-    #     save_path = os.path.join(daily_folder, filename)
-    #     file.save(save_path)
-    #     # 이미지 저장 경로 반환
-    #     if os.path.exists(save_path):
-    #         # 데이터베이스에 정보 삽입
-    #         connection = self.db_manager_2.connect()
-    #         cursor = connection.cursor()
-    #         # SQL 쿼리 생성
-    #         sql = """
-    #             MERGE INTO DCS_HISTORY USING dual
-    #             ON (INDEX_NO = :1 AND INDEX_NO_SFIX = :2 AND SERIAL_NO = :3 AND DEPT_CODE = :4 AND PROCESS_CODE = :5)
-    #             WHEN MATCHED THEN
-    #                 UPDATE SET STATUS = :6, EMP_NO = :7, RENEWAL_D = :8, RENEWAL_BY = :9
-    #             WHEN NOT MATCHED THEN
-    #                 INSERT (INDEX_NO, INDEX_NO_SFIX, SERIAL_NO, DEPT_CODE, PROCESS_CODE, STATUS, EMP_NO, ENTRY_D, ENTRY_BY)
-    #                 VALUES (:1, :2, :3, :4, :5, :6, :7, :8, :9)
-    #         """
-    #         params = (indexNo, indexNo_sfix, serial_no, deptCode, process_code, 1, empNo, date_str, pc_name)
-    #         # 데이터베이스에 정보 삽입
-    #         try:
-    #             cursor.execute(sql, params)
-    #             connection.commit()
-    #             return jsonify({
-    #                 'message': f'Image successfully saved at {save_path} and data recorded in database',
-    #                 'imagePath': f'/files/get/{deptCode}/MountLabel/{date_str}/{serial_no}/{filename}'
-    #             })
-    #         except Exception as e:
-    #             connection.rollback()
-    #             logging.error("Failed to insert image data into database", exc_info=True)
-    #             try:
-    #                 os.remove(save_path)
-    #                 logging.info(f"Removed failed upload file at {save_path}")
-    #             except OSError as os_error:
-    #                 logging.error(f"Failed to remove file at {save_path}: {os_error}")
-    #             return jsonify({'error': str(e)}), 500
-    #         finally:
-    #             cursor.close()
-    #             connection.close()
-    #     # 이미지 저장 경로 반환 
-    #     return jsonify({
-    #         'message': f'Image successfully saved at {save_path}',
-    #         'imagePath': f'/files/get/{deptCode}/MountLabel/{date_str}/{serial_no}/{filename}'
-    #     })
-
     def save_checkbox_states(self):
         """ 체크박스 상태 저장 """
         data = request.json
@@ -735,7 +653,7 @@ class RouteHandler:
         sql = """
             SELECT CHECKBOX_INDEX, STATE 
             FROM CHECKBOX_STATES 
-            WHERE INDEX_NO = :1 AND INDEX_NO_SFIX = :2 AND SERIAL_NO = :3 AND DEPT_CODE = :4 AND PROCESS_CODE = :5
+            WHERE INDEX_NO = :1 AND INDEX_NO_SFIX = :2 AND SERIAL_NO = :3 AND DEPT_CODE = :4 AND PROCESS_CODE = :5 AND DATA_ST = 'A'
             ORDER BY TO_NUMBER(CHECKBOX_INDEX)
         """
 
@@ -792,6 +710,7 @@ class RouteHandler:
                   AND INDEX_NO_SFIX = :2 
                   AND DEPT_CODE = :3 
                   AND PROCESS_CODE = :4
+                  AND DATA_ST = 'A'
             """
             
             cursor.execute(sql, (index_no, index_no_sfix, dept_code, previous_process))
@@ -873,6 +792,7 @@ class RouteHandler:
                   AND SERIAL_NO = :2 
                   AND DEPT_CODE = :3
                   AND PROCESS_CODE = :4
+                  AND DATA_ST = 'A'
             """
             
             # 각 필수 공정에 대해 상태 확인
@@ -908,6 +828,292 @@ class RouteHandler:
                 return jsonify(settings)
         except Exception as e:
             return jsonify({'error': str(e)}), 500
+
+    def check_serial_in_dcs_history(self, serial_no, process_code):
+        """DCS_HISTORY에서 SERIAL_NO와 PROCESS_CODE로 존재 여부를 확인하는 함수"""
+        try:
+            connection = self.db_manager_2.connect()
+            cursor = connection.cursor()
+            
+            sql = """
+                SELECT COUNT(*)
+                FROM DCS_HISTORY
+                WHERE SERIAL_NO = :1
+                  AND PROCESS_CODE = :2
+                  AND DATA_ST = 'A'
+            """
+            cursor.execute(sql, (serial_no, process_code))
+            result = cursor.fetchone()
+            
+            return result[0] > 0
+            
+        finally:
+            cursor.close()
+            connection.close()
+
+    @login_required
+    def update_and_insert_product_info(self):
+        data = request.get_json()
+        indexNo = data.get('indexNo')[:-2]
+        indexNo_sfix = data.get('indexNo')[-2:]
+        serialNo = data.get('serialNo')
+        processCode = data.get('processCode')
+
+        date_str = datetime.now()
+        pc_name = socket.gethostname()
+        # 데이터 유효성 검사
+        if not all([indexNo, indexNo_sfix, serialNo, processCode]):
+            return jsonify({'error': '필수 데이터가 누락되었습니다.'}), 400
+
+        try:
+            connection = self.db_manager_2.connect()
+            cursor = connection.cursor()
+
+            # 트랜잭션 시작
+            connection.begin()
+
+            # DCS_HISTORY 테이블 업데이트: DATA_ST을 'D'로 변경
+            update_dcs_history_sql = """
+                UPDATE DCS_HISTORY
+                SET DATA_ST = 'D'
+                WHERE SERIAL_NO = :1 AND PROCESS_CODE = :2
+            """
+            cursor.execute(update_dcs_history_sql, (serialNo, processCode))
+
+            # CHECKBOX_STATES 테이블 업데이트: DATA_ST을 'D'로 변경
+            update_checkbox_states_sql = """
+                UPDATE CHECKBOX_STATES
+                SET DATA_ST = 'D'
+                WHERE SERIAL_NO = :1 AND PROCESS_CODE = :2
+            """
+            cursor.execute(update_checkbox_states_sql, (serialNo, processCode))
+
+            # 기존 DCS_HISTORY 레코드 조회 - 현재 공정 우선, 없으면 최신 데이터
+            select_dcs_history_sql = """
+                SELECT INDEX_NO, INDEX_NO_SFIX, SERIAL_NO, DEPT_CODE, PROCESS_CODE, STATUS,
+                       EMP_NO, ENTRY_BY, PREV_INDEX_NO, PREV_INDEX_NO_SFIX, DATA_ST
+                FROM (
+                    SELECT *
+                    FROM DCS_HISTORY
+                    WHERE SERIAL_NO = :1
+                    ORDER BY 
+                        CASE WHEN PROCESS_CODE = :2 THEN 0 ELSE 1 END,
+                        TO_NUMBER(INDEX_NO || INDEX_NO_SFIX) DESC
+                )
+                WHERE ROWNUM = 1
+            """
+            cursor.execute(select_dcs_history_sql, (serialNo, processCode))
+            dcs_result = cursor.fetchone()
+
+            # 새로운 레코드 삽입 - processCode는 현재 선택된 공정 코드 사용
+            insert_dcs_history_sql = """
+                INSERT INTO DCS_HISTORY (
+                    INDEX_NO, INDEX_NO_SFIX, SERIAL_NO, DEPT_CODE, PROCESS_CODE, STATUS,
+                    EMP_NO, PREV_INDEX_NO, PREV_INDEX_NO_SFIX, ENTRY_D, ENTRY_BY
+                ) VALUES (
+                    :1, :2, :3, :4, :5, :6,
+                    :7, :8, :9, :10, :11
+                )
+            """
+            cursor.execute(insert_dcs_history_sql, (
+                indexNo, indexNo_sfix, dcs_result[2], dcs_result[3],  # SERIAL_NO, DEPT_CODE
+                processCode, dcs_result[5],  # processCode, STATUS
+                dcs_result[6], dcs_result[0],  # EMP_NO, PREV_INDEX_NO
+                dcs_result[1], date_str, pc_name  # PREV_INDEX_NO_SFIX, ENTRY_D, ENTRY_BY
+            ))
+
+            select_checkbox_states_sql = """
+                WITH RANKED_STATES AS (
+                    SELECT a.*, 
+                           RANK() OVER (
+                               PARTITION BY CHECKBOX_INDEX
+                               ORDER BY 
+                                   CASE WHEN PROCESS_CODE = :2 THEN 0 ELSE 1 END,
+                                   TO_NUMBER(INDEX_NO || INDEX_NO_SFIX) DESC
+                           ) as RNK
+                    FROM CHECKBOX_STATES a
+                    WHERE SERIAL_NO = :1
+                )
+                SELECT 
+                    INDEX_NO, INDEX_NO_SFIX, SERIAL_NO, DEPT_CODE, PROCESS_CODE,
+                    CHECKBOX_INDEX, STATE, ENTRY_D, ENTRY_BY, RENEWAL_D, RENEWAL_BY,
+                    X_POSITION, Y_POSITION, WIDTH, HEIGHT, PREV_INDEX_NO, PREV_INDEX_NO_SFIX, DATA_ST
+                FROM RANKED_STATES
+                WHERE RNK = 1
+                ORDER BY TO_NUMBER(CHECKBOX_INDEX)
+            """
+            cursor.execute(select_checkbox_states_sql, (serialNo, processCode))
+            checkbox_results = cursor.fetchall()  # fetchone() 대신 fetchall() 사용
+
+            # 체크박스 상태 데이터 삽입
+            insert_checkbox_states_sql = """
+                INSERT INTO CHECKBOX_STATES (
+                    INDEX_NO, INDEX_NO_SFIX, SERIAL_NO, DEPT_CODE, PROCESS_CODE,
+                    CHECKBOX_INDEX, STATE, X_POSITION, Y_POSITION, WIDTH, HEIGHT,
+                    PREV_INDEX_NO, PREV_INDEX_NO_SFIX, ENTRY_D, ENTRY_BY
+                ) VALUES (
+                    :1, :2, :3, :4, :5,
+                    :6, :7, :8, :9, :10, :11,
+                    :12, :13, :14, :15
+                )
+            """
+            
+            for checkbox_result in checkbox_results:
+                cursor.execute(insert_checkbox_states_sql, (
+                    indexNo, indexNo_sfix,
+                    checkbox_result[2],  # SERIAL_NO
+                    checkbox_result[3],  # DEPT_CODE
+                    checkbox_result[4],  # PROCESS_CODE
+                    checkbox_result[5],  # CHECKBOX_INDEX
+                    checkbox_result[6],  # STATE
+                    checkbox_result[7],  # X_POSITION
+                    checkbox_result[8],  # Y_POSITION
+                    checkbox_result[9],  # WIDTH
+                    checkbox_result[10], # HEIGHT
+                    checkbox_result[0],  # PREV_INDEX_NO (이전 데이터의 INDEX_NO)
+                    checkbox_result[1],  # PREV_INDEX_NO_SFIX (이전 데이터의 INDEX_NO_SFIX)
+                    date_str,           # ENTRY_D (현재 시간)
+                    pc_name             # ENTRY_BY (PC 이름)
+                ))
+
+            # 트랜잭션 커밋
+            connection.commit()
+
+            return jsonify({'message': '제품 정보가 성공적으로 업데이트되었습니다.'}), 200
+
+        except Exception as e:
+            # 트랜잭션 롤백
+            connection.rollback()
+            logging.error(f"제품 정보 업데이트 중 오류 발생: {e}")
+            return jsonify({'error': '제품 정보 업데이트 중 오류가 발생했습니다.'}), 500
+        finally:
+            cursor.close()
+            connection.close()
+
+    def cleanup_processed_files(self):
+        """
+        매일 오전 6시에 실행되어 merged 폴더의 이미지에 해당하는
+        Checked와 Process 폴더의 파일들을 삭제합니다.
+        """
+        try:
+            # 모든 부서 코드에 대해 처리
+            for dept_code in os.listdir(self.app.config['UPLOAD_FOLDER']):
+                dept_path = os.path.join(self.app.config['UPLOAD_FOLDER'], dept_code)
+                if not os.path.isdir(dept_path):
+                    continue
+
+                merged_path = os.path.join(dept_path, 'Merged')
+                if not os.path.exists(merged_path):
+                    continue
+
+                # Merged 폴더의 모든 이미지 파일 처리
+                for merged_file in os.listdir(merged_path):
+                    if merged_file.endswith('.png'):
+                        serial_no = os.path.splitext(merged_file)[0]
+                        
+                        # 로컬 Checked 폴더 삭제
+                        local_checked_path = os.path.join(dept_path, 'Checked', serial_no)
+                        if os.path.exists(local_checked_path):
+                            shutil.rmtree(local_checked_path)
+                            
+                        # 로컬 Process 폴더 삭제
+                        local_process_path = os.path.join(dept_path, 'Process', serial_no)
+                        if os.path.exists(local_process_path):
+                            shutil.rmtree(local_process_path)
+                            
+                        # 서버 Checked 폴더 삭제
+                        server_checked_path = os.path.join(
+                            self.app.config['NETWORK_PATH'],
+                            dept_code,
+                            'Checked',
+                            serial_no
+                        )
+                        if os.path.exists(server_checked_path):
+                            shutil.rmtree(server_checked_path)
+                            
+                        # 서버 Process 폴더 삭제
+                        server_process_path = os.path.join(
+                            self.app.config['NETWORK_PATH'],
+                            dept_code,
+                            'Process',
+                            serial_no
+                        )
+                        if os.path.exists(server_process_path):
+                            shutil.rmtree(server_process_path)
+                            
+            logging.info(f"일일 파일 정리 작업 완료: {datetime.now()}")
+            
+        except Exception as e:
+            logging.error(f"파일 정리 중 오류 발생: {str(e)}")
+
+    def check_index_in_dcs_history(self):
+        try:
+            data = request.get_json()
+            index_no_hex = data.get('indexNo')
+            dept_code = data.get('deptCode')
+            
+            if not index_no_hex or not dept_code:
+                return jsonify({'error': '필수 파라미터가 누락되었습니다.'}), 400
+
+            # 32진수를 10진수로 변환
+            index_no_decimal = int(index_no_hex, 32)
+            index_no_str = str(index_no_decimal)
+            index_no = index_no_str.zfill(10)[:-2]
+            index_no_sfix = index_no_str[-2:]
+
+            connection = self.db_manager_2.connect()
+            cursor = connection.cursor()
+
+            check_sql = """
+                SELECT DISTINCT
+                    a.INDEX_NO, 
+                    a.INDEX_NO_SFIX, 
+                    a.SERIAL_NO,
+                    b.MS_CODE,
+                    a.DATA_ST
+                FROM DCS_HISTORY a
+                JOIN TDSC952 c ON a.INDEX_NO = c.INDEX_NO 
+                    AND a.INDEX_NO_SFIX = c.INDEX_NO_SFIX
+                JOIN TDSC951 b ON c.PROD_NO = b.PROD_NO 
+                    AND c.PROD_INST_SHEET_REV_NO = b.PROD_INST_SHEET_REV_NO
+                    AND c.PROD_INST_REV_NO = b.PROD_INST_REV_NO
+                    AND c.PROD_ITEM_REV_NO = b.PROD_ITEM_REV_NO
+                    AND c.ORDER_NO = b.ORDER_NO
+                    AND c.ITEM_NO = b.ITEM_NO
+                    AND b.CANCEL_D IS NULL
+                WHERE a.INDEX_NO = :1 
+                    AND a.INDEX_NO_SFIX = :2 
+                    AND a.DEPT_CODE = :3
+                AND ROWNUM = 1
+            """
+            cursor.execute(check_sql, (index_no, index_no_sfix, dept_code))
+            result = cursor.fetchone()
+
+            if result:
+                return jsonify({
+                    'exists': True,
+                    'productInfo': {
+                        'Index_No': result[0],
+                        'Index_No_Sfix': result[1],
+                        'Serial_No': result[2],
+                        'MS_CODE': result[3],
+                        'DATA_ST': result[4]
+                    }
+                })
+            else:
+                return jsonify({
+                    'exists': False,
+                    'productInfo': None
+                })
+
+        except Exception as e:
+            logging.error(f"DCS_HISTORY 조회 중 오류 발생: {str(e)}")
+            return jsonify({'error': '데이터베이스 조회 중 오류가 발생했습니다.'}), 500
+        finally:
+            if cursor:
+                cursor.close()
+            if connection:
+                connection.close()
 
 
 

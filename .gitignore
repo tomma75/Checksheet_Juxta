@@ -5917,3 +5917,17 @@ venv38/Scripts/pyrcc5.exe
 venv38/Scripts/python.exe
 venv38/Scripts/pythonw.exe
 venv38/Scripts/pyuic5.exe
+build/build/Analysis-00.toc
+build/build/base_library.zip
+build/build/CheckSheetServer.pkg
+build/build/EXE-00.toc
+build/build/PKG-00.toc
+build/build/PYZ-00.pyz
+build/build/PYZ-00.toc
+build/build/warn-build.txt
+build/build/xref-build.html
+debug_vertical_lines.png
+logs/web_service.log
+/logs
+*.png
+*.log

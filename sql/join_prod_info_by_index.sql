@@ -22,6 +22,7 @@ JOIN
                AND a.PROD_ITEM_REV_NO = b.PROD_ITEM_REV_NO
                AND a.ORDER_NO = b.ORDER_NO
                AND a.ITEM_NO = b.ITEM_NO
+               AND b.CANCEL_D IS NULL
 WHERE 
     a.INDEX_NO = '{index_no}'
     AND a.INDEX_NO_SFIX = '{index_no_sfix}'
