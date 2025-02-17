@@ -668,6 +668,7 @@
                     }
                 }
             } else {
+                clearAllDisplays();  // 화면 초기화
                 processNewBarcode(barcode);
             }
         }
@@ -691,13 +692,43 @@
             .then(response => response.json())
             .then(dcsData => {
                 if (dcsData.exists) {
-                    // DATA_ST 값 체크
-                    if (dcsData.productInfo.DATA_ST === 'A') {
-                        // 기존 로직 실행
-                        return { json: () => dcsData.productInfo };
+                    // DCS_HISTORY에 존재하는 경우
+                    const productInfo = dcsData.productInfo;
+                    // DATA_ST 확인
+                    if (productInfo.DATA_ST === 'A') {
+                        if (selectedProcess === '08' || selectedProcess === '06') {
+                            fetchProductInfoAndImage(barcode, productInfo);
+                            return null; // Promise 체인 종료
+                        } else {
+                            // 그 외 공정은 이전 공정 체크 후 진행
+                            return fetch('/check_previous_process', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({
+                                    serialNo: productInfo.Serial_No,
+                                    currentProcessCode: selectedProcess,
+                                    deptCode: deptCode
+                                })
+                            })
+                            .then(response => response.json())
+                            .then(checkData => {
+                                if (checkData.previousCompleted) {
+                                    fetchProductInfoAndImage(barcode, productInfo);
+                                } else {
+                                    showMessage('이전 공정이 완료되지 않았습니다. 이전 공정을 먼저 완료해주세요.', 'error');
+                                    document.getElementById('canvasContainer').style.display = 'none';
+                                    barcodeInput.value = '';
+                                }
+                                return null; // Promise 체인 종료
+                            });
+                        }
                     } else {
-                        showMessage('이미 REV UP된 제품입니다. REV UP된 제품의 바코드를 입력해주세요.', 'error');
-                        throw new Error('REV UP 제품');
+                        // DATA_ST가 'A'가 아닌 경우
+                        clearAllDisplays();
+                        showMessage(`이미 REV UP된 제품입니다. REV UP된 바코드를 입력해주세요.`, 'error');
+                        return null; // Promise 체인 종료
                     }
                 } else {
                     // DCS_HISTORY에 존재하지 않는 경우 TDSC952 조회
@@ -715,87 +746,125 @@
                             throw new Error(tdscData.error);
                         }
                         
-                        // TDSC952에서 데이터를 찾은 경우, DCS_HISTORY에 데이터 삽입
-                        return fetch('/update_and_insert_product_info', {
+                        // TDSC952에서 데이터를 찾은 경우, DCS_HISTORY 상태 확인
+                        return fetch('/check_dcs_history_status', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
                             },
                             body: JSON.stringify({
-                                indexNo: tdscData.Index_No,
                                 serialNo: tdscData.Serial_No,
                                 processCode: selectedProcess
                             })
                         })
                         .then(response => response.json())
-                        .then(updateResult => {
-                            if (updateResult.error) {
-                                throw new Error(updateResult.error);
+                        .then(dcsData => {
+                            if (dcsData.exists) {
+                                if (dcsData.data.dataSt === 'A') {
+                                    // DATA_ST가 'A'인 경우 기존 로직 실행
+                                    return fetch('/update_and_insert_product_info', {
+                                        method: 'POST',
+                                        headers: {
+                                            'Content-Type': 'application/json',
+                                        },
+                                        body: JSON.stringify({
+                                            indexNo: tdscData.Index_No,
+                                            serialNo: tdscData.Serial_No,
+                                            processCode: selectedProcess,
+                                            dcsData: dcsData.data  // DCS_HISTORY 상태 정보 추가
+                                        })
+                                    })
+                                    .then(response => response.json())
+                                    .then(updateResult => {
+                                        if (updateResult.error) {
+                                            throw new Error(updateResult.error);
+                                        }
+                                        if (selectedProcess === '08' || selectedProcess === '06') {
+                                            fetchProductInfoAndImage(barcode, tdscData);
+                                        } else {
+                                            return fetch('/check_previous_process', {
+                                                method: 'POST',
+                                                headers: {
+                                                    'Content-Type': 'application/json',
+                                                },
+                                                body: JSON.stringify({
+                                                    serialNo: tdscData.Serial_No,
+                                                    currentProcessCode: selectedProcess,
+                                                    deptCode: deptCode
+                                                })
+                                            })
+                                            .then(response => response.json())
+                                            .then(checkData => {
+                                                if (checkData.previousCompleted) {
+                                                    fetchProductInfoAndImage(barcode, tdscData);
+                                                } else {
+                                                    showMessage('이전 공정이 완료되지 않았습니다. 이전 공정을 먼저 완료해주세요.', 'error');
+                                                    document.getElementById('canvasContainer').style.display = 'none';
+                                                    barcodeInput.value = '';
+                                                }
+                                                return null; // Promise 체인 종료
+                                            });
+                                        }
+                                        return null; // Promise 체인 종료
+                                    });
+                                } else {
+                                    // DATA_ST가 'A'가 아닌 경우
+                                    clearAllDisplays();
+                                    showMessage(`이미 REV UP된 제품입니다. 바코드 ${dcsData.data.indexNo}를 입력해주세요.`, 'error');
+                                    throw new Error('REV UP 제품');
+                                }
+                            } else {
+                                if (selectedProcess === '08' || selectedProcess === '06') {
+                                    fetchProductInfoAndImage(barcode, tdscData);
+                                } else {
+                                    return fetch('/check_previous_process', {
+                                        method: 'POST',
+                                        headers: {
+                                            'Content-Type': 'application/json',
+                                        },
+                                        body: JSON.stringify({
+                                            serialNo: tdscData.Serial_No,
+                                            currentProcessCode: selectedProcess,
+                                            deptCode: deptCode
+                                        })
+                                    })
+                                    .then(response => response.json())
+                                    .then(checkData => {
+                                        if (checkData.previousCompleted) {
+                                            fetchProductInfoAndImage(barcode, tdscData);
+                                        } else {
+                                            showMessage('이전 공정이 완료되지 않았습니다. 이전 공정을 먼저 완료해주세요.', 'error');
+                                            document.getElementById('canvasContainer').style.display = 'none';
+                                            barcodeInput.value = '';
+                                        }
+                                        return null; // Promise 체인 종료
+                                    });
+                                }
+                                return null; // Promise 체인 종료
                             }
-                            return { json: () => tdscData };
                         });
                     });
                 }
             })
-            .then(response => response.json())
-            .then(data => {
-                endDebugTimer('제품 정보 조회');
-                startDebugTimer('이미지 로드');
-                handleResponse(data);
-                
-                if (selectedProcess === '08' || selectedProcess === '06') {
-                    fetchProductInfoAndImage(barcode);
-                } else {
-                    // 그 외 공정은 이전 공정 체크 후 진행
-                    fetch('/check_previous_process', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            serialNo: data.Serial_No,
-                            currentProcessCode: selectedProcess,
-                            deptCode: deptCode
-                        })
-                    })
-                    .then(response => response.json())
-                    .then(checkData => {
-                        if (checkData.previousCompleted) {
-                            fetchProductInfoAndImage(barcode);
-                        } else {
-                            showMessage('이전 공정이 완료되지 않았습니다. 이전 공정을 먼저 완료해주세요.', 'error');
-                            document.getElementById('canvasContainer').style.display = 'none';
-                            barcodeInput.value = '';
-                        }
-                    })
-                    .catch(error => {
-                        endDebugTimer('이전 공정 체크');
-                        console.error('이전 공정 체크 중 오류:', error);
-                        showMessage('이전 공정 확인 중 오류가 발생했습니다.', 'error');
-                        barcodeInput.value = '';
-                    });
+            .then(response => {
+                if (response) {
+                    return response.json();
                 }
+                return null; // 이미 처리된 경우 null 반환
             })
             .catch(error => {
-                endDebugTimer('제품 정보 조회');
-                console.error('Error:', error);
-                errorDisplay.textContent = error.message || 'DB에서 정보를 조회할 수 없습니다.';
+                if (error.message !== 'REV UP 제품') {
+                    console.error('Error:', error);
+                    showMessage('제품 정보 조회 중 오류가 발생했습니다.', 'error');
+                }
             });
         }
 
         // 제품 정보와 이미지를 가져오는 함수를 분리
-        function fetchProductInfoAndImage(barcode) {
+        function fetchProductInfoAndImage(barcode, productInfo = null) {
             startDebugTimer('이미지 로드');
-            fetch('/get_product_info', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: new URLSearchParams({'indexNo': barcode})
-            })
-            .then(response => response.json())
-            .then(data => {
-                handleResponse(data);
+            
+            const loadImageWithProductInfo = (data) => {
                 if (data.Serial_No) {
                     // 제품 정보 컨테이너와 체크 완료 버튼을 함께 표시
                     document.getElementById('productInfoContainer').style.display = 'flex';
@@ -825,40 +894,54 @@
                             is_checked_image = imageData.is_checked_image;
                             loadImage(imageData.image_url);
                             checkBoxes = imageData.checkboxes || [];
-                            // 체크박스 상태 불러오기
-                            fetch(`/get_checkbox_states?indexNo=${encodeURIComponent(data.Index_No)}&serialNo=${encodeURIComponent(data.Serial_No)}&processCode=${encodeURIComponent(selectedProcess)}&deptCode=${encodeURIComponent(deptCode)}`)
-                            .then(response => response.json())
-                            .then(states => {
-                                if (is_checked_image) {
-                                    checkBoxStates = states;
-                                } else {
-                                    // is_checked_image가 false일 때 모든 체크박스 상태를 'default'로 설정
-                                    checkBoxStates = {};
-                                    checkBoxes.forEach((_, index) => {
-                                        checkBoxStates[index] = 'default';
-                                    });
-                                }
-                                redrawCheckboxes();
-                            })
-                            .catch(error => {
-                                console.error('체크박스 상태 불러오기 오류:', error);
-                            });
+                            
+                            return fetch(`/get_checkbox_states?indexNo=${encodeURIComponent(data.Index_No)}&serialNo=${encodeURIComponent(data.Serial_No)}&processCode=${encodeURIComponent(selectedProcess)}&deptCode=${encodeURIComponent(deptCode)}`);
                         } else {
                             throw new Error('이미지 URL이 없습니다.');
                         }
                     })
+                    .then(response => response.json())
+                    .then(states => {
+                        if (is_checked_image) {
+                            checkBoxStates = states;
+                        } else {
+                            checkBoxStates = {};
+                            checkBoxes.forEach((_, index) => {
+                                checkBoxStates[index] = 'default';
+                            });
+                        }
+                        redrawCheckboxes();
+                    })
                     .catch(error => {
-                        console.error('이미지 가져오기 오류:', error);
-                        errorDisplay.textContent = '요청한 이미지가 존재하지 않습니다. Index No 바코드 혹은 공정을 확인해주세요.';
+                        console.error('체크박스 상태 불러오기 오류:', error);
                     });
                 }
-                endDebugTimer('이미지 로드');
-            })
-            .catch(error => {
-                endDebugTimer('이미지 로드');
-                console.error('Error:', error);
-                showMessage('제품 정보를 가져오는 중 오류가 발생했습니다.', 'error');
-            });
+            };
+
+            if (productInfo) {
+                // 이미 제품 정보가 있는 경우 바로 사용
+                handleResponse(productInfo);
+                loadImageWithProductInfo(productInfo);
+            } else {
+                // 제품 정보가 없는 경우에만 API 호출
+                fetch('/get_product_info', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams({'indexNo': barcode})
+                })
+                .then(response => response.json())
+                .then(data => {
+                    handleResponse(data);
+                    loadImageWithProductInfo(data);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showMessage('제품 정보를 가져오는 중 오류가 발생했습니다.', 'error');
+                });
+            }
+            endDebugTimer('이미지 로드');
         }
 
         // 바코드 입력 필드에 영문과 숫자만 입력 허용

@@ -25,7 +25,12 @@ class ImageProcessor:
                             # 제외 영역에 있는 체크박스는 건너뜀
                             if 800 <= x <= image.shape[1] and 200 <= y <= 380:
                                 continue
-                        
+                        elif process_code == '11':
+                            if 800 <= x <= image.shape[1] and 180 <= y <= 350:
+                                continue
+                        elif process_code == '15':
+                            if 850 <= x <= image.shape[1] and 250 <= y <= 400:
+                                continue
                         # 내부 영역의 균일성 검사
                         mask = np.zeros(gray.shape, np.uint8)
                         cv2.drawContours(mask, [cnt], 0, 255, -1)

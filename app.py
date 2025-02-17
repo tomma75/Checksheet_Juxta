@@ -1,7 +1,6 @@
 from flask import Flask
 from dotenv import load_dotenv
 import os
-import ssl
 from datetime import timedelta
 
 # .env 파일에서 환경 변수 로드하기
@@ -53,6 +52,8 @@ def create_app():
 app = create_app()
 
 if __name__ == '__main__':
-    context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
-    context.load_cert_chain('server.crt', 'server.key')
-    app.run(host='0.0.0.0', port=5000, ssl_context=context, debug=True)
+    app.run(
+        host='0.0.0.0',  # 모든 IP에서 접근 가능
+        port=80,         # HTTP 기본 포트
+        debug=False
+    )
