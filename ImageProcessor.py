@@ -26,10 +26,10 @@ class ImageProcessor:
                             if 800 <= x <= image.shape[1] and 200 <= y <= 380:
                                 continue
                         elif process_code == '11':
-                            if 800 <= x <= image.shape[1] and 180 <= y <= 350:
+                            if 825 <= x <= image.shape[1] and 180 <= y <= 350:
                                 continue
                         elif process_code == '15':
-                            if 850 <= x <= image.shape[1] and 250 <= y <= 400:
+                            if 850 <= x <= image.shape[1] and 180 <= y <= 310:
                                 continue
                         # 내부 영역의 균일성 검사
                         mask = np.zeros(gray.shape, np.uint8)

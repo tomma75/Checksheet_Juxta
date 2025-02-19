@@ -9,8 +9,6 @@ a = Analysis(
     datas=[
         ('templates', 'templates'),  # HTML 템플릿 포함
         ('static', 'static'),        # 정적 파일 포함
-        ('server.crt', '.'),         # SSL 인증서
-        ('server.key', '.'),         # SSL 키
         ('settings.json', '.'),      # 설정 파일
     ],
     hiddenimports=[

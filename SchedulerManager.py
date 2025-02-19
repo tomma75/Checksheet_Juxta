@@ -72,10 +72,10 @@ class SchedulerManager:
                 func=self._run_with_context,
                 trigger='cron',
                 hour=6,  # 매일 오전 6시에 실행
-                minute=0,  # 매일 오전 6시에 실행
+                minute=0,
                 id='cleanup_job',
-                name='Daily Cleanup Job',
-                misfire_grace_time=3600,  # 1시간의 유예 시간 설정
+                name='Daily Cleanup and Move Job',
+                misfire_grace_time=3600,
                 replace_existing=True
             )
             self.scheduler.start()
@@ -173,6 +173,7 @@ class SchedulerManager:
         with self.app.app_context():
             try:
                 self.cleanup_processed_files()
+                self.move_old_files()
             except Exception as e:
                 self.logger.error(f"스케줄러 작업 중 예외 발생: {str(e)}")
 
@@ -276,6 +277,63 @@ class SchedulerManager:
             self.logger.error(f"파일 정리 작업 중 오류 발생: {str(e)}")
             print(f"파일 정리 작업 중 오류 발생: {str(e)}")
             
+    def move_old_files(self):
+        """오래된 파일들을 네트워크 드라이브로 이동하는 함수"""
+        try:
+            self.logger.info("오래된 파일 이동 작업을 시작합니다...")
+            
+            # 로컬과 네트워크 경로 설정
+            local_base = os.path.join(self.app.config['UPLOAD_FOLDER'])
+            network_base = os.path.join(self.app.config['NETWORK_PATH'])
+            
+            # 최신 파일 날짜 찾기
+            latest_date = datetime.min
+            for root, _, files in os.walk(local_base):
+                for file in files:
+                    file_path = os.path.join(root, file)
+                    file_time = datetime.fromtimestamp(os.path.getmtime(file_path))
+                    if file_time > latest_date:
+                        latest_date = file_time
+            
+            # 기준일 계산 (2일 전)
+            target_date = latest_date - timedelta(days=2)
+            self.logger.info(f"기준일: {target_date}")
+            
+            # 파일 처리
+            for root, _, files in os.walk(local_base):
+                for file in files:
+                    try:
+                        file_path = os.path.join(root, file)
+                        file_time = datetime.fromtimestamp(os.path.getmtime(file_path))
+                        
+                        # 파일이 기준일보다 오래된 경우
+                        if file_time < target_date:
+                            # 상대 경로 계산
+                            rel_path = os.path.relpath(file_path, local_base)
+                            target_path = os.path.join(network_base, rel_path)
+                            target_dir = os.path.dirname(target_path)
+                            
+                            # 대상 디렉토리 생성
+                            if not os.path.exists(target_dir):
+                                os.makedirs(target_dir, exist_ok=True)
+                            
+                            # 대상 경로에 파일이 없는 경우에만 이동
+                            if not os.path.exists(target_path):
+                                self.logger.info(f"파일 이동: {file_path} -> {target_path}")
+                                shutil.move(file_path, target_path)
+                                self.logger.info(f"파일 이동 완료: {file}")
+                            else:
+                                self.logger.info(f"대상 파일이 이미 존재하여 건너뜀: {target_path}")
+                                
+                    except Exception as e:
+                        self.logger.error(f"파일 처리 중 오류 발생 ({file}): {str(e)}")
+                        continue
+            
+            self.logger.info("오래된 파일 이동 작업이 완료되었습니다.")
+            
+        except Exception as e:
+            self.logger.error(f"파일 이동 작업 중 오류 발생: {str(e)}")
+
     def shutdown(self):
         """스케줄러 종료 시 현재 시리얼 목록을 저장합니다."""
         if self.scheduler.running:

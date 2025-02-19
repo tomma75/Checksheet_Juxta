@@ -47,13 +47,15 @@ class RouteHandler:
             ('/search_history', self.search_history, ['POST']),
             ('/files/list/<path:directory>', self.list_files, ['GET']),
             ('/files/get/<path:filepath>', self.serve_file, ['GET']),
+            ('/network/files/list/<path:directory>', self.list_network_files, ['GET']),
+            ('/network/files/get/<path:filepath>', self.get_network_file, ['GET']),
             ('/check_login_status', self.check_login_status, ['GET']),
             ('/save_checkbox_states', self.save_checkbox_states, ['POST']),
             ('/get_checkbox_states', self.get_checkbox_states, ['GET']),
             ('/check_previous_process', self.check_previous_process, ['POST']),
             ('/refresh_session', self.refresh_session, ['POST']),
-            ('/network/files/list/<dept_code>/Checked/<serial_no>/', self.list_network_files, ['GET']),
-            ('/network/files/get/<dept_code>/Checked/<serial_no>/<filename>', self.get_network_file, ['GET']),
+            # ('/network/files/list/<dept_code>/Checked/<serial_no>/', self.list_network_files, ['GET']),
+            # ('/network/files/get/<dept_code>/Checked/<serial_no>/<filename>', self.get_network_file, ['GET']),
             ('/get_settings', self.get_settings, ['GET']),  # 새로운 라우트 추가
             ('/update_and_insert_product_info', self.update_and_insert_product_info, ['POST']),
             ('/check_index_in_dcs_history', self.check_index_in_dcs_history, ['POST']),
@@ -571,29 +573,45 @@ class RouteHandler:
     @login_required
     def list_files(self, directory):
         """디렉토리 내의 파일 목록을 반환합니다."""
-        actual_path = os.path.join(self.app.config['UPLOAD_FOLDER'], directory)
+        # 로컬 경로와 네트워크 경로 모두 확인
+        local_path = os.path.join(self.app.config['UPLOAD_FOLDER'], directory)
+        network_path = os.path.join(self.app.config['NETWORK_PATH'], directory)
+        
         try:
-            files = os.listdir(actual_path)
-            return jsonify(files)
+            files = set()  # 중복 제거를 위해 set 사용
+            
+            # 로컬 경로 확인
+            if os.path.exists(local_path):
+                files.update(os.listdir(local_path))
+                
+            # 네트워크 경로 확인
+            if os.path.exists(network_path):
+                files.update(os.listdir(network_path))
+                
+            return jsonify(list(files))
         except Exception as e:
             return jsonify({'error': str(e)}), 500
 
     @login_required
     def serve_file(self, filepath):
-        """지정된 파일을 클라이언트에 제공합다."""
-        # 네트워크 저장 경로
-        network_path = self.app.config['UPLOAD_FOLDER']
-
-        # 파일 경로 안전 검증
+        """지정된 파일을 클라이언트에 제공합니다."""
         try:
-            # safe_join을 사용하여 경로를 안전하게 결합하고, 해당 경로에 대한 접근을 확인합니다.
-            safe_file_path = safe_join(network_path, filepath)
-            if not os.path.isfile(safe_file_path):
-                raise FileNotFoundError('The requested file was not found on the server.')
-
-            # 파일 이름 추출 및 send_from_directory를 사용하여 파일 제공
-            directory, filename = os.path.split(safe_file_path)
-            return send_from_directory(directory, filename)
+            # 로컬과 네트워크 경로 모두 확인
+            local_path = safe_join(self.app.config['UPLOAD_FOLDER'], filepath)
+            network_path = safe_join(self.app.config['NETWORK_PATH'], filepath)
+            
+            # 로컬 경로 먼저 확인
+            if os.path.isfile(local_path):
+                directory, filename = os.path.split(local_path)
+                return send_from_directory(directory, filename)
+            
+            # 네트워크 경로 확인
+            if os.path.isfile(network_path):
+                directory, filename = os.path.split(network_path)
+                return send_from_directory(directory, filename)
+                
+            raise FileNotFoundError('The requested file was not found on the server.')
+            
         except Exception as e:
             return jsonify({'error': str(e)}), 404
 
@@ -736,33 +754,22 @@ class RouteHandler:
         return jsonify({'valid': False})
 
     @login_required
-    def list_network_files(self, dept_code, serial_no):
+    def list_network_files(self, directory):
+        """네트워크 경로의 파일 목록을 반환합니다."""
+        actual_path = os.path.join(self.app.config['NETWORK_PATH'], directory)
         try:
-            if not serial_no:
-                return jsonify({'error': '시리얼 번호가 필요합니다.'}), 400
-
-            network_path = os.path.join(self.app.config['NETWORK_PATH'], dept_code, 'Checked', serial_no)
-            
-            if not os.path.exists(network_path):
-                return jsonify([])
-
-            files = [f for f in os.listdir(network_path) if os.path.isfile(os.path.join(network_path, f))]
+            files = os.listdir(actual_path)
             return jsonify(files)
-
         except Exception as e:
-            logging.error(f"네트워크 파일 목록 조회 중 오류 발생: {str(e)}")
             return jsonify({'error': str(e)}), 500
 
     @login_required
-    def get_network_file(self, dept_code, serial_no, filename):
+    def get_network_file(self, filepath):
         try:
             # 네트워크 경로 구성
             file_path = os.path.join(
                 self.app.config['NETWORK_PATH'],
-                dept_code,
-                'Checked',
-                serial_no,
-                filename
+                filepath
             )
             
             if os.path.exists(file_path):

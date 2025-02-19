@@ -734,59 +734,29 @@
         // 이미지 열기 함수
         function openFirstImage(deptCode, datePath, serialNo, processName) {
             const processValue = processMap[processName];
-            const localListPath = `/files/list/${deptCode}/Checked/${serialNo}/`;
-            const networkListPath = `/network/files/list/${deptCode}/Checked/${serialNo}/`;
-
-            // 먼저 로컬 경로에서 체크시트 이미지 확인
-            fetch(localListPath)
+            const listPath = `/files/list/${deptCode}/Checked/${serialNo}/`;
+            
+            fetch(listPath)
                 .then(response => {
                     if (!response.ok) {
-                        // 로컬 경로에서 파일을 찾지 못한 경우 네트워크 경로 확인
-                        throw new Error('로컬 파일 없음');
+                        throw new Error('파일 목록을 가져올 수 없습니다.');
                     }
                     return response.json();
                 })
                 .then(files => {
-                    if (!Array.isArray(files)) {
-                        throw new Error('로컬 파일 없음');
-                    }
                     const regexPattern = new RegExp(`${serialNo}_${processValue}\\.png$`);
                     const targetFile = files.find(file => regexPattern.test(file));
-
+                    
                     if (targetFile) {
                         const filePath = `/files/get/${deptCode}/Checked/${serialNo}/${targetFile}`;
                         window.open(filePath, '_blank');
                     } else {
-                        throw new Error('로컬 파일 없음');
+                        throw new Error('파일을 찾을 수 없습니다.');
                     }
                 })
                 .catch(error => {
-                    // 로컬 파일이 없는 경우 네트워크 경로 확인
-                    fetch(networkListPath)
-                        .then(response => {
-                            if (!response.ok) {
-                                throw new Error('네트워크 파일 없음');
-                            }
-                            return response.json();
-                        })
-                        .then(networkFiles => {
-                            if (!Array.isArray(networkFiles)) {
-                                throw new Error('네트워크 파일 없음');
-                            }
-                            const regexPattern = new RegExp(`${serialNo}_${processValue}\\.png$`);
-                            const networkTargetFile = networkFiles.find(file => regexPattern.test(file));
-                            
-                            if (networkTargetFile) {
-                                const networkFilePath = `/network/files/get/${deptCode}/Checked/${serialNo}/${networkTargetFile}`;
-                                window.open(networkFilePath, '_blank');
-                            } else {
-                                throw new Error('네트워크 파일 없음');
-                            }
-                        })
-                        .catch(networkError => {
-                            console.error('파일을 찾을 수 없습니다 (로컬 및 네트워크)');
-                            alert('해당하는 체크시트 이미지를 찾을 수 없습니다.');
-                        });
+                    console.error('파일을 찾을 수 없습니다:', error);
+                    alert('해당하는 체크시트 이미지를 찾을 수 없습니다.');
                 });
         }
 
@@ -837,48 +807,27 @@
 
         // 병합된 이미지를 여는 함수 수정
         function openMergedImage(deptCode, serialNo) {
-            const mergedImagePathLocal = `/files/get/${deptCode}/merged/${serialNo}.png`;
-            const mergedImagePathNetwork = `/network/files/get/${deptCode}/merged/${serialNo}.png`;
-
-            // 로컬 경로에서 병합된 이미지 확인
+            const filePath = `/files/get/${deptCode}/merged/${serialNo}.png`;
+            
+            // 단일 API 호출로 파일 확인
             fetch(`/files/list/${deptCode}/merged/`)
                 .then(response => {
                     if (!response.ok) {
-                        throw new Error('로컬 파일 없음');
+                        throw new Error('파일 목록을 가져올 수 없습니다.');
                     }
                     return response.json();
                 })
                 .then(files => {
                     const targetFile = `${serialNo}.png`;
                     if (files.includes(targetFile)) {
-                        const filePath = `/files/get/${deptCode}/merged/${targetFile}`;
                         window.open(filePath, '_blank');
                     } else {
-                        throw new Error('로컬 파일 없음');
+                        throw new Error('파일을 찾을 수 없습니다.');
                     }
                 })
-                .catch(() => {
-                    // 로컬에 없으면 네트워크 경로에서 병합된 이미지 확인
-                    fetch(`/network/files/list/${deptCode}/merged/`)
-                        .then(response => {
-                            if (!response.ok) {
-                                throw new Error('네트워크 파일 없음');
-                            }
-                            return response.json();
-                        })
-                        .then(networkFiles => {
-                            const targetFile = `${serialNo}.png`;
-                            if (networkFiles.includes(targetFile)) {
-                                const networkFilePath = `/network/files/get/${deptCode}/merged/${targetFile}`;
-                                window.open(networkFilePath, '_blank');
-                            } else {
-                                throw new Error('네트워크 파일 없음');
-                            }
-                        })
-                        .catch(() => {
-                            console.error('병합된 이미지를 찾을 수 없습니다 (로컬 및 네트워크)');
-                            alert('해당 시리얼 번호의 병합된 이미지를 찾을 수 없습니다.');
-                        });
+                .catch(error => {
+                    console.error('이미지를 찾을 수 없습니다:', error);
+                    alert('해당 시리얼 번호의 병합된 이미지를 찾을 수 없습니다.');
                 });
         }
 

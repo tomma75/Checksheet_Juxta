@@ -30,10 +30,9 @@ def run_server_with_retry(max_retries=3, retry_delay=5):
             app.run(
                 host='0.0.0.0',
                 port=80,
-                debug=True,
-                use_reloader=False  # 자동 재로드 비활성화
+                debug=False,  # 프로덕션 환경에서는 debug=False로 설정
+                use_reloader=False
             )
-            # 정상 종료시 루프 탈출
             break
         except SystemExit as e:
             retry_count += 1
