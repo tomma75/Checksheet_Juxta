@@ -55,5 +55,5 @@ if __name__ == '__main__':
     app.run(
         host='0.0.0.0',  # 모든 IP에서 접근 가능
         port=80,         # HTTP 기본 포트
-        debug=False
+        debug=True
     )

@@ -236,9 +236,16 @@
                     <option value="11">조립</option>
                     <option value="15">출하검사</option>
                 </select>
+                <select id="3186_processSelect" name="3186_processSelect" style="display: none;">
+                    <option value="04">부품SET</option>
+                    <option value="07">공통화조립</option>
+                    <option value="10">2자검사</option>
+                    <option value="11">포장</option>
+                </select>
                 <label for="deptSelect">라인 선택:</label>
                 <select id="deptSelect" name="deptSelect">
                     <option value="3165">UTA</option>
+                    <option value="3186">JUXTA</option>
                 </select>
                 <!-- 기존 라벨과 입력 필드 구조를 컨테이너로 감싸서 같은 행에 배치 -->
                 <div class="date-range-container">
@@ -288,7 +295,22 @@
             // setupEventListeners(); // 다른 이벤트 리스너 설정
             fetchConfig();
             initializeProcessMap();
-            
+
+            document.getElementById('deptSelect').addEventListener('change', () => {
+                console.log('deptSelect changed:', document.getElementById('deptSelect').value);
+                const deptCode = document.getElementById('deptSelect').value;
+                const processSelectId = deptCode + "_processSelect";
+                const processSelect = document.getElementById(processSelectId);
+                
+                if (processSelect) {
+                    // 공정 선택 초기화
+                    const sortProcessSelect = document.getElementById('sortProcess');
+                    sortProcessSelect.innerHTML = '<option value="">선택하세요</option>'; // 초기화
+                    initializeProcessMap(); // 공정 맵 초기화
+                } else {
+                    console.error('No process select found for the given deptCode:', deptCode);
+                }
+            });
             // 정렬 옵션 변경 시 자동으로 결과 업데이트
             document.getElementById('sortProcess').addEventListener('change', () => {
                 if (window.lastSearchData) {
@@ -305,9 +327,11 @@
 
         // 공정 맵 초기화 함수
         function initializeProcessMap() {
-            const processSelect = document.getElementById('3165_processSelect');
+            const deptCode = document.getElementById('deptSelect').value;
+            const processSelectId = deptCode + "_processSelect";
+            const processSelect = document.getElementById(processSelectId);
             const sortProcessSelect = document.getElementById('sortProcess');
-            
+            console.log('processSelect:', processSelect);
             if (processSelect) {
                 processMap = Array.from(processSelect.options).reduce((map, option) => {
                     map[option.text] = option.value;
@@ -534,7 +558,8 @@
             var formData = new FormData(document.getElementById('searchForm'));
             var processSelectId = deptCode + "_processSelect";
             var processSelect = document.getElementById(processSelectId);
-            
+            console.log('processSelect:', processSelect);
+
             if (serialNumber) {
                 formData.set('serialNumber', serialNumber);
             }

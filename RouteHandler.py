@@ -60,6 +60,7 @@ class RouteHandler:
             ('/update_and_insert_product_info', self.update_and_insert_product_info, ['POST']),
             ('/check_index_in_dcs_history', self.check_index_in_dcs_history, ['POST']),
             ('/check_dcs_history_status', self.check_dcs_history_status, ['POST']),
+            ('/insert_dcs_history',self.insert_dcs_history,['POST'])
         ]
 
         # 라우트 등록 시 view_func를 데코레이터로 감싸서 등록
@@ -168,20 +169,44 @@ class RouteHandler:
                 # DB 저장 시도
                 connection = self.db_manager_2.connect()
                 cursor = connection.cursor()
-                
-                sql = """
-                    MERGE INTO DCS_HISTORY USING dual
-                    ON (INDEX_NO = :1 AND INDEX_NO_SFIX = :2 AND SERIAL_NO = :3 AND DEPT_CODE = :4 AND PROCESS_CODE = :5)
-                    WHEN MATCHED THEN
-                        UPDATE SET STATUS = :6, EMP_NO = :7, RENEWAL_D = :8, RENEWAL_BY = :9
-                    WHEN NOT MATCHED THEN
-                        INSERT (INDEX_NO, INDEX_NO_SFIX, SERIAL_NO, DEPT_CODE, PROCESS_CODE, STATUS, EMP_NO, ENTRY_D, ENTRY_BY)
-                        VALUES (:1, :2, :3, :4, :5, :6, :7, :8, :9)
-                """
-                
-                params = (indexNo, indexNo_sfix, serial_no, deptCode, process_code, result, empNo, date_str, pc_name)
-                
-                cursor.execute(sql, params)
+                sql_check = """
+                                SELECT RENEWAL_D
+                                FROM DCS_HISTORY_DBG
+                                WHERE INDEX_NO=:1 AND INDEX_NO_SFIX=:2
+                                AND SERIAL_NO=:3 AND DEPT_CODE=:4
+                                AND PROCESS_CODE=:5 AND DATA_ST='A'
+                            """
+                cursor.execute(sql_check, (indexNo, indexNo_sfix, serial_no, deptCode, process_code))
+                row = cursor.fetchone()
+                renewal_d_value = row[0]
+
+                sql_model = """
+                    SELECT T951.MODEL FROM TDSC951 T951, TDSC952 T952
+                    WHERE T951.PROD_NO = T952.PROD_NO 
+                    AND T952.SERIAL_NO =:1
+                    """
+                cursor.execute(sql_model, (serial_no,))
+                row = cursor.fetchone()
+                model = row[0] if row else None
+
+                if renewal_d_value is None:
+                    sql_update = """
+                        UPDATE DCS_HISTORY_DBG
+                        SET STATUS = :1, EMP_NO = :2, FINISH_D = :3
+                        WHERE INDEX_NO = :4 AND INDEX_NO_SFIX = :5 AND SERIAL_NO = :6 AND DEPT_CODE = :7 AND PROCESS_CODE = :8 AND DATA_ST = 'A'
+                    """
+                    params = (result, empNo, date_str, indexNo, indexNo_sfix, serial_no, deptCode, process_code)
+                    cursor.execute(sql_update, params)
+                else:
+                    # RENEWAL_D가 NULL이 아닐 경우
+                    sql_update = """
+                        UPDATE DCS_HISTORY_DBG
+                        SET STATUS = :1, EMP_NO = :2, RENEWAL_FINISH_D = :3, RENEWAL_BY = :4
+                        WHERE INDEX_NO = :4 AND INDEX_NO_SFIX = :5 AND SERIAL_NO = :6 AND DEPT_CODE = :7 AND PROCESS_CODE = :8 AND DATA_ST = 'A'
+                    """
+                    params = (result, empNo, date_str, pc_name, indexNo, indexNo_sfix, serial_no, deptCode, process_code)
+                    cursor.execute(sql_update, params)
+
                 connection.commit()
                 db_success = True
                 
@@ -195,16 +220,28 @@ class RouteHandler:
                         
                         # 합쳐질 이미지의 경로 설정 (시리얼 번호로 저장)
                         merged_image_path = os.path.join(merged_folder, f"{serial_no}.png")
-                        
-                        # 모든 체크시트 이미지 경로 수집 (부품SET 제외)
-                        image_folder = os.path.join(self.app.config['UPLOAD_FOLDER'], deptCode, 'Checked', serial_no)
-                        image_files = sorted([
-                            os.path.join(image_folder, f) for f in os.listdir(image_folder)
-                            if f.startswith(serial_no) and f.endswith('.png') and not f.endswith('_08.png')
-                        ])
-                        
-                        # 이미지 합치기 실행
-                        ImageProcessor.merge_checksheet_images(image_files, merged_image_path, target_width=800)
+                        if deptCode in ['3165','UTA']:
+                            # 모든 체크시트 이미지 경로 수집 (부품SET 제외)
+                            image_folder = os.path.join(self.app.config['UPLOAD_FOLDER'], deptCode, 'Checked', serial_no)
+                            image_files = sorted([
+                                os.path.join(image_folder, f) for f in os.listdir(image_folder)
+                                if f.startswith(serial_no) and f.endswith('.png') and not f.endswith('_08.png')
+                            ])
+                            
+                            # 이미지 합치기 실행
+                            ImageProcessor.merge_checksheet_images_uta(image_files, merged_image_path, target_width=800)
+                        elif deptCode in ['3186','JUXTA']:
+                            # 모든 체크시트 이미지 경로 수집 (부품SET 제외)
+                            image_folder = os.path.join(self.app.config['UPLOAD_FOLDER'], deptCode, 'Checked', serial_no)
+                            image_files = sorted([
+                                os.path.join(image_folder, f) for f in os.listdir(image_folder)
+                                if f.startswith(serial_no) and f.endswith('.png')
+                            ])
+                            if model != 'VJ77':
+                                VJ77_image_paths = (rf'\\10.36.15.199\UTA_Checksheet_Server\CheckSheet\3186\process\{serial_no}\{serial_no}_0.png')
+                                image_files.insert(0, VJ77_image_paths)
+                            # 이미지 합치기 실행
+                            ImageProcessor.merge_checksheet_images_juxta(image_files, merged_image_path, target_width=800)
                         
                     return jsonify({
                         'success': True,
@@ -269,14 +306,15 @@ class RouteHandler:
         index = int(parts[-1])
         if index != 0:
             index = int(parts[-1]) - 1
-        
+        if parts[1] == '3186':
+            index = int(parts[-1])
         # 체크박스 상태 확인을 위한 DB 조회
         connection = self.db_manager_2.connect()
         cursor = connection.cursor()
         try:
             cursor.execute("""
                 SELECT COUNT(*)
-                FROM CHECKBOX_STATES 
+                FROM CHECKBOX_STATES_DBG 
                 WHERE SERIAL_NO = :1 
                 AND DEPT_CODE = :2 
                 AND PROCESS_CODE = :3
@@ -284,10 +322,20 @@ class RouteHandler:
             """, (serial, dept, process))
             checkbox_count = cursor.fetchone()[0]
             is_checked_image = checkbox_count > 0
+            sql_model = """
+                SELECT T951.MODEL FROM TDSC951 T951, TDSC952 T952
+                WHERE T951.PROD_NO = T952.PROD_NO 
+                AND T952.SERIAL_NO =:1
+                """
+            cursor.execute(sql_model, (serial,))
+            row = cursor.fetchone()
+            model = row[0] if row else None
         finally:
             cursor.close()
             connection.close()
-
+        if model == 'VJ77':
+            if index != 0 :
+                index -= 1
         # 체크 완료된 이미지 경로 확인 (로컬)
         checked_filename = f"{serial}_{process}.png"
         checked_file_path = os.path.join(self.app.config['UPLOAD_FOLDER'], dept, 'Checked', serial, checked_filename)
@@ -318,29 +366,36 @@ class RouteHandler:
                 file_path = network_process_path
             else:
                 # index가 0이고 Process 파일이 없는 경우 Master PDF 확인
-                if index == 0:
+                if dept == '3186':
+                    master_pdf_path = os.path.join(self.app.config['UPLOAD_FOLDER'], dept, 'Master', f'{serial}_0.pdf')
+                    network_master_path = os.path.join(self.app.config['NETWORK_PATH'], dept, 'Master', f'{serial}_0.pdf')
+                else:
                     master_pdf_path = os.path.join(self.app.config['UPLOAD_FOLDER'], dept, 'Master', f'{serial}.pdf')
                     network_master_path = os.path.join(self.app.config['NETWORK_PATH'], dept, 'Master', f'{serial}.pdf')
-                    
-                    if os.path.exists(master_pdf_path):
-                        master_path = master_pdf_path
-                    elif os.path.exists(network_master_path):
-                        master_path = network_master_path
-                    else:
-                        return jsonify({'error': 'Requested master PDF does not exist.'}), 404
-
-                    # Master PDF를 이미지로 변환
-                    images = convert_from_path(master_path, dpi=150)
-                    master_jpg_path = os.path.join(self.app.config['UPLOAD_FOLDER'], dept, 'Master', f'{serial}.jpg')
-                    images[0].save(master_jpg_path, 'JPEG')
-                    self.image_processor.split_image_by_horizontal_lines(master_jpg_path)
-                    
-                    if os.path.exists(process_file_path):
-                        file_path = process_file_path
-                    else:
-                        return jsonify({'error': 'Failed to create process image from master PDF.'}), 500
+                
+                if os.path.exists(master_pdf_path):
+                    master_path = master_pdf_path
+                    base_folder_ori = self.app.config['UPLOAD_FOLDER']
+                elif os.path.exists(network_master_path):
+                    master_path = network_master_path
+                    base_folder_ori = self.app.config['NETWORK_PATH']
                 else:
-                    return jsonify({'error': 'Requested image does not exist.'}), 404
+                    return jsonify({'error': 'Requested master PDF does not exist.'}), 404
+
+                # Master PDF를 이미지로 변환
+                images = convert_from_path(master_path, dpi=150)
+                if dept == '3186':
+                    master_jpg_path = os.path.join(self.app.config['UPLOAD_FOLDER'], dept, 'Master', f'{serial}_0.png')
+                    images[0].save(master_jpg_path, 'PNG')
+                else:
+                    master_jpg_path = os.path.join(self.app.config['UPLOAD_FOLDER'], dept, 'Master', f'{serial}.png')
+                    images[0].save(master_jpg_path, 'PNG')
+                self.image_processor.convert_pdf_to_process_images(dept, process, serial, base_folder=self.app.config['UPLOAD_FOLDER'], model=model, base_folder_ori=base_folder_ori)
+                
+                if os.path.exists(process_file_path):
+                    file_path = process_file_path
+                else:
+                    return jsonify({'error': 'Failed to create process image from master PDF.'}), 500
 
         if not os.path.exists(file_path):
             logging.error(f'Image not found: {file_path}')
@@ -357,7 +412,7 @@ class RouteHandler:
             try:
                 cursor.execute("""
                     SELECT CHECKBOX_INDEX, X_POSITION, Y_POSITION, WIDTH, HEIGHT
-                    FROM CHECKBOX_STATES 
+                    FROM CHECKBOX_STATES_DBG 
                     WHERE INDEX_NO = :1 AND INDEX_NO_SFIX = :2 AND SERIAL_NO = :3 AND DEPT_CODE = :4 AND PROCESS_CODE = :5
                     ORDER BY TO_NUMBER(CHECKBOX_INDEX)
                 """, (indexNo[:8], indexNo[8:], serial, dept, process))
@@ -385,7 +440,7 @@ class RouteHandler:
             numpy_image = np.array(pil_image)
             numpy_image = numpy_image[:, :, [2, 1, 0]]
             # process 코드를 전달하여 체크박스 찾기
-            result_pil_image, boxes = self.image_processor.find_checkboxes(numpy_image, process)
+            result_pil_image, boxes = self.image_processor.find_checkboxes(numpy_image, process, model=model, dept=dept)
             # 비슷한 위치의 박스를 통합하는 함수
             def merge_similar_boxes(boxes, threshold=20):
                 merged_boxes = []
@@ -426,6 +481,55 @@ class RouteHandler:
         })
 
     @login_required
+    def insert_dcs_history(self):
+        """
+        - FormData로 넘어온 serialNo, processCode, deptCode, empNo, indexNo 등
+        - DCS_HISTORY에 MERGE
+        - JSON으로 성공/에러 응답
+        """
+        if request.method == 'POST':
+            serial_no = request.form['serialNo']
+            process_code = request.form['processCode']
+            deptCode = request.form['deptCode']
+            empNo = request.form['empNo']
+            indexNo = request.form['indexNo'][:-2]
+            indexNo_sfix = request.form['indexNo'][-2:]
+            date_str = datetime.now()
+            pc_name = socket.gethostname()
+            if not all([serial_no, process_code, deptCode, empNo, indexNo]):
+                return jsonify({'error': '파라미터가 누락되었습니다.'}), 400
+
+            connection = self.db_manager_2.connect()
+            cursor = connection.cursor()
+            try:
+                sql = """
+                    MERGE INTO DCS_HISTORY_DBG USING dual
+                    ON (INDEX_NO = :1 AND INDEX_NO_SFIX = :2 AND SERIAL_NO = :3 AND DEPT_CODE = :4 AND PROCESS_CODE = :5)
+                    WHEN MATCHED THEN
+                        UPDATE SET EMP_NO = :6, RENEWAL_D = :7, RENEWAL_BY = :8
+                    WHEN NOT MATCHED THEN
+                        INSERT (INDEX_NO, INDEX_NO_SFIX, SERIAL_NO, DEPT_CODE, PROCESS_CODE, EMP_NO, ENTRY_D, ENTRY_BY, DATA_ST)
+                        VALUES (:1, :2, :3, :4, :5, :6, :7, :8, 'A')
+                """
+                
+                params = (indexNo, indexNo_sfix, serial_no, deptCode, process_code, empNo, date_str, pc_name)
+                
+                cursor.execute(sql, params)
+                connection.commit()
+                return jsonify({'message': 'DCS_HISTORY 저장(병합) 완료'}), 200
+            
+            except Exception as e:
+                connection.rollback()
+                return jsonify({'error': str(e)}), 500
+            finally:
+                if 'cursor' in locals():
+                    cursor.close()
+                if 'connection' in locals():
+                    connection.close()
+        else:
+            return jsonify({'error': 'Only POST method is allowed'}), 405
+
+    @login_required
     def get_product_info(self):
         # 제품 정보 가져오기
         logging.debug("get_product_info called")
@@ -453,7 +557,8 @@ class RouteHandler:
                     return jsonify({
                         'MS_CODE': product_info[10],
                         'Serial_No': product_info[6], 
-                        'Index_No': index_no + index_no_sfix
+                        'Index_No': index_no + index_no_sfix,
+                        'construction_No': product_info[9]
                     })
                 else:
                     return jsonify({'error': 'DB에 없는 제품 정보입니다.'}), 404
@@ -484,7 +589,7 @@ class RouteHandler:
             # 먼저 DCS_HISTORY에서 작업자 번호 목록을 가져옴
             emp_no_sql = f"""
             SELECT DISTINCT h.EMP_NO
-            FROM DCS_HISTORY h
+            FROM DCS_HISTORY_DBG h
             WHERE h.DEPT_CODE LIKE :dept_code
             AND h.EMP_NO IS NOT NULL
             """
@@ -517,13 +622,13 @@ class RouteHandler:
             sql = f"""
             WITH FILTERED_SERIALS AS (
                 SELECT DISTINCT SERIAL_NO
-                FROM DCS_HISTORY
+                FROM DCS_HISTORY_DBG
                 WHERE DEPT_CODE LIKE :dept_code
                 AND {date_where_clause}
                 {f"AND SERIAL_NO LIKE :serial_number" if serial_number else ""}
             )
             SELECT h.SERIAL_NO, {', '.join(case_statements)}
-            FROM DCS_HISTORY h
+            FROM DCS_HISTORY_DBG h
             INNER JOIN FILTERED_SERIALS fs ON h.SERIAL_NO = fs.SERIAL_NO
             WHERE h.DEPT_CODE LIKE :dept_code
             GROUP BY h.SERIAL_NO
@@ -648,7 +753,7 @@ class RouteHandler:
             for index, state in checkbox_states.items():
                 position = checkbox_positions[index]
                 cursor.execute("""
-                    MERGE INTO CHECKBOX_STATES cs
+                    MERGE INTO CHECKBOX_STATES_DBG cs
                     USING (SELECT :1 AS INDEX_NO, :2 AS INDEX_NO_SFIX, :3 AS SERIAL_NO, 
                                 :4 AS DEPT_CODE, :5 AS PROCESS_CODE, :6 AS CHECKBOX_INDEX FROM DUAL) src
                     ON (cs.INDEX_NO = src.INDEX_NO AND cs.INDEX_NO_SFIX = src.INDEX_NO_SFIX 
@@ -659,8 +764,8 @@ class RouteHandler:
                                 cs.WIDTH = :10, cs.HEIGHT = :11, cs.RENEWAL_D = CURRENT_TIMESTAMP, cs.RENEWAL_BY = :12
                     WHEN NOT MATCHED THEN
                         INSERT (INDEX_NO, INDEX_NO_SFIX, SERIAL_NO, DEPT_CODE, PROCESS_CODE, CHECKBOX_INDEX, 
-                                STATE, X_POSITION, Y_POSITION, WIDTH, HEIGHT, ENTRY_BY, RENEWAL_BY)
-                        VALUES (:1, :2, :3, :4, :5, :6, :7, :8, :9, :10, :11, :12, :12)
+                                STATE, X_POSITION, Y_POSITION, WIDTH, HEIGHT, ENTRY_BY, RENEWAL_BY, DATA_ST)
+                        VALUES (:1, :2, :3, :4, :5, :6, :7, :8, :9, :10, :11, :12, :12, 'A')
                 """, (index_no, index_no_sfix, serial_no, dept_code, process_code, index, 
                     state, position['x'], position['y'], position['width'], position['height'], pc_name))
             # 데이터베이스에 정보 삽입
@@ -686,7 +791,7 @@ class RouteHandler:
         # SQL 쿼리 생성 - Y_POSITION으로 먼저 렬하고, 같은 Y값을 가진 항목들은 X_POSITION으로 정렬
         sql = """
             SELECT CHECKBOX_INDEX, STATE 
-            FROM CHECKBOX_STATES 
+            FROM CHECKBOX_STATES_DBG 
             WHERE INDEX_NO = :1 AND INDEX_NO_SFIX = :2 AND SERIAL_NO = :3 AND DEPT_CODE = :4 AND PROCESS_CODE = :5 AND DATA_ST = 'A'
             ORDER BY TO_NUMBER(CHECKBOX_INDEX)
         """
@@ -709,14 +814,26 @@ class RouteHandler:
         dept_code = data.get('deptCode')
         
         # 공정 순서 정의
-        process_order = ['08', '06', '11', '15']  # 부품SET, 단자체결기, 조립, 출하검사 순서
-        
+        dept_process_map = {
+            '3165': {  # UTA
+                'order': ['08', '06', '11', '15'],
+                'skip':  ['08', '06']  # 이전 공정 체크를 스킵할 공정
+            },
+            '3186': {  # JUXTA
+                'order': ['04', '07', '10', '11'],
+                'skip':  ['04','07']        # 이전 공정은 이전 공정 체크 안 함
+            }
+        }
+
         try:
             # 현재 공정의 인덱스 찾기
+            process_order = dept_process_map[dept_code]['order']
+            skip_processes = dept_process_map[dept_code]['skip']
+
             current_index = process_order.index(current_process)
             
             # 부품SET(08)와 단자체결기(06)는 이전 공정 체크 불필요
-            if current_process in ['08', '06']:
+            if current_process in skip_processes:
                 return jsonify({'previousCompleted': True})
                 
             # 이전 공정 코드 가져오기
@@ -728,7 +845,7 @@ class RouteHandler:
             # 이전 공정의 완료 상태 확인
             sql = """
                 SELECT STATUS 
-                FROM DCS_HISTORY 
+                FROM DCS_HISTORY_DBG 
                 WHERE SERIAL_NO = :1 
                   AND DEPT_CODE = :2 
                   AND PROCESS_CODE = :3
@@ -789,16 +906,24 @@ class RouteHandler:
         :param serial_no: 시리얼 번호
         :return: 모든 공정이 완료되었으면 True, 아니면 False
         """
-        process_order = ['06', '11', '15']  # 부품SET 제외 후 공정 순서
+
         try:
             connection = self.db_manager_2.connect()
             cursor = connection.cursor()
             
             # 각 필수 공정별 상태 확인
-            completed_processes = {}
+            required_processes = []
+            if deptCode == '3165':
+                required_processes = ['06','11','15']
+            elif deptCode == '3186':
+                required_processes = ['07','10','11']
+            else:
+                # 그 외 부서코드는 처리 대상 외
+                print(f"알 수 없는 부서 코드: {deptCode}, 공정 완료 체크 로직 없음.")
+                return True  # 혹은 False
             sql = """
                 SELECT PROCESS_CODE, STATUS 
-                FROM DCS_HISTORY 
+                FROM DCS_HISTORY_DBG 
                 WHERE INDEX_NO = :1 
                   AND SERIAL_NO = :2 
                   AND DEPT_CODE = :3
@@ -807,7 +932,7 @@ class RouteHandler:
             """
             
             # 각 필수 공정에 대해 상태 확인
-            for process in process_order:
+            for process in required_processes:
                 cursor.execute(sql, (indexNo, serial_no, deptCode, process))
                 result = cursor.fetchone()
                 if not result or result[1] != 1:  # 공정이 없거나 STATUS가 1이 아닌 경우
@@ -848,7 +973,7 @@ class RouteHandler:
             
             sql = """
                 SELECT COUNT(*)
-                FROM DCS_HISTORY
+                FROM DCS_HISTORY_DBG
                 WHERE SERIAL_NO = :1
                   AND PROCESS_CODE = :2
                   AND DATA_ST = 'A'
@@ -890,7 +1015,7 @@ class RouteHandler:
 
             # DCS_HISTORY 테이블 업데이트: DATA_ST을 'D'로 변경
             update_dcs_history_sql = """
-                UPDATE DCS_HISTORY
+                UPDATE DCS_HISTORY_DBG
                 SET DATA_ST = 'D'
                 WHERE SERIAL_NO = :1 AND PROCESS_CODE = :2
             """
@@ -898,7 +1023,7 @@ class RouteHandler:
 
             # CHECKBOX_STATES 테이블 업데이트: DATA_ST을 'D'로 변경
             update_checkbox_states_sql = """
-                UPDATE CHECKBOX_STATES
+                UPDATE CHECKBOX_STATES_DBG
                 SET DATA_ST = 'D'
                 WHERE SERIAL_NO = :1 AND PROCESS_CODE = :2
             """
@@ -906,7 +1031,7 @@ class RouteHandler:
 
             # 새로운 레코드 삽입 - processCode는 현재 선택된 공정 코드 사용
             insert_dcs_history_sql = """
-                INSERT INTO DCS_HISTORY (
+                INSERT INTO DCS_HISTORY_DBG (
                     INDEX_NO, INDEX_NO_SFIX, SERIAL_NO, DEPT_CODE, PROCESS_CODE, STATUS,
                     EMP_NO, PREV_INDEX_NO, PREV_INDEX_NO_SFIX, ENTRY_D, ENTRY_BY
                 ) VALUES (
@@ -930,7 +1055,7 @@ class RouteHandler:
                                    CASE WHEN PROCESS_CODE = :1 THEN 0 ELSE 1 END,
                                    TO_NUMBER(INDEX_NO || INDEX_NO_SFIX) DESC
                            ) as RNK
-                    FROM CHECKBOX_STATES a
+                    FROM CHECKBOX_STATES_DBG a
                     WHERE SERIAL_NO = :2
                 )
                 SELECT 
@@ -946,7 +1071,7 @@ class RouteHandler:
 
             # 체크박스 상태 데이터 삽입
             insert_checkbox_states_sql = """
-                INSERT INTO CHECKBOX_STATES (
+                INSERT INTO CHECKBOX_STATES_DBG (
                     INDEX_NO, INDEX_NO_SFIX, SERIAL_NO, DEPT_CODE, PROCESS_CODE,
                     CHECKBOX_INDEX, STATE, X_POSITION, Y_POSITION, WIDTH, HEIGHT,
                     PREV_INDEX_NO, PREV_INDEX_NO_SFIX, ENTRY_D, ENTRY_BY
@@ -1013,8 +1138,9 @@ class RouteHandler:
                     a.INDEX_NO_SFIX, 
                     a.SERIAL_NO,
                     b.MS_CODE,
-                    a.DATA_ST
-                FROM DCS_HISTORY a
+                    a.DATA_ST,
+                    c.START_NO
+                FROM DCS_HISTORY_DBG a
                 JOIN TDSC952 c ON a.INDEX_NO = c.INDEX_NO 
                     AND a.INDEX_NO_SFIX = c.INDEX_NO_SFIX
                 JOIN TDSC951 b ON c.PROD_NO = b.PROD_NO 
@@ -1039,7 +1165,8 @@ class RouteHandler:
                         'Index_No': result[0] + result[1],
                         'Serial_No': result[2],
                         'MS_CODE': result[3],
-                        'DATA_ST': result[4]
+                        'DATA_ST': result[4],
+                        'construction_No': result[5] if result[5] is not None else '착공번호 없음'
                     }
                 })
             else:
@@ -1073,7 +1200,7 @@ class RouteHandler:
                        EMP_NO, ENTRY_BY, PREV_INDEX_NO, PREV_INDEX_NO_SFIX, DATA_ST
                 FROM (
                     SELECT *
-                    FROM DCS_HISTORY
+                    FROM DCS_HISTORY_DBG
                     WHERE SERIAL_NO = :1
                     ORDER BY 
                         CASE WHEN PROCESS_CODE = :2 THEN 0 ELSE 1 END,

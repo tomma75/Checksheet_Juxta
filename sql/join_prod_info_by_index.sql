@@ -8,6 +8,7 @@ SELECT
     a.SERIAL_NO,
     a.INDEX_NO,
     a.INDEX_NO_SFIX,
+    NVL(TO_CHAR(a.START_NO), 'null') AS START_NO,
     b.ORDER_ENTRY_CODE,
     b.MS_CODE,
     b.MODEL,

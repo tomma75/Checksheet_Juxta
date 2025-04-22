@@ -220,7 +220,7 @@
                 deptInfo = data.deptInfo || '';
                 employeeNameDisplay.textContent = employeeName;
                 deptInfoDisplay.textContent = deptInfo;
-                if (deptInfo.includes('UTA')) {
+                if (deptInfo.includes('UTA') || deptInfo.includes('JUXTA')) {
                     loginButton.disabled = false;
                 } else {
                     errorDisplay.textContent = '이 부서(라인)은 전자체크시트를 지원하지 않습니다.';
