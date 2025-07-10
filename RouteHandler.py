@@ -171,7 +171,7 @@ class RouteHandler:
                 cursor = connection.cursor()
                 sql_check = """
                                 SELECT RENEWAL_D
-                                FROM DCS_HISTORY_DBG
+                                FROM DCS_HISTORY
                                 WHERE INDEX_NO=:1 AND INDEX_NO_SFIX=:2
                                 AND SERIAL_NO=:3 AND DEPT_CODE=:4
                                 AND PROCESS_CODE=:5 AND DATA_ST='A'
@@ -191,7 +191,7 @@ class RouteHandler:
 
                 if renewal_d_value is None:
                     sql_update = """
-                        UPDATE DCS_HISTORY_DBG
+                        UPDATE DCS_HISTORY
                         SET STATUS = :1, EMP_NO = :2, FINISH_D = :3
                         WHERE INDEX_NO = :4 AND INDEX_NO_SFIX = :5 AND SERIAL_NO = :6 AND DEPT_CODE = :7 AND PROCESS_CODE = :8 AND DATA_ST = 'A'
                     """
@@ -200,7 +200,7 @@ class RouteHandler:
                 else:
                     # RENEWAL_D가 NULL이 아닐 경우
                     sql_update = """
-                        UPDATE DCS_HISTORY_DBG
+                        UPDATE DCS_HISTORY
                         SET STATUS = :1, EMP_NO = :2, RENEWAL_FINISH_D = :3, RENEWAL_BY = :4
                         WHERE INDEX_NO = :4 AND INDEX_NO_SFIX = :5 AND SERIAL_NO = :6 AND DEPT_CODE = :7 AND PROCESS_CODE = :8 AND DATA_ST = 'A'
                     """
@@ -314,7 +314,7 @@ class RouteHandler:
         try:
             cursor.execute("""
                 SELECT COUNT(*)
-                FROM CHECKBOX_STATES_DBG 
+                FROM CHECKBOX_STATES
                 WHERE SERIAL_NO = :1 
                 AND DEPT_CODE = :2 
                 AND PROCESS_CODE = :3
@@ -412,7 +412,7 @@ class RouteHandler:
             try:
                 cursor.execute("""
                     SELECT CHECKBOX_INDEX, X_POSITION, Y_POSITION, WIDTH, HEIGHT
-                    FROM CHECKBOX_STATES_DBG 
+                    FROM CHECKBOX_STATES
                     WHERE INDEX_NO = :1 AND INDEX_NO_SFIX = :2 AND SERIAL_NO = :3 AND DEPT_CODE = :4 AND PROCESS_CODE = :5
                     ORDER BY TO_NUMBER(CHECKBOX_INDEX)
                 """, (indexNo[:8], indexNo[8:], serial, dept, process))
@@ -503,7 +503,7 @@ class RouteHandler:
             cursor = connection.cursor()
             try:
                 sql = """
-                    MERGE INTO DCS_HISTORY_DBG USING dual
+                    MERGE INTO DCS_HISTORY USING dual
                     ON (INDEX_NO = :1 AND INDEX_NO_SFIX = :2 AND SERIAL_NO = :3 AND DEPT_CODE = :4 AND PROCESS_CODE = :5)
                     WHEN MATCHED THEN
                         UPDATE SET EMP_NO = :6, RENEWAL_D = :7, RENEWAL_BY = :8
@@ -589,7 +589,7 @@ class RouteHandler:
             # 먼저 DCS_HISTORY에서 작업자 번호 목록을 가져옴
             emp_no_sql = f"""
             SELECT DISTINCT h.EMP_NO
-            FROM DCS_HISTORY_DBG h
+            FROM DCS_HISTORY h
             WHERE h.DEPT_CODE LIKE :dept_code
             AND h.EMP_NO IS NOT NULL
             """
@@ -622,13 +622,13 @@ class RouteHandler:
             sql = f"""
             WITH FILTERED_SERIALS AS (
                 SELECT DISTINCT SERIAL_NO
-                FROM DCS_HISTORY_DBG
+                FROM DCS_HISTORY
                 WHERE DEPT_CODE LIKE :dept_code
                 AND {date_where_clause}
                 {f"AND SERIAL_NO LIKE :serial_number" if serial_number else ""}
             )
             SELECT h.SERIAL_NO, {', '.join(case_statements)}
-            FROM DCS_HISTORY_DBG h
+            FROM DCS_HISTORY h
             INNER JOIN FILTERED_SERIALS fs ON h.SERIAL_NO = fs.SERIAL_NO
             WHERE h.DEPT_CODE LIKE :dept_code
             GROUP BY h.SERIAL_NO
@@ -753,7 +753,7 @@ class RouteHandler:
             for index, state in checkbox_states.items():
                 position = checkbox_positions[index]
                 cursor.execute("""
-                    MERGE INTO CHECKBOX_STATES_DBG cs
+                    MERGE INTO CHECKBOX_STATES cs
                     USING (SELECT :1 AS INDEX_NO, :2 AS INDEX_NO_SFIX, :3 AS SERIAL_NO, 
                                 :4 AS DEPT_CODE, :5 AS PROCESS_CODE, :6 AS CHECKBOX_INDEX FROM DUAL) src
                     ON (cs.INDEX_NO = src.INDEX_NO AND cs.INDEX_NO_SFIX = src.INDEX_NO_SFIX 
@@ -791,7 +791,7 @@ class RouteHandler:
         # SQL 쿼리 생성 - Y_POSITION으로 먼저 렬하고, 같은 Y값을 가진 항목들은 X_POSITION으로 정렬
         sql = """
             SELECT CHECKBOX_INDEX, STATE 
-            FROM CHECKBOX_STATES_DBG 
+            FROM CHECKBOX_STATES
             WHERE INDEX_NO = :1 AND INDEX_NO_SFIX = :2 AND SERIAL_NO = :3 AND DEPT_CODE = :4 AND PROCESS_CODE = :5 AND DATA_ST = 'A'
             ORDER BY TO_NUMBER(CHECKBOX_INDEX)
         """
@@ -845,7 +845,7 @@ class RouteHandler:
             # 이전 공정의 완료 상태 확인
             sql = """
                 SELECT STATUS 
-                FROM DCS_HISTORY_DBG 
+                FROM DCS_HISTORY
                 WHERE SERIAL_NO = :1 
                   AND DEPT_CODE = :2 
                   AND PROCESS_CODE = :3
@@ -923,7 +923,7 @@ class RouteHandler:
                 return True  # 혹은 False
             sql = """
                 SELECT PROCESS_CODE, STATUS 
-                FROM DCS_HISTORY_DBG 
+                FROM DCS_HISTORY
                 WHERE INDEX_NO = :1 
                   AND SERIAL_NO = :2 
                   AND DEPT_CODE = :3
@@ -973,7 +973,7 @@ class RouteHandler:
             
             sql = """
                 SELECT COUNT(*)
-                FROM DCS_HISTORY_DBG
+                FROM DCS_HISTORY
                 WHERE SERIAL_NO = :1
                   AND PROCESS_CODE = :2
                   AND DATA_ST = 'A'
@@ -1015,7 +1015,7 @@ class RouteHandler:
 
             # DCS_HISTORY 테이블 업데이트: DATA_ST을 'D'로 변경
             update_dcs_history_sql = """
-                UPDATE DCS_HISTORY_DBG
+                UPDATE DCS_HISTORY
                 SET DATA_ST = 'D'
                 WHERE SERIAL_NO = :1 AND PROCESS_CODE = :2
             """
@@ -1023,7 +1023,7 @@ class RouteHandler:
 
             # CHECKBOX_STATES 테이블 업데이트: DATA_ST을 'D'로 변경
             update_checkbox_states_sql = """
-                UPDATE CHECKBOX_STATES_DBG
+                UPDATE CHECKBOX_STATES
                 SET DATA_ST = 'D'
                 WHERE SERIAL_NO = :1 AND PROCESS_CODE = :2
             """
@@ -1031,7 +1031,7 @@ class RouteHandler:
 
             # 새로운 레코드 삽입 - processCode는 현재 선택된 공정 코드 사용
             insert_dcs_history_sql = """
-                INSERT INTO DCS_HISTORY_DBG (
+                INSERT INTO DCS_HISTORY (
                     INDEX_NO, INDEX_NO_SFIX, SERIAL_NO, DEPT_CODE, PROCESS_CODE, STATUS,
                     EMP_NO, PREV_INDEX_NO, PREV_INDEX_NO_SFIX, ENTRY_D, ENTRY_BY
                 ) VALUES (
@@ -1055,7 +1055,7 @@ class RouteHandler:
                                    CASE WHEN PROCESS_CODE = :1 THEN 0 ELSE 1 END,
                                    TO_NUMBER(INDEX_NO || INDEX_NO_SFIX) DESC
                            ) as RNK
-                    FROM CHECKBOX_STATES_DBG a
+                    FROM CHECKBOX_STATES a
                     WHERE SERIAL_NO = :2
                 )
                 SELECT 
@@ -1071,7 +1071,7 @@ class RouteHandler:
 
             # 체크박스 상태 데이터 삽입
             insert_checkbox_states_sql = """
-                INSERT INTO CHECKBOX_STATES_DBG (
+                INSERT INTO CHECKBOX_STATES (
                     INDEX_NO, INDEX_NO_SFIX, SERIAL_NO, DEPT_CODE, PROCESS_CODE,
                     CHECKBOX_INDEX, STATE, X_POSITION, Y_POSITION, WIDTH, HEIGHT,
                     PREV_INDEX_NO, PREV_INDEX_NO_SFIX, ENTRY_D, ENTRY_BY
@@ -1140,7 +1140,7 @@ class RouteHandler:
                     b.MS_CODE,
                     a.DATA_ST,
                     c.START_NO
-                FROM DCS_HISTORY_DBG a
+                FROM DCS_HISTORY a
                 JOIN TDSC952 c ON a.INDEX_NO = c.INDEX_NO 
                     AND a.INDEX_NO_SFIX = c.INDEX_NO_SFIX
                 JOIN TDSC951 b ON c.PROD_NO = b.PROD_NO 
@@ -1200,7 +1200,7 @@ class RouteHandler:
                        EMP_NO, ENTRY_BY, PREV_INDEX_NO, PREV_INDEX_NO_SFIX, DATA_ST
                 FROM (
                     SELECT *
-                    FROM DCS_HISTORY_DBG
+                    FROM DCS_HISTORY
                     WHERE SERIAL_NO = :1
                     ORDER BY 
                         CASE WHEN PROCESS_CODE = :2 THEN 0 ELSE 1 END,
