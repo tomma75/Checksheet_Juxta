@@ -238,7 +238,13 @@ class RouteHandler:
                                 if f.startswith(serial_no) and f.endswith('.png')
                             ])
                             if model != 'VJ77':
-                                VJ77_image_paths = (rf'\\10.36.15.199\UTA_Checksheet_Server\CheckSheet\3186\process\{serial_no}\{serial_no}_0.png')
+                                VJ77_image_paths = os.path.join(
+                                        self.app.config['UPLOAD_FOLDER'],
+                                        deptCode,
+                                        'Process',
+                                        serial_no,
+                                        f'{serial_no}_0.png'
+                                        )
                                 image_files.insert(0, VJ77_image_paths)
                             # 이미지 합치기 실행
                             ImageProcessor.merge_checksheet_images_juxta(image_files, merged_image_path, target_width=800)

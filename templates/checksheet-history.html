@@ -832,10 +832,10 @@
 
         // 병합된 이미지를 여는 함수 수정
         function openMergedImage(deptCode, serialNo) {
-            const filePath = `/files/get/${deptCode}/merged/${serialNo}.png`;
+            const filePath = `/files/get/${deptCode}/Merged/${serialNo}.png`;
             
             // 단일 API 호출로 파일 확인
-            fetch(`/files/list/${deptCode}/merged/`)
+            fetch(`/files/list/${deptCode}/Merged/`)
                 .then(response => {
                     if (!response.ok) {
                         throw new Error('파일 목록을 가져올 수 없습니다.');
