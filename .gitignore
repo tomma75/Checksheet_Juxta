@@ -1,5 +1,8 @@
-
 *.pyc
+__pycache__/
+*.log
+instantclient_21_7/
+venv/
 build/main/Analysis-00.toc
 build/main/base_library.zip
 build/main/COLLECT-00.toc
