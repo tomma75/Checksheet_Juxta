@@ -13,7 +13,8 @@ SELECT
     b.MS_CODE,
     b.MODEL,
     b.CHK_SUFFIX_CODE,
-    b.CHK_OPT_CODE
+    b.CHK_OPT_CODE,
+    TO_CHAR(SYSDATE, 'DD') || '-' || LPAD(c.SEQ, 3, '0') AS SEQ
 FROM 
     TDSC952 a
 JOIN 
@@ -24,6 +25,8 @@ JOIN
                AND a.ORDER_NO = b.ORDER_NO
                AND a.ITEM_NO = b.ITEM_NO
                AND b.CANCEL_D IS NULL
+LEFT JOIN
+    PDSD0010 c ON a.PROD_NO = c.PROD_NO
 WHERE 
     a.INDEX_NO = '{index_no}'
     AND a.INDEX_NO_SFIX = '{index_no_sfix}'

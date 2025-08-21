@@ -353,7 +353,53 @@ class RouteHandler:
         network_process_path = os.path.join(self.app.config['NETWORK_PATH'], dept, 'Process', serial, process_filename)
 
         # 파일 경로 결정
-        if is_checked_image:
+        file_path = None
+        
+        # JUXTA (3186) 04번 프로세스 특별 처리
+        if dept == '3186' and process == '04' and not is_checked_image:
+            # 04번 프로세스는 시리얼번호_0.png를 사용
+            process_0_filename = f'{serial}_0.png'
+            process_0_file_path = os.path.join(self.app.config['UPLOAD_FOLDER'], dept, 'Process', serial, process_0_filename)
+            network_process_0_path = os.path.join(self.app.config['NETWORK_PATH'], dept, 'Process', serial, process_0_filename)
+            
+            # Process/시리얼번호/시리얼번호_0.png 파일이 있는지 확인
+            if os.path.exists(process_0_file_path) or os.path.exists(network_process_0_path):
+                source_path = process_0_file_path if os.path.exists(process_0_file_path) else network_process_0_path
+                
+                # Checked 폴더에 시리얼번호_04.png로 복사
+                checked_dir = os.path.join(self.app.config['UPLOAD_FOLDER'], dept, 'Checked', serial)
+                os.makedirs(checked_dir, exist_ok=True)
+                
+                # shutil.copy2 대신 PIL을 사용하여 이미지를 저장
+                try:
+                    temp_image = Image.open(source_path)
+                    temp_image.save(checked_file_path)
+                    logging.info(f"Saved {source_path} to {checked_file_path} for process 04 using PIL")
+                except Exception as e:
+                    logging.error(f"Failed to save image using PIL: {e}")
+                    # PIL 실패 시 파일 읽기/쓰기로 시도
+                    try:
+                        with open(source_path, 'rb') as src:
+                            data = src.read()
+                        with open(checked_file_path, 'wb') as dst:
+                            dst.write(data)
+                        logging.info(f"Copied {source_path} to {checked_file_path} for process 04 using file operations")
+                    except Exception as e2:
+                        logging.error(f"Failed to copy file: {e2}")
+                        # 실패해도 원본 파일 사용
+                        file_path = source_path
+                        logging.info(f"Using source file directly: {source_path}")
+                
+                # 복사가 성공했거나 실패했어도 file_path가 설정됨
+                if 'file_path' not in locals():
+                    file_path = checked_file_path
+            else:
+                # 0번 이미지도 없으면 일반 프로세스 파일 경로 사용
+                if os.path.exists(process_file_path):
+                    file_path = process_file_path
+                elif os.path.exists(network_process_path):
+                    file_path = network_process_path
+        elif is_checked_image:
             if os.path.exists(checked_file_path):
                 file_path = checked_file_path
             elif os.path.exists(network_checked_path):
@@ -371,39 +417,43 @@ class RouteHandler:
             elif os.path.exists(network_process_path):
                 file_path = network_process_path
             else:
-                # index가 0이고 Process 파일이 없는 경우 Master PDF 확인
-                if dept == '3186':
-                    master_pdf_path = os.path.join(self.app.config['UPLOAD_FOLDER'], dept, 'Master', f'{serial}_0.pdf')
-                    network_master_path = os.path.join(self.app.config['NETWORK_PATH'], dept, 'Master', f'{serial}_0.pdf')
-                else:
-                    master_pdf_path = os.path.join(self.app.config['UPLOAD_FOLDER'], dept, 'Master', f'{serial}.pdf')
-                    network_master_path = os.path.join(self.app.config['NETWORK_PATH'], dept, 'Master', f'{serial}.pdf')
-                
-                if os.path.exists(master_pdf_path):
-                    master_path = master_pdf_path
-                    base_folder_ori = self.app.config['UPLOAD_FOLDER']
-                elif os.path.exists(network_master_path):
-                    master_path = network_master_path
-                    base_folder_ori = self.app.config['NETWORK_PATH']
-                else:
-                    return jsonify({'error': 'Requested master PDF does not exist.'}), 404
+                file_path = None
+        
+        # file_path가 여전히 None인 경우 Master PDF 처리
+        if file_path is None:
+            # index가 0이고 Process 파일이 없는 경우 Master PDF 확인
+            if dept == '3186':
+                master_pdf_path = os.path.join(self.app.config['UPLOAD_FOLDER'], dept, 'Master', f'{serial}_0.pdf')
+                network_master_path = os.path.join(self.app.config['NETWORK_PATH'], dept, 'Master', f'{serial}_0.pdf')
+            else:
+                master_pdf_path = os.path.join(self.app.config['UPLOAD_FOLDER'], dept, 'Master', f'{serial}.pdf')
+                network_master_path = os.path.join(self.app.config['NETWORK_PATH'], dept, 'Master', f'{serial}.pdf')
+            
+            if os.path.exists(master_pdf_path):
+                master_path = master_pdf_path
+                base_folder_ori = self.app.config['UPLOAD_FOLDER']
+            elif os.path.exists(network_master_path):
+                master_path = network_master_path
+                base_folder_ori = self.app.config['NETWORK_PATH']
+            else:
+                return jsonify({'error': 'Requested master PDF does not exist.'}), 404
 
-                # Master PDF를 이미지로 변환
-                images = convert_from_path(master_path, dpi=150)
-                if dept == '3186':
-                    master_jpg_path = os.path.join(self.app.config['UPLOAD_FOLDER'], dept, 'Master', f'{serial}_0.png')
-                    images[0].save(master_jpg_path, 'PNG')
-                else:
-                    master_jpg_path = os.path.join(self.app.config['UPLOAD_FOLDER'], dept, 'Master', f'{serial}.png')
-                    images[0].save(master_jpg_path, 'PNG')
-                self.image_processor.convert_pdf_to_process_images(dept, process, serial, base_folder=self.app.config['UPLOAD_FOLDER'], model=model, base_folder_ori=base_folder_ori)
-                
-                if os.path.exists(process_file_path):
-                    file_path = process_file_path
-                else:
-                    return jsonify({'error': 'Failed to create process image from master PDF.'}), 500
+            # Master PDF를 이미지로 변환
+            images = convert_from_path(master_path, dpi=150)
+            if dept == '3186':
+                master_jpg_path = os.path.join(self.app.config['UPLOAD_FOLDER'], dept, 'Master', f'{serial}_0.png')
+                images[0].save(master_jpg_path, 'PNG')
+            else:
+                master_jpg_path = os.path.join(self.app.config['UPLOAD_FOLDER'], dept, 'Master', f'{serial}.png')
+                images[0].save(master_jpg_path, 'PNG')
+            self.image_processor.convert_pdf_to_process_images(dept, process, serial, base_folder=self.app.config['UPLOAD_FOLDER'], model=model, base_folder_ori=base_folder_ori)
+            
+            if os.path.exists(process_file_path):
+                file_path = process_file_path
+            else:
+                return jsonify({'error': 'Failed to create process image from master PDF.'}), 500
 
-        if not os.path.exists(file_path):
+        if file_path is None or not os.path.exists(file_path):
             logging.error(f'Image not found: {file_path}')
             return jsonify({'error': 'Requested image does not exist.'}), 404
 
@@ -538,10 +588,11 @@ class RouteHandler:
     @login_required
     def get_product_info(self):
         # 제품 정보 가져오기
-        logging.debug("get_product_info called")
+        logging.info("=== get_product_info called ===")
         if request.method == 'POST':
             index_no_hex = request.form['indexNo'].strip()
-            logging.debug(f"Received IndexNo (base 32): {index_no_hex}")
+            dept_code = request.form.get('deptCode', '')  # HTML에서 전달받은 dept_code
+            logging.info(f"Received IndexNo (base 32): {index_no_hex}, DeptCode: '{dept_code}'")
             # 32진수를 10진수로 변환
             index_no_decimal = int(index_no_hex, 32)
             logging.debug(f"Converted IndexNo to Decimal: {index_no_decimal}")
@@ -560,11 +611,27 @@ class RouteHandler:
                 cursor.execute(sql)
                 product_info = cursor.fetchone()
                 if product_info:
+                    # 디버깅 로그 추가
+                    logging.info(f"Product info fetched - Total columns: {len(product_info)}")
+                    logging.info(f"DeptCode received: '{dept_code}'")
+                    if len(product_info) > 15:
+                        logging.info(f"SEQ field (index 15): {product_info[15]}")
+                    logging.info(f"START_NO field (index 9): {product_info[9]}")
+                    
+                    # dept_code가 3186일 때 SEQ를 construction_No로 사용
+                    if dept_code == '3186' or 'JUXTA' in dept_code:
+                        construction_no = product_info[15] if len(product_info) > 15 else product_info[9]
+                        logging.info(f"Using SEQ for JUXTA: {construction_no}")
+                    else:
+                        construction_no = product_info[9]  # 기존 START_NO 필드
+                        logging.info(f"Using START_NO for non-JUXTA: {construction_no}")
+                    
                     return jsonify({
                         'MS_CODE': product_info[10],
                         'Serial_No': product_info[6], 
                         'Index_No': index_no + index_no_sfix,
-                        'construction_No': product_info[9]
+                        'construction_No': construction_no,
+                        'MODEL': product_info[12]  # MODEL 정보 추가
                     })
                 else:
                     return jsonify({'error': 'DB에 없는 제품 정보입니다.'}), 404
