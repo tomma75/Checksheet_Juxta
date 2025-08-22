@@ -6,6 +6,140 @@
     <!-- Font Awesome 아이콘 라이브러리 추가 -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/font-awesome.min.css') }}">
     <style>
+        /* 커스텀 확인 모달 스타일 */
+        .custom-confirm-modal {
+            display: none;
+            position: fixed;
+            z-index: 10000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            animation: fadeIn 0.2s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        
+        @keyframes slideUp {
+            from {
+                transform: translate(-50%, -45%) scale(0.95);
+                opacity: 0;
+            }
+            to {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 1;
+            }
+        }
+        
+        .custom-confirm-content {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            position: fixed;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            padding: 0;
+            width: 420px;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+            animation: slideUp 0.3s ease-out;
+        }
+        
+        .custom-confirm-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px 25px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .custom-confirm-header::before {
+            content: "⚠️";
+            font-size: 40px;
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            opacity: 0.3;
+        }
+        
+        .custom-confirm-title {
+            color: white;
+            font-size: 20px;
+            font-weight: 600;
+            margin: 0;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .custom-confirm-message {
+            padding: 25px;
+            font-size: 16px;
+            color: #495057;
+            line-height: 1.6;
+            background: white;
+        }
+        
+        .custom-confirm-buttons {
+            display: flex;
+            padding: 0 25px 25px 25px;
+            gap: 12px;
+            background: white;
+        }
+        
+        .custom-confirm-buttons button {
+            flex: 1;
+            padding: 12px 24px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .custom-confirm-save {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .custom-confirm-save:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(102, 126, 234, 0.4);
+        }
+        
+        .custom-confirm-cancel {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: #495057;
+        }
+        
+        .custom-confirm-cancel:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            color: white;
+        }
+        
+        .custom-confirm-cancel:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(252, 182, 159, 0.3), 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .custom-confirm-save:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.3), 0 6px 12px rgba(102, 126, 234, 0.4);
+        }
+        
         /* 전체 페이지 스타일 설정 */
         body, input, button, select {
             font-size: 20px;
@@ -266,6 +400,23 @@
         }
     </style>
 <body onload="focusOnBarcodeInput()">
+    <!-- 커스텀 확인 모달 -->
+    <div id="customConfirmModal" class="custom-confirm-modal">
+        <div class="custom-confirm-content">
+            <div class="custom-confirm-header">
+                <h3 class="custom-confirm-title">저장 확인</h3>
+            </div>
+            <div class="custom-confirm-message">
+                현재 체크시트가 완료되지 않았습니다.<br>
+                저장하시겠습니까?
+            </div>
+            <div class="custom-confirm-buttons">
+                <button class="custom-confirm-save" id="confirmSaveBtn">저장</button>
+                <button class="custom-confirm-cancel" id="confirmCancelBtn">취소</button>
+            </div>
+        </div>
+    </div>
+    
     <!-- 사이드바 구조 -->
     <div id="mySidebar" class="sidebar collapsed">
         <!-- 사이드바 메뉴 항목들 -->
@@ -1312,12 +1463,24 @@
             }
         };
             
-        // 바코드가 6자리 입력되면 호출되는 함수
-        function fetchIndexNo(barcode) {
-            if (isCheckSheetModified) {
-                if (confirm('현재 체크시트가 완료되지 않았습니다. 저장하시겠습니까?')) {
-                    // 확인 버튼: 현재 체크시트 저장 후 새 바코드 처리
-                    const newBarcode = barcode;
+        // 커스텀 확인 모달 표시 함수
+        function showCustomConfirm(barcode) {
+            const modal = document.getElementById('customConfirmModal');
+            const saveBtn = document.getElementById('confirmSaveBtn');
+            const cancelBtn = document.getElementById('confirmCancelBtn');
+            
+            modal.style.display = 'block';
+            
+            // 취소 버튼에 포커스 설정
+            setTimeout(() => {
+                cancelBtn.focus();
+            }, 100);
+            
+            // 저장 버튼 클릭 이벤트
+            saveBtn.onclick = function() {
+                modal.style.display = 'none';
+                // 현재 체크시트 저장 후 새 바코드 처리
+                const newBarcode = barcode;
                     
                     // 체크완료 버튼 클릭 이벤트를 직접 실행하고 완료될 때까지 대기
                     const checkCompleteBtn = document.getElementById('checkCompleteButton');
@@ -1335,16 +1498,33 @@
                             processNewBarcode(newBarcode);
                         });
                     }
-                } else {
-                    // 취소 버튼: 현재 체크시트를 저장하지 않고 새 바코드 처리
-                    // 체크시트 수정 상태 초기화
-                    isCheckSheetModified = false;
-                    checkBoxStates = {};
-                    checkboxPositions = {};
-                    
-                    clearAllDisplays();  // 화면 초기화
-                    processNewBarcode(barcode);
+            };
+            
+            // 취소 버튼 클릭 이벤트
+            cancelBtn.onclick = function() {
+                modal.style.display = 'none';
+                // 현재 체크시트를 저장하지 않고 새 바코드 처리
+                // 체크시트 수정 상태 초기화
+                isCheckSheetModified = false;
+                checkBoxStates = {};
+                checkboxPositions = {};
+                
+                clearAllDisplays();  // 화면 초기화
+                processNewBarcode(barcode);
+            };
+            
+            // ESC 키로 모달 닫기 (취소와 동일)
+            window.onclick = function(event) {
+                if (event.target == modal) {
+                    cancelBtn.click();
                 }
+            };
+        }
+        
+        // 바코드가 6자리 입력되면 호출되는 함수
+        function fetchIndexNo(barcode) {
+            if (isCheckSheetModified) {
+                showCustomConfirm(barcode);
             } else {
                 clearAllDisplays();  // 화면 초기화
                 processNewBarcode(barcode);
