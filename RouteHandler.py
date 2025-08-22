@@ -355,7 +355,7 @@ class RouteHandler:
         # 파일 경로 결정
         file_path = None
         
-        # JUXTA (3186) 04번 프로세스 특별 처리
+        # JUXTA (3186) 11번 프로세스일 때 04번 프로세스 특별 처리
         if dept == '3186' and process == '04' and not is_checked_image:
             # 04번 프로세스는 시리얼번호_0.png를 사용
             process_0_filename = f'{serial}_0.png'

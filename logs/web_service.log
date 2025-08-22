@@ -15,3 +15,263 @@
 2025-08-21 20:34:58,032 - INFO - Restarting server in 5 seconds...
 2025-08-21 20:37:43,525 - INFO - Starting server...
 2025-08-21 20:37:43,525 - INFO - Server starting on http://0.0.0.0:80
+2025-08-22 08:24:03,967 - INFO - Starting server...
+2025-08-22 08:24:03,968 - INFO - Server starting on http://0.0.0.0:80
+2025-08-22 08:24:03,986 - ERROR - Server crashed with SystemExit: 1. Attempt 1 of 3
+2025-08-22 08:24:03,986 - INFO - Restarting server in 5 seconds...
+2025-08-22 08:24:09,002 - INFO - Starting server...
+2025-08-22 08:24:09,003 - INFO - Server starting on http://0.0.0.0:80
+2025-08-22 08:24:09,005 - ERROR - Server crashed with SystemExit: 1. Attempt 2 of 3
+2025-08-22 08:24:09,005 - INFO - Restarting server in 5 seconds...
+2025-08-22 08:24:11,661 - INFO - Starting server...
+2025-08-22 08:24:11,662 - INFO - Server starting on http://0.0.0.0:80
+2025-08-22 08:24:11,671 - ERROR - Server crashed with SystemExit: 1. Attempt 3 of 3
+2025-08-22 08:24:11,672 - CRITICAL - Maximum retry attempts reached. Server shutting down.
+2025-08-22 08:25:17,140 - INFO - Starting server...
+2025-08-22 08:25:17,140 - INFO - Server starting on http://0.0.0.0:80
+2025-08-22 08:27:37,211 - INFO - Starting server...
+2025-08-22 08:27:37,211 - INFO - Server starting on http://0.0.0.0:80
+2025-08-22 08:54:05,594 - INFO - Starting server...
+2025-08-22 08:54:05,595 - INFO - Server starting on http://0.0.0.0:80
+2025-08-22 08:54:14,555 - INFO - [172.26.176.1]  GET http://localhost/
+2025-08-22 08:54:14,626 - INFO - [172.26.176.1]  GET http://localhost/static/css/font-awesome.min.css
+2025-08-22 08:54:14,820 - INFO - [172.26.176.1]  GET http://localhost/static/fonts/fontawesome-webfont.woff2?v=4.7.0
+2025-08-22 08:54:15,195 - INFO - [172.26.176.1]  GET http://localhost/favicon.ico
+2025-08-22 08:54:24,102 - INFO - [172.26.176.1]  GET http://10.36.13.121/
+2025-08-22 08:54:24,207 - INFO - [172.26.176.1]  GET http://10.36.13.121/static/css/font-awesome.min.css
+2025-08-22 08:54:24,326 - INFO - [172.26.176.1]  GET http://10.36.13.121/static/fonts/fontawesome-webfont.woff2?v=4.7.0
+2025-08-22 08:54:25,060 - INFO - [172.26.176.1]  GET http://10.36.13.121/favicon.ico
+2025-08-22 08:57:33,725 - INFO - [172.26.176.1]  GET http://localhost/
+2025-08-22 08:57:33,792 - INFO - [172.26.176.1]  GET http://localhost/static/css/font-awesome.min.css
+2025-08-22 08:57:33,995 - INFO - [172.26.176.1]  GET http://localhost/static/fonts/fontawesome-webfont.woff2?v=4.7.0
+2025-08-22 09:04:49,153 - INFO - [172.26.176.1]  GET http://10.36.13.121/
+2025-08-22 09:04:49,216 - INFO - [172.26.176.1]  GET http://10.36.13.121/static/css/font-awesome.min.css
+2025-08-22 09:04:49,352 - INFO - [172.26.176.1]  GET http://10.36.13.121/static/fonts/fontawesome-webfont.woff2?v=4.7.0
+2025-08-22 09:04:49,409 - INFO - [172.26.176.1]  GET http://10.36.13.121/favicon.ico
+2025-08-22 09:04:54,207 - INFO - [172.26.176.1]  POST http://10.36.13.121/get_employee_name
+2025-08-22 09:04:55,094 - INFO - [172.26.176.1]  POST http://10.36.13.121/get_employee_name
+2025-08-22 09:04:55,310 - INFO - [172.26.176.1]  GET http://10.36.13.121/checkSheet
+2025-08-22 09:04:55,374 - INFO - [172.26.176.1]  GET http://10.36.13.121/static/css/font-awesome.min.css
+2025-08-22 09:05:34,437 - INFO - [172.26.176.1]  GET http://10.36.13.121/get_settings
+2025-08-22 09:05:34,485 - INFO - [172.26.176.1]  POST http://10.36.13.121/check_index_in_dcs_history
+2025-08-22 09:05:34,782 - INFO - [172.26.176.1]  POST http://10.36.13.121/get_product_info
+2025-08-22 09:05:35,273 - INFO - [172.26.176.1]  POST http://10.36.13.121/check_dcs_history_status
+2025-08-22 09:05:35,603 - INFO - [172.26.176.1]  POST http://10.36.13.121/get_product_info
+2025-08-22 09:05:35,606 - INFO - [172.26.176.1]  POST http://10.36.13.121/insert_dcs_history
+2025-08-22 09:05:35,842 - INFO - [172.26.176.1]  GET http://10.36.13.121/upload_image/0865584900_3186_T12816631_04_0
+2025-08-22 09:05:35,846 - INFO - [172.26.176.1]  GET http://10.36.13.121/static/icon/pen-tool.png
+2025-08-22 09:05:55,820 - INFO - [172.26.176.1]  GET http://10.36.13.121/get_settings
+2025-08-22 09:05:56,142 - INFO - [172.26.176.1]  POST http://10.36.13.121/check_index_in_dcs_history
+2025-08-22 09:05:56,397 - INFO - [172.26.176.1]  POST http://10.36.13.121/get_product_info
+2025-08-22 09:05:56,399 - INFO - [172.26.176.1]  POST http://10.36.13.121/insert_dcs_history
+2025-08-22 09:05:56,744 - INFO - [172.26.176.1]  GET http://10.36.13.121/upload_image/0865733500_3186_T12827401_04_0
+2025-08-22 09:06:18,785 - INFO - [172.26.176.1]  GET http://10.36.13.121/get_settings
+2025-08-22 09:06:18,835 - INFO - [172.26.176.1]  POST http://10.36.13.121/check_index_in_dcs_history
+2025-08-22 09:06:19,115 - INFO - [172.26.176.1]  POST http://10.36.13.121/check_previous_process
+2025-08-22 09:06:19,295 - INFO - [172.26.176.1]  POST http://10.36.13.121/insert_dcs_history
+2025-08-22 09:06:19,299 - INFO - [172.26.176.1]  POST http://10.36.13.121/get_product_info
+2025-08-22 09:06:19,564 - INFO - [172.26.176.1]  GET http://10.36.13.121/upload_image/0865733500_3186_T12827401_04_2
+2025-08-22 09:09:54,378 - INFO - [172.26.176.1]  POST http://10.36.13.121/refresh_session
+2025-08-22 09:14:54,479 - INFO - [172.26.176.1]  POST http://10.36.13.121/refresh_session
+2025-08-22 09:19:54,543 - INFO - [172.26.176.1]  POST http://10.36.13.121/refresh_session
+2025-08-22 09:24:54,647 - INFO - [172.26.176.1]  POST http://10.36.13.121/refresh_session
+2025-08-22 09:29:54,613 - INFO - [172.26.176.1]  POST http://10.36.13.121/refresh_session
+2025-08-22 09:32:39,714 - INFO - Starting server...
+2025-08-22 09:32:39,714 - INFO - Server starting on http://0.0.0.0:80
+2025-08-22 09:32:42,287 - INFO - [172.26.176.1]  GET http://localhost/
+2025-08-22 09:32:42,339 - INFO - [172.26.176.1]  GET http://localhost/static/css/font-awesome.min.css
+2025-08-22 09:32:44,092 - INFO - [172.26.176.1]  POST http://localhost/get_employee_name
+2025-08-22 09:32:46,407 - INFO - [172.26.176.1]  POST http://localhost/get_employee_name
+2025-08-22 09:32:46,678 - INFO - [172.26.176.1]  GET http://localhost/checkSheet
+2025-08-22 09:32:46,900 - INFO - [172.26.176.1]  GET http://localhost/static/css/font-awesome.min.css
+2025-08-22 09:32:51,336 - INFO - [172.26.176.1]  GET http://localhost/get_settings
+2025-08-22 09:32:51,707 - INFO - [172.26.176.1]  POST http://localhost/check_index_in_dcs_history
+2025-08-22 09:32:49,518 - INFO - [172.26.176.1]  POST http://localhost/get_product_info
+2025-08-22 09:32:52,887 - INFO - [172.26.176.1]  GET http://localhost/get_settings
+2025-08-22 09:32:53,164 - INFO - [172.26.176.1]  POST http://localhost/check_index_in_dcs_history
+2025-08-22 09:32:53,436 - INFO - [172.26.176.1]  POST http://localhost/check_previous_process
+2025-08-22 09:32:53,892 - INFO - [172.26.176.1]  POST http://localhost/get_product_info
+2025-08-22 09:32:53,896 - INFO - [172.26.176.1]  POST http://localhost/insert_dcs_history
+2025-08-22 09:32:54,463 - INFO - [172.26.176.1]  GET http://localhost/upload_image/0865733500_3186_T12827401_04_2
+2025-08-22 09:32:54,807 - INFO - [172.26.176.1]  GET http://localhost/static/icon/pen-tool.png
+2025-08-22 09:32:55,330 - INFO - [172.26.176.1]  GET http://localhost/get_checkbox_states?indexNo=0865733500&serialNo=T12827401&processCode=04&deptCode=3186
+2025-08-22 09:32:59,145 - INFO - [172.26.176.1]  GET http://localhost/upload_image/0865733500_3186_T12827401_10_2
+2025-08-22 09:32:59,969 - INFO - [172.26.176.1]  GET http://localhost/get_checkbox_states?indexNo=0865733500&serialNo=T12827401&processCode=10&deptCode=3186
+2025-08-22 09:34:35,344 - INFO - [172.26.176.1]  GET http://localhost/static/icon/eraser-cursor.svg
+2025-08-22 09:34:54,723 - INFO - [172.26.176.1]  POST http://10.36.13.121/refresh_session
+2025-08-22 09:37:47,353 - INFO - [172.26.176.1]  POST http://localhost/refresh_session
+2025-08-22 09:42:47,515 - INFO - [172.26.176.1]  POST http://localhost/refresh_session
+2025-08-22 09:47:29,383 - INFO - [172.26.176.1]  GET http://localhost/get_settings
+2025-08-22 09:47:29,657 - INFO - [172.26.176.1]  POST http://localhost/check_index_in_dcs_history
+2025-08-22 09:47:29,948 - INFO - [172.26.176.1]  POST http://localhost/get_product_info
+2025-08-22 09:47:32,186 - INFO - [172.26.176.1]  GET http://localhost/get_settings
+2025-08-22 09:47:32,468 - INFO - [172.26.176.1]  POST http://localhost/check_index_in_dcs_history
+2025-08-22 09:47:32,707 - INFO - [172.26.176.1]  POST http://localhost/check_previous_process
+2025-08-22 09:47:33,243 - INFO - [172.26.176.1]  POST http://localhost/get_product_info
+2025-08-22 09:47:33,248 - INFO - [172.26.176.1]  POST http://localhost/insert_dcs_history
+2025-08-22 09:47:33,525 - INFO - [172.26.176.1]  GET http://localhost/upload_image/0865733500_3186_T12827401_04_3
+2025-08-22 09:47:33,963 - INFO - [172.26.176.1]  GET http://localhost/get_checkbox_states?indexNo=0865733500&serialNo=T12827401&processCode=04&deptCode=3186
+2025-08-22 09:47:36,886 - INFO - [172.26.176.1]  GET http://localhost/upload_image/0865733500_3186_T12827401_11_3
+2025-08-22 09:47:37,206 - INFO - [172.26.176.1]  GET http://localhost/get_checkbox_states?indexNo=0865733500&serialNo=T12827401&processCode=11&deptCode=3186
+2025-08-22 09:47:47,584 - INFO - [172.26.176.1]  POST http://localhost/refresh_session
+2025-08-22 09:52:45,208 - INFO - [172.26.176.1]  POST http://localhost/refresh_session
+2025-08-22 09:52:56,746 - INFO - [172.26.176.1]  GET http://localhost/checkSheet
+2025-08-22 09:52:57,093 - INFO - [172.26.176.1]  GET http://localhost/static/css/font-awesome.min.css
+2025-08-22 09:53:01,968 - INFO - [172.26.176.1]  GET http://localhost/get_settings
+2025-08-22 09:53:02,250 - INFO - [172.26.176.1]  POST http://localhost/check_index_in_dcs_history
+2025-08-22 09:53:02,450 - INFO - [172.26.176.1]  POST http://localhost/check_previous_process
+2025-08-22 09:53:02,949 - INFO - [172.26.176.1]  POST http://localhost/get_product_info
+2025-08-22 09:53:02,953 - INFO - [172.26.176.1]  POST http://localhost/insert_dcs_history
+2025-08-22 09:53:03,218 - INFO - [172.26.176.1]  GET http://localhost/upload_image/0865733500_3186_T12827401_04_3
+2025-08-22 09:53:03,485 - INFO - [172.26.176.1]  GET http://localhost/static/icon/pen-tool.png
+2025-08-22 09:53:03,632 - INFO - [172.26.176.1]  GET http://localhost/get_checkbox_states?indexNo=0865733500&serialNo=T12827401&processCode=04&deptCode=3186
+2025-08-22 09:54:15,849 - INFO - [172.26.176.1]  GET http://localhost/upload_image/0865733500_3186_T12827401_11_3
+2025-08-22 09:54:16,265 - INFO - [172.26.176.1]  GET http://localhost/get_checkbox_states?indexNo=0865733500&serialNo=T12827401&processCode=11&deptCode=3186
+2025-08-22 09:54:24,367 - INFO - Starting server...
+2025-08-22 09:54:24,367 - INFO - Server starting on http://0.0.0.0:80
+2025-08-22 09:54:26,944 - INFO - [172.26.176.1]  GET http://localhost/checkSheet
+2025-08-22 09:54:26,952 - INFO - [172.26.176.1]  GET http://localhost/
+2025-08-22 09:54:27,201 - INFO - [172.26.176.1]  GET http://localhost/static/css/font-awesome.min.css
+2025-08-22 09:54:29,134 - INFO - [172.26.176.1]  POST http://localhost/get_employee_name
+2025-08-22 09:54:29,782 - INFO - [172.26.176.1]  POST http://localhost/get_employee_name
+2025-08-22 09:54:30,268 - INFO - [172.26.176.1]  GET http://localhost/checkSheet
+2025-08-22 09:54:30,352 - INFO - [172.26.176.1]  GET http://localhost/static/css/font-awesome.min.css
+2025-08-22 09:54:34,972 - INFO - [172.26.176.1]  GET http://localhost/get_settings
+2025-08-22 09:54:35,340 - INFO - [172.26.176.1]  POST http://localhost/check_index_in_dcs_history
+2025-08-22 09:54:35,603 - INFO - [172.26.176.1]  POST http://localhost/check_previous_process
+2025-08-22 09:54:35,874 - INFO - [172.26.176.1]  POST http://localhost/get_product_info
+2025-08-22 09:54:36,078 - INFO - [172.26.176.1]  POST http://localhost/insert_dcs_history
+2025-08-22 09:54:36,104 - INFO - [172.26.176.1]  GET http://localhost/upload_image/0865733500_3186_T12827401_04_3
+2025-08-22 09:54:36,450 - INFO - [172.26.176.1]  GET http://localhost/static/icon/pen-tool.png
+2025-08-22 09:54:36,993 - INFO - [172.26.176.1]  GET http://localhost/get_checkbox_states?indexNo=0865733500&serialNo=T12827401&processCode=04&deptCode=3186
+2025-08-22 09:54:38,198 - INFO - [172.26.176.1]  GET http://localhost/upload_image/0865733500_3186_T12827401_11_3
+2025-08-22 09:54:38,824 - INFO - [172.26.176.1]  GET http://localhost/get_checkbox_states?indexNo=0865733500&serialNo=T12827401&processCode=11&deptCode=3186
+2025-08-22 09:57:38,489 - INFO - [172.26.176.1]  GET http://localhost/checkSheet
+2025-08-22 09:57:38,554 - INFO - [172.26.176.1]  GET http://localhost/static/css/font-awesome.min.css
+2025-08-22 09:57:43,082 - INFO - [172.26.176.1]  GET http://localhost/get_settings
+2025-08-22 09:57:43,439 - INFO - [172.26.176.1]  POST http://localhost/check_index_in_dcs_history
+2025-08-22 09:57:43,734 - INFO - [172.26.176.1]  POST http://localhost/check_previous_process
+2025-08-22 09:57:43,978 - INFO - [172.26.176.1]  POST http://localhost/get_product_info
+2025-08-22 09:57:44,197 - INFO - [172.26.176.1]  POST http://localhost/insert_dcs_history
+2025-08-22 09:57:44,199 - INFO - [172.26.176.1]  GET http://localhost/upload_image/0865733500_3186_T12827401_04_3
+2025-08-22 09:57:44,521 - INFO - [172.26.176.1]  GET http://localhost/static/icon/pen-tool.png
+2025-08-22 09:57:44,682 - INFO - [172.26.176.1]  GET http://localhost/get_checkbox_states?indexNo=0865733500&serialNo=T12827401&processCode=04&deptCode=3186
+2025-08-22 09:57:46,418 - INFO - [172.26.176.1]  GET http://localhost/upload_image/0865733500_3186_T12827401_11_3
+2025-08-22 09:57:44,323 - INFO - [172.26.176.1]  GET http://localhost/get_checkbox_states?indexNo=0865733500&serialNo=T12827401&processCode=11&deptCode=3186
+2025-08-22 10:02:39,007 - INFO - [172.26.176.1]  POST http://localhost/refresh_session
+2025-08-22 10:07:38,984 - INFO - [172.26.176.1]  POST http://localhost/refresh_session
+2025-08-22 10:12:39,120 - INFO - [172.26.176.1]  POST http://localhost/refresh_session
+2025-08-22 10:17:39,129 - INFO - [172.26.176.1]  POST http://localhost/refresh_session
+2025-08-22 10:20:43,674 - INFO - [172.26.176.1]  GET http://localhost/checkSheet
+2025-08-22 10:20:43,755 - INFO - [172.26.176.1]  GET http://localhost/static/css/font-awesome.min.css
+2025-08-22 10:22:14,148 - INFO - [172.26.176.1]  GET http://localhost/get_settings
+2025-08-22 10:22:14,432 - INFO - [172.26.176.1]  POST http://localhost/check_index_in_dcs_history
+2025-08-22 10:22:14,690 - INFO - [172.26.176.1]  POST http://localhost/check_previous_process
+2025-08-22 10:22:15,172 - INFO - [172.26.176.1]  POST http://localhost/get_product_info
+2025-08-22 10:22:15,179 - INFO - [172.26.176.1]  POST http://localhost/insert_dcs_history
+2025-08-22 10:22:15,464 - INFO - [172.26.176.1]  GET http://localhost/upload_image/0865733500_3186_T12827401_04_3
+2025-08-22 10:22:15,811 - INFO - [172.26.176.1]  GET http://localhost/static/icon/pen-tool.png
+2025-08-22 10:22:16,250 - INFO - [172.26.176.1]  GET http://localhost/get_checkbox_states?indexNo=0865733500&serialNo=T12827401&processCode=04&deptCode=3186
+2025-08-22 10:22:21,726 - INFO - [172.26.176.1]  GET http://localhost/upload_image/0865733500_3186_T12827401_11_3
+2025-08-22 10:22:22,432 - INFO - [172.26.176.1]  GET http://localhost/get_checkbox_states?indexNo=0865733500&serialNo=T12827401&processCode=11&deptCode=3186
+2025-08-22 10:53:24,141 - INFO - [172.26.176.1]  GET http://localhost/
+2025-08-22 10:53:24,147 - INFO - [172.26.176.1]  GET http://localhost/checkSheet
+2025-08-22 10:53:24,428 - INFO - [172.26.176.1]  GET http://localhost/static/css/font-awesome.min.css
+2025-08-22 10:53:24,802 - INFO - [172.26.176.1]  GET http://localhost/static/fonts/fontawesome-webfont.woff2?v=4.7.0
+2025-08-22 10:53:35,480 - INFO - [172.26.176.1]  GET http://localhost/get_settings
+2025-08-22 10:53:35,837 - INFO - [172.26.176.1]  POST http://localhost/check_index_in_dcs_history
+2025-08-22 10:53:36,105 - INFO - [172.26.176.1]  POST http://localhost/get_product_info
+2025-08-22 10:53:36,447 - INFO - [172.26.176.1]  POST http://localhost/insert_dcs_history
+2025-08-22 10:53:36,452 - INFO - [172.26.176.1]  GET http://localhost/upload_image/0865733500_3186_T12827401_07_1
+2025-08-22 10:53:36,714 - INFO - [172.26.176.1]  GET http://localhost/static/icon/pen-tool.png
+2025-08-22 10:53:36,971 - INFO - [172.26.176.1]  GET http://localhost/get_checkbox_states?indexNo=0865733500&serialNo=T12827401&processCode=07&deptCode=3186
+2025-08-22 10:53:43,992 - INFO - [172.26.176.1]  GET http://localhost/get_settings
+2025-08-22 10:53:44,263 - INFO - [172.26.176.1]  POST http://localhost/check_index_in_dcs_history
+2025-08-22 10:53:44,452 - INFO - [172.26.176.1]  POST http://localhost/check_previous_process
+2025-08-22 10:53:44,920 - INFO - [172.26.176.1]  POST http://localhost/get_product_info
+2025-08-22 10:53:44,933 - INFO - [172.26.176.1]  POST http://localhost/insert_dcs_history
+2025-08-22 10:53:45,209 - INFO - [172.26.176.1]  GET http://localhost/upload_image/0865733500_3186_T12827401_10_2
+2025-08-22 10:53:45,576 - INFO - [172.26.176.1]  GET http://localhost/get_checkbox_states?indexNo=0865733500&serialNo=T12827401&processCode=10&deptCode=3186
+2025-08-22 10:53:57,383 - INFO - [172.26.176.1]  GET http://localhost/get_settings
+2025-08-22 10:53:57,665 - INFO - [172.26.176.1]  POST http://localhost/check_index_in_dcs_history
+2025-08-22 10:53:57,881 - INFO - [172.26.176.1]  POST http://localhost/check_previous_process
+2025-08-22 10:53:58,374 - INFO - [172.26.176.1]  POST http://localhost/get_product_info
+2025-08-22 10:53:58,381 - INFO - [172.26.176.1]  POST http://localhost/insert_dcs_history
+2025-08-22 10:53:58,641 - INFO - [172.26.176.1]  GET http://localhost/upload_image/0865733500_3186_T12827401_04_3
+2025-08-22 10:53:59,173 - INFO - [172.26.176.1]  GET http://localhost/get_checkbox_states?indexNo=0865733500&serialNo=T12827401&processCode=04&deptCode=3186
+2025-08-22 10:54:03,655 - INFO - [172.26.176.1]  GET http://localhost/upload_image/0865733500_3186_T12827401_11_3
+2025-08-22 10:54:03,930 - INFO - [172.26.176.1]  GET http://localhost/get_checkbox_states?indexNo=0865733500&serialNo=T12827401&processCode=11&deptCode=3186
+2025-08-22 10:54:17,316 - INFO - [172.26.176.1]  GET http://localhost/static/icon/eraser-cursor.svg
+2025-08-22 10:58:24,858 - INFO - [172.26.176.1]  POST http://localhost/refresh_session
+2025-08-22 11:03:24,897 - INFO - [172.26.176.1]  POST http://localhost/refresh_session
+2025-08-22 11:08:25,006 - INFO - [172.26.176.1]  POST http://localhost/refresh_session
+2025-08-22 11:09:55,195 - INFO - [172.26.176.1]  GET http://localhost/checkSheet
+2025-08-22 11:09:55,250 - INFO - [172.26.176.1]  GET http://localhost/static/css/font-awesome.min.css
+2025-08-22 11:09:55,479 - INFO - [172.26.176.1]  GET http://localhost/static/fonts/fontawesome-webfont.woff2?v=4.7.0
+2025-08-22 11:10:01,280 - INFO - [172.26.176.1]  GET http://localhost/get_settings
+2025-08-22 11:10:01,573 - INFO - [172.26.176.1]  POST http://localhost/check_index_in_dcs_history
+2025-08-22 11:10:01,810 - INFO - [172.26.176.1]  POST http://localhost/check_previous_process
+2025-08-22 11:10:02,329 - INFO - [172.26.176.1]  POST http://localhost/get_product_info
+2025-08-22 11:10:02,334 - INFO - [172.26.176.1]  POST http://localhost/insert_dcs_history
+2025-08-22 11:10:02,697 - INFO - [172.26.176.1]  GET http://localhost/upload_image/0865733500_3186_T12827401_04_3
+2025-08-22 11:10:03,043 - INFO - [172.26.176.1]  GET http://localhost/static/icon/pen-tool.png
+2025-08-22 11:10:03,539 - INFO - [172.26.176.1]  GET http://localhost/get_checkbox_states?indexNo=0865733500&serialNo=T12827401&processCode=04&deptCode=3186
+2025-08-22 11:10:07,096 - INFO - [172.26.176.1]  GET http://localhost/static/icon/eraser-cursor.svg
+2025-08-22 11:11:09,432 - INFO - [172.26.176.1]  GET http://localhost/checkSheet
+2025-08-22 11:11:09,505 - INFO - [172.26.176.1]  GET http://localhost/static/css/font-awesome.min.css
+2025-08-22 11:11:09,713 - INFO - [172.26.176.1]  GET http://localhost/static/fonts/fontawesome-webfont.woff2?v=4.7.0
+2025-08-22 11:11:11,071 - INFO - [172.26.176.1]  GET http://localhost/get_settings
+2025-08-22 11:11:11,357 - INFO - [172.26.176.1]  POST http://localhost/check_index_in_dcs_history
+2025-08-22 11:11:11,560 - INFO - [172.26.176.1]  POST http://localhost/check_previous_process
+2025-08-22 11:11:12,066 - INFO - [172.26.176.1]  POST http://localhost/get_product_info
+2025-08-22 11:11:12,071 - INFO - [172.26.176.1]  POST http://localhost/insert_dcs_history
+2025-08-22 11:11:12,366 - INFO - [172.26.176.1]  GET http://localhost/upload_image/0865733500_3186_T12827401_04_3
+2025-08-22 11:11:12,620 - INFO - [172.26.176.1]  GET http://localhost/static/icon/pen-tool.png
+2025-08-22 11:11:12,883 - INFO - [172.26.176.1]  GET http://localhost/get_checkbox_states?indexNo=0865733500&serialNo=T12827401&processCode=04&deptCode=3186
+2025-08-22 11:11:34,709 - INFO - [172.26.176.1]  GET http://localhost/checkSheet
+2025-08-22 11:11:34,750 - INFO - [172.26.176.1]  GET http://localhost/static/css/font-awesome.min.css
+2025-08-22 11:11:38,955 - INFO - [172.26.176.1]  GET http://localhost/get_settings
+2025-08-22 11:11:39,313 - INFO - [172.26.176.1]  POST http://localhost/check_index_in_dcs_history
+2025-08-22 11:11:40,336 - INFO - [172.26.176.1]  POST http://localhost/check_previous_process
+2025-08-22 11:11:40,882 - INFO - [172.26.176.1]  POST http://localhost/get_product_info
+2025-08-22 11:11:40,886 - INFO - [172.26.176.1]  POST http://localhost/insert_dcs_history
+2025-08-22 11:11:41,168 - INFO - [172.26.176.1]  GET http://localhost/upload_image/0865733500_3186_T12827401_04_3
+2025-08-22 11:11:41,457 - INFO - [172.26.176.1]  GET http://localhost/static/icon/pen-tool.png
+2025-08-22 11:11:39,291 - INFO - [172.26.176.1]  GET http://localhost/get_checkbox_states?indexNo=0865733500&serialNo=T12827401&processCode=04&deptCode=3186
+2025-08-22 11:12:51,067 - INFO - [172.26.176.1]  GET http://localhost/checkSheet
+2025-08-22 11:12:51,144 - INFO - [172.26.176.1]  GET http://localhost/static/css/font-awesome.min.css
+2025-08-22 11:12:54,812 - INFO - [172.26.176.1]  GET http://localhost/get_settings
+2025-08-22 11:12:55,174 - INFO - [172.26.176.1]  POST http://localhost/check_index_in_dcs_history
+2025-08-22 11:12:55,480 - INFO - [172.26.176.1]  POST http://localhost/check_previous_process
+2025-08-22 11:12:55,964 - INFO - [172.26.176.1]  POST http://localhost/get_product_info
+2025-08-22 11:12:55,967 - INFO - [172.26.176.1]  POST http://localhost/insert_dcs_history
+2025-08-22 11:12:56,253 - INFO - [172.26.176.1]  GET http://localhost/upload_image/0865733500_3186_T12827401_04_3
+2025-08-22 11:12:56,523 - INFO - [172.26.176.1]  GET http://localhost/static/icon/pen-tool.png
+2025-08-22 11:12:56,710 - INFO - [172.26.176.1]  GET http://localhost/get_checkbox_states?indexNo=0865733500&serialNo=T12827401&processCode=04&deptCode=3186
+2025-08-22 11:14:10,043 - INFO - [172.26.176.1]  GET http://localhost/checkSheet
+2025-08-22 11:14:10,097 - INFO - [172.26.176.1]  GET http://localhost/static/css/font-awesome.min.css
+2025-08-22 11:14:14,965 - INFO - [172.26.176.1]  GET http://localhost/get_settings
+2025-08-22 11:14:15,313 - INFO - [172.26.176.1]  POST http://localhost/check_index_in_dcs_history
+2025-08-22 11:14:15,596 - INFO - [172.26.176.1]  POST http://localhost/check_previous_process
+2025-08-22 11:14:15,860 - INFO - [172.26.176.1]  POST http://localhost/get_product_info
+2025-08-22 11:14:16,071 - INFO - [172.26.176.1]  POST http://localhost/insert_dcs_history
+2025-08-22 11:14:16,072 - INFO - [172.26.176.1]  GET http://localhost/upload_image/0865733500_3186_T12827401_04_3
+2025-08-22 11:14:16,426 - INFO - [172.26.176.1]  GET http://localhost/static/icon/pen-tool.png
+2025-08-22 11:14:16,872 - INFO - [172.26.176.1]  GET http://localhost/get_checkbox_states?indexNo=0865733500&serialNo=T12827401&processCode=04&deptCode=3186
+2025-08-22 11:14:17,810 - INFO - [172.26.176.1]  GET http://localhost/static/icon/eraser-cursor.svg
+2025-08-22 11:15:36,176 - INFO - [172.26.176.1]  GET http://localhost/upload_image/0865733500_3186_T12827401_11_3
+2025-08-22 11:15:36,596 - INFO - [172.26.176.1]  GET http://localhost/get_checkbox_states?indexNo=0865733500&serialNo=T12827401&processCode=11&deptCode=3186
+2025-08-22 11:16:27,451 - INFO - [172.26.176.1]  GET http://localhost/checkSheet
+2025-08-22 11:16:27,503 - INFO - [172.26.176.1]  GET http://localhost/static/css/font-awesome.min.css
+2025-08-22 11:16:32,096 - INFO - [172.26.176.1]  GET http://localhost/get_settings
+2025-08-22 11:16:32,455 - INFO - [172.26.176.1]  POST http://localhost/check_index_in_dcs_history
+2025-08-22 11:16:32,723 - INFO - [172.26.176.1]  POST http://localhost/check_previous_process
+2025-08-22 11:16:33,047 - INFO - [172.26.176.1]  POST http://localhost/get_product_info
+2025-08-22 11:16:33,225 - INFO - [172.26.176.1]  POST http://localhost/insert_dcs_history
+2025-08-22 11:16:33,270 - INFO - [172.26.176.1]  GET http://localhost/upload_image/0865733500_3186_T12827401_10_2
+2025-08-22 11:16:33,624 - INFO - [172.26.176.1]  GET http://localhost/static/icon/pen-tool.png
+2025-08-22 11:16:34,043 - INFO - [172.26.176.1]  GET http://localhost/get_checkbox_states?indexNo=0865733500&serialNo=T12827401&processCode=10&deptCode=3186
+2025-08-22 11:16:36,493 - INFO - [172.26.176.1]  GET http://localhost/static/icon/eraser-cursor.svg
+2025-08-22 11:16:46,824 - INFO - [172.26.176.1]  GET http://localhost/logout
+2025-08-22 11:16:46,945 - INFO - [172.26.176.1]  GET http://localhost/
+2025-08-22 11:16:47,126 - INFO - [172.26.176.1]  GET http://localhost/static/css/font-awesome.min.css

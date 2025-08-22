@@ -1,9 +1,20 @@
 {
   "permissions": {
     "allow": [
-      "Bash(findmnt:*)"
+      "Bash(findmnt:*)",
+      "Bash(export:*)",
+      "Bash(source:*)",
+      "Bash(python:*)",
+      "Bash(mount)",
+      "Bash(sudo apt-get:*)",
+      "Bash(sudo apt-get install:*)",
+      "Bash(apt-get install:*)",
+      "Bash(grep:*)"
     ],
     "deny": [],
-    "ask": []
+    "ask": [],
+    "additionalDirectories": [
+      "/mnt/CheckSheet"
+    ]
   }
 }

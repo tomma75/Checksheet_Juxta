@@ -1,11 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-  <!-- 지우개 본체 -->
-  <rect x="3" y="8" width="18" height="10" rx="2" fill="#FFB6C1" stroke="#333" stroke-width="2"/>
-  <!-- 지우개 줄 -->
-  <line x1="3" y1="13" x2="21" y2="13" stroke="#666" stroke-width="1.5"/>
-  <!-- 지우개 끝부분 -->
-  <rect x="3" y="14" width="18" height="4" rx="1" fill="#FF69B4" opacity="0.7"/>
-  <!-- 활성 포인트 표시 -->
-  <circle cx="12" cy="13" r="2" fill="#FF0000" opacity="0.8"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+  <!-- 세련된 지우개 디자인 (45도 기울어진) -->
+  <g transform="rotate(-45, 16, 16)">
+    <!-- 그림자 효과 -->
+    <ellipse cx="16" cy="24" rx="10" ry="2" fill="#000000" opacity="0.15"/>
+    
+    <!-- 지우개 본체 (그라디언트) -->
+    <defs>
+      <linearGradient id="bodyGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" style="stop-color:#F8F9FA;stop-opacity:1" />
+        <stop offset="100%" style="stop-color:#E9ECEF;stop-opacity:1" />
+      </linearGradient>
+      <linearGradient id="rubberGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" style="stop-color:#495057;stop-opacity:1" />
+        <stop offset="100%" style="stop-color:#212529;stop-opacity:1" />
+      </linearGradient>
+    </defs>
+    
+    <!-- 메인 본체 -->
+    <rect x="6" y="10" width="20" height="10" rx="1.5" fill="url(#bodyGradient)" stroke="#343A40" stroke-width="1"/>
+    
+    <!-- 지우개 고무 부분 (더 크게) -->
+    <rect x="6" y="10" width="7" height="10" rx="1" fill="url(#rubberGradient)"/>
+    
+    <!-- 고무 부분 텍스처 라인 -->
+    <line x1="8" y1="10" x2="8" y2="20" stroke="#6C757D" stroke-width="0.5" opacity="0.3"/>
+    <line x1="10" y1="10" x2="10" y2="20" stroke="#6C757D" stroke-width="0.5" opacity="0.3"/>
+    <line x1="12" y1="10" x2="12" y2="20" stroke="#6C757D" stroke-width="0.5" opacity="0.3"/>
+    
+    <!-- 하이라이트 효과 (본체) -->
+    <rect x="14" y="11" width="10" height="2" fill="#FFFFFF" opacity="0.6" rx="0.5"/>
+    
+    <!-- 메탈 밴드 -->
+    <rect x="13" y="10" width="2" height="10" fill="#ADB5BD" stroke="#6C757D" stroke-width="0.5"/>
+    
+    <!-- 브랜드 텍스트 영역 (선택사항) -->
+    <rect x="17" y="14" width="6" height="2" fill="#DEE2E6" rx="0.5" opacity="0.5"/>
+  </g>
+  
+  <!-- 커서 포인트 (빨간 점 - 정확한 위치 표시) -->
+  <circle cx="16" cy="16" r="1.5" fill="#DC3545" opacity="0.8"/>
+  <circle cx="16" cy="16" r="0.5" fill="#FFFFFF"/>
 </svg>

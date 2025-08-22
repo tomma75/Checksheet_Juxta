@@ -404,6 +404,7 @@
             saveCurrentPageState();
             
             const deptCode = document.getElementById('deptInfo').textContent.split(' ')[0];
+            const checkCompleteBtn = document.getElementById('checkCompleteButton');
             
             if (direction === 'next' && currentPage === 1) {
                 // 04번 → 10번/11번으로 전환
@@ -412,6 +413,13 @@
                 if (originalProcessCode) {
                     console.log('다음 페이지로 전환 - 프로세스:', originalProcessCode);
                     loadPageImage(originalProcessCode);
+                    
+                    // 11번 공정일 때만 체크완료 버튼 활성화
+                    if (originalProcessCode === '11' && checkCompleteBtn) {
+                        checkCompleteBtn.disabled = false;
+                        checkCompleteBtn.style.backgroundColor = '';
+                        checkCompleteBtn.style.cursor = 'pointer';
+                    }
                 } else {
                     console.error('originalProcessCode가 설정되지 않았습니다');
                 }
@@ -424,6 +432,13 @@
                 loadPageImage('04');
                 document.getElementById('prevPageButton').disabled = true;
                 document.getElementById('nextPageButton').disabled = false;
+                
+                // 11번 공정일 때 04페이지에서 체크완료 버튼 비활성화
+                if (originalProcessCode === '11' && checkCompleteBtn) {
+                    checkCompleteBtn.disabled = true;
+                    checkCompleteBtn.style.backgroundColor = '#ccc';
+                    checkCompleteBtn.style.cursor = 'not-allowed';
+                }
             }
         }
         
@@ -434,24 +449,24 @@
             
             if (!baseCanvas || !drawingCanvas) return;
             
-            // 캔버스 복사본 생성
+            // 캔버스 복사본 생성 (원본 크기 유지)
             const savedCanvas = document.createElement('canvas');
-            savedCanvas.width = drawingCanvas.width;
-            savedCanvas.height = drawingCanvas.height;
+            savedCanvas.width = baseCanvas.width;
+            savedCanvas.height = baseCanvas.height;
             const savedCtx = savedCanvas.getContext('2d');
             
-            // base 이미지와 drawing 합치기
-            savedCtx.drawImage(baseCanvas, 0, 0);
-            savedCtx.drawImage(drawingCanvas, 0, 0);
+            // base 이미지와 drawing 합치기 (원본 크기로)
+            savedCtx.drawImage(baseCanvas, 0, 0, baseCanvas.width, baseCanvas.height);
+            savedCtx.drawImage(drawingCanvas, 0, 0, drawingCanvas.width, drawingCanvas.height);
             
             if (currentPage === 1) {
                 page1Canvas = savedCanvas;
                 page1CheckBoxStates = {...checkBoxStates};
-                console.log('04번 페이지 상태 저장됨');
+                console.log('04번 페이지 상태 저장됨 - 크기:', savedCanvas.width, 'x', savedCanvas.height);
             } else {
                 page2Canvas = savedCanvas;
                 page2CheckBoxStates = {...checkBoxStates};
-                console.log('10/11번 페이지 상태 저장됨');
+                console.log('10/11번 페이지 상태 저장됨 - 크기:', savedCanvas.width, 'x', savedCanvas.height);
             }
         }
         
@@ -549,27 +564,39 @@
         function restorePageState(savedCanvas, savedCheckBoxStates) {
             const baseCanvas = document.getElementById('baseImageCanvas');
             const drawingCanvas = document.getElementById('drawingCanvas');
+            const canvasContainer = document.getElementById('canvasContainer');
             
             if (!baseCanvas || !drawingCanvas || !savedCanvas) return;
             
             const baseCtx = baseCanvas.getContext('2d');
             const drawingCtx = drawingCanvas.getContext('2d');
             
-            // 캔버스 크기 설정
+            // 캔버스 크기를 저장된 이미지의 원본 크기로 설정
             baseCanvas.width = savedCanvas.width;
             baseCanvas.height = savedCanvas.height;
             drawingCanvas.width = savedCanvas.width;
             drawingCanvas.height = savedCanvas.height;
             
-            // 저장된 이미지 복원
+            // 컨테이너 크기도 조정
+            if (canvasContainer) {
+                canvasContainer.style.width = savedCanvas.width + 'px';
+                canvasContainer.style.height = savedCanvas.height + 'px';
+            }
+            
+            // 캔버스 초기화
             baseCtx.clearRect(0, 0, baseCanvas.width, baseCanvas.height);
             drawingCtx.clearRect(0, 0, drawingCanvas.width, drawingCanvas.height);
-            baseCtx.drawImage(savedCanvas, 0, 0);
+            
+            // 저장된 이미지를 원본 크기로 복원
+            baseCtx.drawImage(savedCanvas, 0, 0, savedCanvas.width, savedCanvas.height);
             
             // 체크박스 상태 복원
             checkBoxStates = {...savedCheckBoxStates};
             
-            console.log('페이지 상태 복원 완료');
+            // 체크박스 다시 그리기
+            redrawCheckboxes();
+            
+            console.log('페이지 상태 복원 완료 - 크기:', savedCanvas.width, 'x', savedCanvas.height);
         }
         
         // 두 페이지 모두 저장하는 함수 (JUXTA 공정 10/11용)
@@ -1112,8 +1139,8 @@
             const currentSerialNo = serialNoDisplay.textContent;
             const deptCode = document.getElementById('deptInfo').textContent.split(' ')[0];
             
-            // JUXTA 공정 10/11인 경우 두 페이지 모두 저장
-            if (deptCode === '3186' && originalProcessCode && (originalProcessCode === '10' || originalProcessCode === '11')) {
+            // JUXTA 공정 11인 경우만 두 페이지 모두 저장 (10은 기존 로직 유지)
+            if (deptCode === '3186' && originalProcessCode && originalProcessCode === '11') {
                 // 현재 페이지 상태 저장
                 saveCurrentPageState();
                 
@@ -1594,8 +1621,8 @@
                     const selectedProcess = processSelect.options[selectedIndex].value;
                     const deptCode = document.getElementById('deptInfo').textContent.split(' ')[0];
 
-                    // JUXTA (dept 3186) 공정 10 또는 11인 경우 특별 처리
-                    if (deptCode === '3186' && (selectedProcess === '10' || selectedProcess === '11')) {
+                    // JUXTA (dept 3186) 공정 11인 경우만 특별 처리 (10은 기존 로직 유지)
+                    if (deptCode === '3186' && selectedProcess === '11') {
                         // VJ77 모델이 아닌 경우에만 페이지 네비게이션 활성화
                         if (data.MODEL !== 'VJ77') {
                             console.log('MODEL이 VJ77이 아님, 페이지 네비게이션 활성화:', data.MODEL);
@@ -1618,6 +1645,14 @@
                             
                             // 04번 공정 이미지 먼저 로드
                             const firstPageUrl = `/upload_image/${data.Index_No}_${deptCode}_${data.Serial_No}_04_${selectedIndex}`;
+                            
+                            // 11번 공정일 때 04페이지에서 체크완료 버튼 비활성화 (VJ77 제외)
+                            const checkCompleteBtn = document.getElementById('checkCompleteButton');
+                            if (checkCompleteBtn && selectedProcess === '11') {
+                                checkCompleteBtn.disabled = true;
+                                checkCompleteBtn.style.backgroundColor = '#ccc';
+                                checkCompleteBtn.style.cursor = 'not-allowed';
+                            }
                         
                         fetch(firstPageUrl, {
                             method: 'GET',
@@ -1718,6 +1753,69 @@
                                 loadingSpinner.style.display = 'none';
                             });
                         }
+                    } else if (deptCode === '3186' && selectedProcess === '10') {
+                        // JUXTA 공정 10인 경우 - 기존 로직 그대로 유지 (페이지 네비게이션 없이 단일 페이지)
+                        document.getElementById('pageNavigation').style.display = 'none';
+                        originalProcessCode = null;
+                        currentPage = 1;
+                        page1Canvas = null;
+                        page2Canvas = null;
+                        page1CheckBoxStates = {};
+                        page2CheckBoxStates = {};
+                        
+                        const uploadImageUrl = `/upload_image/${data.Index_No}_${deptCode}_${data.Serial_No}_${selectedProcess}_${selectedIndex}`;
+
+                        fetch(uploadImageUrl, {
+                            method: 'GET',
+                            headers: {
+                                'Accept': 'application/json'
+                            }
+                        })
+                        .then(response => {
+                            if (!response.ok) {
+                                loadingSpinner.style.display = 'none';
+                                showMessage('이미지를 서버에서 가져오는데 실패했습니다.', 'error');
+                                throw new Error('이미지를 서버에서 가져오는데 실패했습니다.');
+                            }
+                            return response.json();
+                        })
+                        .then(imageData => {
+                            if (imageData.image_url) {
+                                is_checked_image = imageData.is_checked_image;
+                                loadImage(imageData.image_url);
+                                loadingSpinner.style.display = 'none';
+                                checkBoxes = imageData.checkboxes || [];
+                                return fetch(`/get_checkbox_states?indexNo=${encodeURIComponent(data.Index_No)}&serialNo=${encodeURIComponent(data.Serial_No)}&processCode=${encodeURIComponent(selectedProcess)}&deptCode=${encodeURIComponent(deptCode)}`);
+                            } else {
+                                loadingSpinner.style.display = 'none';
+                                showMessage('이미지 URL이 없습니다.', 'error');
+                                throw new Error('이미지 URL이 없습니다.');
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(states => {
+                            if (is_checked_image) {
+                                checkBoxStates = states;
+                            } else {
+                                checkBoxStates = {};
+                                checkBoxes.forEach((_, index) => {
+                                    checkBoxStates[index] = 'default';
+                                    if (checkBoxStates[index] === 'default') {
+                                        if (isInteriorAllYellow(checkBoxes[index])) {
+                                            checkBoxStates[index] = 'default_n';
+                                            let originalStates = {};
+                                        }
+                                        checkBoxStates[index] = checkBoxStates[index];
+                                        originalStates[index] = checkBoxStates[index];
+                                    }
+                                    startDebugTimer(`체크박스 ${index} 상태: ${checkBoxStates[index]}`);
+                                });
+                            }
+                            redrawCheckboxes();
+                        })
+                        .catch(error => {
+                            console.error('체크박스 상태 불러오기 오류:', error);
+                        });
                     } else {
                         // 일반적인 경우 (기존 로직) - 페이지 네비게이션 숨기기
                         document.getElementById('pageNavigation').style.display = 'none';
