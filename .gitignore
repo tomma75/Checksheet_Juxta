@@ -5934,3 +5934,5 @@ logs/web_service.log
 /logs
 *.png
 *.log
+logs/web_service.log
+previous_serials.json
