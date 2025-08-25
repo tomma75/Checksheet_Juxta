@@ -178,7 +178,7 @@ class RouteHandler:
                             """
                 cursor.execute(sql_check, (indexNo, indexNo_sfix, serial_no, deptCode, process_code))
                 row = cursor.fetchone()
-                renewal_d_value = row[0]
+                renewal_d_value = row[0] if row else None
 
                 sql_model = """
                     SELECT T951.MODEL FROM TDSC951 T951, TDSC952 T952
@@ -189,7 +189,24 @@ class RouteHandler:
                 row = cursor.fetchone()
                 model = row[0] if row else None
 
-                if renewal_d_value is None:
+                # 04번 공정의 경우 DCS_HISTORY에 레코드가 없을 수 있으므로 MERGE 사용
+                if process_code == '04' and deptCode == '3186':
+                    sql_merge = """
+                        MERGE INTO DCS_HISTORY
+                        USING DUAL
+                        ON (INDEX_NO = :1 AND INDEX_NO_SFIX = :2 AND SERIAL_NO = :3 
+                            AND DEPT_CODE = :4 AND PROCESS_CODE = :5 AND DATA_ST = 'A')
+                        WHEN MATCHED THEN
+                            UPDATE SET STATUS = :6, EMP_NO = :7, FINISH_D = :8, RENEWAL_BY = :9
+                        WHEN NOT MATCHED THEN
+                            INSERT (INDEX_NO, INDEX_NO_SFIX, SERIAL_NO, DEPT_CODE, PROCESS_CODE, 
+                                    STATUS, EMP_NO, FINISH_D, ENTRY_D, ENTRY_BY, DATA_ST)
+                            VALUES (:1, :2, :3, :4, :5, :6, :7, :8, :8, :9, 'A')
+                    """
+                    params = (indexNo, indexNo_sfix, serial_no, deptCode, process_code, 
+                             result, empNo, date_str, pc_name)
+                    cursor.execute(sql_merge, params)
+                elif renewal_d_value is None and row is not None:
                     sql_update = """
                         UPDATE DCS_HISTORY
                         SET STATUS = :1, EMP_NO = :2, FINISH_D = :3
@@ -197,7 +214,7 @@ class RouteHandler:
                     """
                     params = (result, empNo, date_str, indexNo, indexNo_sfix, serial_no, deptCode, process_code)
                     cursor.execute(sql_update, params)
-                else:
+                elif row is not None:
                     # RENEWAL_D가 NULL이 아닐 경우
                     sql_update = """
                         UPDATE DCS_HISTORY
