@@ -356,7 +356,8 @@ class RouteHandler:
         file_path = None
         
         # JUXTA (3186) 11번 프로세스일 때 04번 프로세스 특별 처리
-        if dept == '3186' and process == '04' and not is_checked_image:
+        # 체크박스 상태와 관계없이 항상 _0.png 사용
+        if dept == '3186' and process == '04':
             # 04번 프로세스는 시리얼번호_0.png를 사용
             process_0_filename = f'{serial}_0.png'
             process_0_file_path = os.path.join(self.app.config['UPLOAD_FOLDER'], dept, 'Process', serial, process_0_filename)
