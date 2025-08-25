@@ -1852,6 +1852,7 @@
                                 checkCompleteBtn.style.cursor = 'not-allowed';
                             }
                         
+                        console.log('04번 공정 이미지 요청 URL:', firstPageUrl);
                         fetch(firstPageUrl, {
                             method: 'GET',
                             headers: {
@@ -1859,6 +1860,7 @@
                             }
                         })
                         .then(response => {
+                            console.log('04번 공정 응답 상태:', response.status, response.ok);
                             if (!response.ok) {
                                 loadingSpinner.style.display = 'none';
                                 showMessage('04번 공정 이미지를 서버에서 가져오는데 실패했습니다.', 'error');
@@ -1867,6 +1869,13 @@
                             return response.json();
                         })
                         .then(imageData => {
+                            console.log('04번 공정 이미지 데이터:', imageData);
+                            if (imageData.error) {
+                                console.error('서버 에러:', imageData.error);
+                                loadingSpinner.style.display = 'none';
+                                showMessage(`서버 에러: ${imageData.error}`, 'error');
+                                throw new Error(imageData.error);
+                            }
                             if (imageData.image_url) {
                                 is_checked_image = imageData.is_checked_image;
                                 loadImage(imageData.image_url);
@@ -1877,6 +1886,7 @@
                                 return fetch(`/get_checkbox_states?indexNo=${encodeURIComponent(data.Index_No)}&serialNo=${encodeURIComponent(data.Serial_No)}&processCode=04&deptCode=${encodeURIComponent(deptCode)}`);
                             } else {
                                 loadingSpinner.style.display = 'none';
+                                console.error('이미지 URL 없음, 전체 응답:', imageData);
                                 showMessage('04번 공정 이미지 URL이 없습니다.', 'error');
                                 throw new Error('04번 공정 이미지 URL이 없습니다.');
                             }
