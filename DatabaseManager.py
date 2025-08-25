@@ -24,7 +24,7 @@ class DatabaseManager:
     def _init_oracle_client(self):
         try:
             # Oracle 클라이언트 초기화
-            oracle_client_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "instantclient_21_7")
+            oracle_client_path = "/opt/instantclient_21_13"
             if not os.path.exists(oracle_client_path):
                 raise Exception(f"Oracle client path not found: {oracle_client_path}")
                 

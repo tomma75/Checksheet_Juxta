@@ -14,7 +14,7 @@ SELECT
     b.MODEL,
     b.CHK_SUFFIX_CODE,
     b.CHK_OPT_CODE,
-    TO_CHAR(SYSDATE, 'DD') || '-' || LPAD(c.SEQ, 3, '0') AS SEQ
+    TO_CHAR(c.ENTRY_D, 'DD') || '-' || LPAD(c.SEQ, 3, '0') AS SEQ
 FROM 
     TDSC952 a
 JOIN 
