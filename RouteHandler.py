@@ -262,14 +262,34 @@ class RouteHandler:
                                 if f.startswith(serial_no) and f.endswith('.png')
                             ])
                             if model != 'VJ77':
-                                VJ77_image_paths = os.path.join(
-                                        self.app.config['UPLOAD_FOLDER'],
-                                        deptCode,
-                                        'Process',
-                                        serial_no,
-                                        f'{serial_no}_0.png'
-                                        )
-                                image_files.insert(0, VJ77_image_paths)
+                                # 먼저 Checked 폴더에 04번 이미지가 있는지 확인
+                                checked_04_path = os.path.join(
+                                    self.app.config['UPLOAD_FOLDER'],
+                                    deptCode,
+                                    'Checked',
+                                    serial_no,
+                                    f'{serial_no}_04.png'
+                                )
+                                
+                                # Process 폴더의 _0.png 경로
+                                process_0_path = os.path.join(
+                                    self.app.config['UPLOAD_FOLDER'],
+                                    deptCode,
+                                    'Process',
+                                    serial_no,
+                                    f'{serial_no}_0.png'
+                                )
+                                
+                                # Checked에 04번이 있으면 그것을 사용, 없으면 Process의 0번 사용
+                                if os.path.exists(checked_04_path):
+                                    # 이미 image_files에 포함되어 있으므로 추가 작업 불필요
+                                    logging.info(f"Using checked 04 image for merge: {checked_04_path}")
+                                elif os.path.exists(process_0_path):
+                                    # Process 폴더의 0번 이미지를 맨 앞에 추가
+                                    image_files.insert(0, process_0_path)
+                                    logging.info(f"Using process 0 image for merge: {process_0_path}")
+                                else:
+                                    logging.warning(f"Neither checked 04 nor process 0 image found for {serial_no}")
                             # 이미지 합치기 실행
                             ImageProcessor.merge_checksheet_images_juxta(image_files, merged_image_path, target_width=800)
                         
