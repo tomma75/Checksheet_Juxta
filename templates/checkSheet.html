@@ -1428,13 +1428,16 @@
                     event.preventDefault();
                 }
             } else {
-                if (barcodeInput.value.length === 6) {
-                    const selectedProcess = document.getElementById('processSelect').value;
-                    
-                    // 이전 공정 체크 로직 제거 및 직접 바코드 처리
-                    processBarcode(barcodeInput.value);
-                    barcodeInput.value = '';
-                    event.preventDefault();
+                // 엔터키가 눌렸을 때 처리
+                if (event.key === 'Enter') {
+                    event.preventDefault(); // 폼 제출 방지
+                    if (barcodeInput.value.length === 6) {
+                        const selectedProcess = document.getElementById('processSelect').value;
+                        
+                        // 이전 공정 체크 로직 제거 및 직접 바코드 처리
+                        processBarcode(barcodeInput.value);
+                        barcodeInput.value = '';
+                    }
                 }
             }
         });
