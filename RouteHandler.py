@@ -348,7 +348,11 @@ class RouteHandler:
         network_checked_path = os.path.join(self.app.config['NETWORK_PATH'], dept, 'Checked', serial, checked_filename)
 
         # Process 파일 경로 확인 (로컬 및 네트워크)
-        process_filename = f'{serial}_{index}.png'
+        # 3186 부서의 04번 공정은 항상 _0.png 사용
+        if dept == '3186' and process == '04' and model != 'VJ77':
+            process_filename = f'{serial}_0.png'
+        else:
+            process_filename = f'{serial}_{index}.png'
         process_file_path = os.path.join(self.app.config['UPLOAD_FOLDER'], dept, 'Process', serial, process_filename)
         network_process_path = os.path.join(self.app.config['NETWORK_PATH'], dept, 'Process', serial, process_filename)
 
@@ -392,7 +396,8 @@ class RouteHandler:
                         logging.info(f"Using source file directly: {source_path}")
                 
                 # 복사가 성공했거나 실패했어도 file_path가 설정됨
-                if 'file_path' not in locals():
+                # file_path가 아직 설정되지 않았으면 checked_file_path 사용
+                if file_path is None:
                     file_path = checked_file_path
             else:
                 # 0번 이미지도 없으면 일반 프로세스 파일 경로 사용
