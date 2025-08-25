@@ -758,6 +758,43 @@
             // 페이지 1 (04번 공정) 저장
             const savePage1 = () => {
                 return new Promise((resolve, reject) => {
+                    // 04번 공정에 체크박스가 없는 경우 이미지만 저장
+                    if (!page1CheckBoxStates || Object.keys(page1CheckBoxStates).length === 0) {
+                        console.log('04번 공정: 체크박스 없음, 이미지만 저장');
+                        
+                        // 04번 공정 이미지만 저장
+                        if (page1Canvas) {
+                            page1Canvas.toBlob(function(blob) {
+                                const formData = new FormData();
+                                formData.append('image', blob, 'checked_image.png');
+                                formData.append('serialNo', currentSerialNo);
+                                formData.append('processCode', '04');
+                                formData.append('deptCode', deptCode);
+                                formData.append('empNo', empNo);
+                                formData.append('indexNo', indexNo);
+                                formData.append('result', 'OK'); // 체크박스가 없으면 기본 OK
+                                
+                                fetch('/save_checked_image', {
+                                    method: 'POST',
+                                    body: formData
+                                })
+                                .then(response => response.json())
+                                .then(data => {
+                                    if (data.success) {
+                                        console.log('04번 공정 이미지 저장 성공');
+                                        resolve();
+                                    } else {
+                                        reject(new Error('04번 공정 이미지 저장 실패'));
+                                    }
+                                })
+                                .catch(reject);
+                            });
+                        } else {
+                            resolve(); // 캔버스도 없으면 그냥 넘어감
+                        }
+                        return;
+                    }
+                    
                     // 04번 공정 체크박스 상태 확인
                     let anyCrossed = false;
                     Object.values(page1CheckBoxStates).forEach(state => {
@@ -910,8 +947,8 @@
                 })
                 .catch(error => {
                     loadingSpinner.style.display = 'none';
-                    console.error('Error:', error);
-                    showMessage('체크시트 저장 중 오류가 발생했습니다.', 'error');
+                    console.error('saveBothPages 에러:', error);
+                    showMessage(`체크시트 저장 중 오류가 발생했습니다: ${error.message}`, 'error');
                 });
         }
         
