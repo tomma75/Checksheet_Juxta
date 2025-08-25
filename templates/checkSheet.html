@@ -604,7 +604,7 @@
             const savedCanvas = document.createElement('canvas');
             savedCanvas.width = baseCanvas.width;
             savedCanvas.height = baseCanvas.height;
-            const savedCtx = savedCanvas.getContext('2d');
+            const savedCtx = savedCanvas.getContext('2d', { willReadFrequently: true });
             
             // base 이미지와 drawing 합치기 (원본 크기로)
             savedCtx.drawImage(baseCanvas, 0, 0, baseCanvas.width, baseCanvas.height);
@@ -719,8 +719,8 @@
             
             if (!baseCanvas || !drawingCanvas || !savedCanvas) return;
             
-            const baseCtx = baseCanvas.getContext('2d');
-            const drawingCtx = drawingCanvas.getContext('2d');
+            const baseCtx = baseCanvas.getContext('2d', { willReadFrequently: true });
+            const drawingCtx = drawingCanvas.getContext('2d', { willReadFrequently: true });
             
             // 캔버스 크기를 저장된 이미지의 원본 크기로 설정
             baseCanvas.width = savedCanvas.width;
@@ -944,8 +944,8 @@
         const form = document.getElementById('upload-form');
         const baseImageCanvas = document.getElementById('baseImageCanvas');
         const drawingCanvas = document.getElementById('drawingCanvas');
-        const baseCtx = baseImageCanvas.getContext('2d');
-        const drawingCtx = drawingCanvas.getContext('2d');
+        const baseCtx = baseImageCanvas.getContext('2d', { willReadFrequently: true });
+        const drawingCtx = drawingCanvas.getContext('2d', { willReadFrequently: true });
         const loadingSpinner = document.getElementById('loadingSpinner'); // 모래시계 아이콘
 
         let is_checked_image = false;
@@ -1359,7 +1359,7 @@
                 const mergedCanvas = document.createElement('canvas');
                 mergedCanvas.width = baseImageCanvas.width;
                 mergedCanvas.height = baseImageCanvas.height;
-                const mergedCtx = mergedCanvas.getContext('2d');
+                const mergedCtx = mergedCanvas.getContext('2d', { willReadFrequently: true });
                 mergedCtx.drawImage(baseImageCanvas, 0, 0);
                 mergedCtx.drawImage(drawingCanvas, 0, 0);
 
