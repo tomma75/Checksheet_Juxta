@@ -504,6 +504,8 @@
         let page2Canvas = null; // 10번/11번 이미지 캔버스 저장
         let page1CheckBoxStates = {}; // 04번 체크박스 상태
         let page2CheckBoxStates = {}; // 10번/11번 체크박스 상태
+        let page1CheckBoxes = []; // 04번 체크박스 위치 정보
+        let page2CheckBoxes = []; // 11번 체크박스 위치 정보
         let currentProductInfo = null; // 현재 제품 정보 저장
         let originalProcessCode = null; // 원래 선택된 공정 코드 (10 or 11)
         
@@ -613,11 +615,15 @@
             if (currentPage === 1) {
                 page1Canvas = savedCanvas;
                 page1CheckBoxStates = {...checkBoxStates};
+                page1CheckBoxes = checkBoxes ? [...checkBoxes] : [];  // 체크박스 위치 정보도 저장
                 console.log('04번 페이지 상태 저장됨 - 크기:', savedCanvas.width, 'x', savedCanvas.height);
+                console.log('04번 페이지 체크박스 개수:', page1CheckBoxes.length);
             } else {
                 page2Canvas = savedCanvas;
                 page2CheckBoxStates = {...checkBoxStates};
+                page2CheckBoxes = checkBoxes ? [...checkBoxes] : [];  // 체크박스 위치 정보도 저장
                 console.log('10/11번 페이지 상태 저장됨 - 크기:', savedCanvas.width, 'x', savedCanvas.height);
+                console.log('11번 페이지 체크박스 개수:', page2CheckBoxes.length);
             }
         }
         
@@ -812,7 +818,15 @@
                         processCode: '04',
                         checkboxStates: page1CheckBoxStates,
                         originalStates: {},
-                        checkboxPositions: {},
+                        checkboxPositions: page1CheckBoxes.reduce((acc, box, index) => {
+                            acc[index] = {
+                                x: box.x,
+                                y: box.y,
+                                width: box.width,
+                                height: box.height
+                            };
+                            return acc;
+                        }, {}),
                         empNo: empNo
                     };
                     
@@ -880,7 +894,15 @@
                         processCode: originalProcessCode,
                         checkboxStates: page2CheckBoxStates,
                         originalStates: {},
-                        checkboxPositions: {},
+                        checkboxPositions: page2CheckBoxes.reduce((acc, box, index) => {
+                            acc[index] = {
+                                x: box.x,
+                                y: box.y,
+                                width: box.width,
+                                height: box.height
+                            };
+                            return acc;
+                        }, {}),
                         empNo: empNo
                     };
                     
@@ -944,6 +966,8 @@
                     page2Canvas = null;
                     page1CheckBoxStates = {};
                     page2CheckBoxStates = {};
+                    page1CheckBoxes = [];
+                    page2CheckBoxes = [];
                 })
                 .catch(error => {
                     loadingSpinner.style.display = 'none';
