@@ -376,6 +376,57 @@
             border-radius: 4px;
             border: 1px solid #dee2e6;
         }
+        
+        /* Sticky header 스타일 */
+        #productInfoContainer {
+            background-color: white;
+            padding: 15px;
+            border-bottom: 2px solid #ccc;
+            transition: all 0.3s ease;
+            z-index: 999;
+            box-shadow: none;
+            margin-bottom: 10px;
+        }
+        
+        #productInfoContainer.sticky {
+            position: fixed;
+            top: 0;
+            left: 50px; /* 사이드바 토글 버튼 고려 */
+            right: 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            animation: slideDown 0.3s ease;
+        }
+        
+        @keyframes slideDown {
+            from {
+                transform: translateY(-100%);
+            }
+            to {
+                transform: translateY(0);
+            }
+        }
+        
+        /* Sticky 상태일 때 placeholder 역할 */
+        .sticky-placeholder {
+            display: none;
+            height: 100px; /* productInfoContainer 높이에 맞춤 */
+        }
+        
+        #productInfoContainer.sticky ~ .sticky-placeholder {
+            display: block;
+        }
+        
+        /* 사이드바가 열려있을 때 sticky header 위치 조정 */
+        .sidebar-expanded #productInfoContainer.sticky {
+            left: 250px;
+            width: calc(100% - 250px);
+        }
+        
+        /* 작은 이미지일 때는 sticky 비활성화 */
+        #productInfoContainer.no-sticky {
+            position: static !important;
+        }
+        
         /* 로딩 스피너(모래시계) 컨테이너 */
         #loadingSpinner {
             display: none;         /* 기본적으로 숨김 */
@@ -413,6 +464,23 @@
             <div class="custom-confirm-buttons">
                 <button class="custom-confirm-save" id="confirmSaveBtn">저장</button>
                 <button class="custom-confirm-cancel" id="confirmCancelBtn">취소</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 3186 공정 체크박스 미체크 확인 모달 -->
+    <div id="uncheckedConfirmModal" class="custom-confirm-modal">
+        <div class="custom-confirm-content">
+            <div class="custom-confirm-header">
+                <h3 class="custom-confirm-title">미체크 항목 확인</h3>
+            </div>
+            <div class="custom-confirm-message">
+                미체크 항목이 있습니다.<br>
+                저장하시겠습니까?
+            </div>
+            <div class="custom-confirm-buttons">
+                <button class="custom-confirm-save" id="uncheckedSaveBtn">저장</button>
+                <button class="custom-confirm-cancel" id="uncheckedCancelBtn">취소</button>
             </div>
         </div>
     </div>
@@ -473,6 +541,8 @@
                     <button type="button" id="nextPageButton" onclick="switchToPage('next')">다음 페이지</button>
                 </div>
             </div>
+            <!-- Sticky placeholder -->
+            <div class="sticky-placeholder"></div>
             <!-- 에러 메시지 표시 영역 -->
             <p id="error" style="color: red;"></p>
             <!-- 이미지 표시 영역 -->
@@ -1351,6 +1421,53 @@
             const currentSerialNo = serialNoDisplay.textContent;
             const deptCode = document.getElementById('deptInfo').textContent.split(' ')[0];
             
+            // 3186 공정인 경우 체크박스 검증
+            if (deptCode === '3186') {
+                // 모든 체크박스 확인
+                let hasUncheckedItems = false;
+                
+                // 현재 페이지의 체크박스 확인
+                for (let index in checkBoxStates) {
+                    if (checkBoxStates[index] === 'default' || !checkBoxStates[index]) {
+                        hasUncheckedItems = true;
+                        break;
+                    }
+                }
+                
+                // 두 번째 페이지가 있는 경우 (공정 11)
+                if (originalProcessCode === '11') {
+                    // 현재 페이지 상태 저장
+                    saveCurrentPageState();
+                    
+                    // page1CheckBoxStates 확인 (04번 페이지)
+                    if (page1CheckBoxStates) {
+                        for (let index in page1CheckBoxStates) {
+                            if (page1CheckBoxStates[index] === 'default' || !page1CheckBoxStates[index]) {
+                                hasUncheckedItems = true;
+                                break;
+                            }
+                        }
+                    }
+                    
+                    // page2CheckBoxStates 확인 (11번 페이지)
+                    if (page2CheckBoxStates) {
+                        for (let index in page2CheckBoxStates) {
+                            if (page2CheckBoxStates[index] === 'default' || !page2CheckBoxStates[index]) {
+                                hasUncheckedItems = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+                
+                // 미체크 항목이 있으면 모달 표시
+                if (hasUncheckedItems) {
+                    showUncheckedConfirmModal(selectedProcess, currentSerialNo, deptCode);
+                    loadingSpinner.style.display = 'none'; // 로딩 스피너 숨김
+                    return;
+                }
+            }
+            
             // JUXTA 공정 11인 경우만 두 페이지 모두 저장 (10은 기존 로직 유지)
             if (deptCode === '3186' && originalProcessCode && originalProcessCode === '11') {
                 // 현재 페이지 상태 저장
@@ -1361,120 +1478,128 @@
                 return;
             }
             
-            // 일반적인 경우 (단일 페이지)
-            let anyCrossed = false;
-            let checkboxSaveSuccess = false;
-            let imageSaveSuccess = false;
-
-            // 체크박스 상태 확인
-            checkBoxes.forEach((box, index) => {
-                if (checkBoxStates[index] === 'crossed') {
-                    anyCrossed = true;
-                }
-                if(checkBoxStates[index] === 'default_n') {
-                    anyCrossed = true;
-                }
-            });
-
-            let result = anyCrossed ? 'NG' : 'OK';
-
-            // 체크박스 상태와 위치를 서버로 전송
-            const checkboxData = {
-                indexNo: indexNoDisplay.textContent,
-                serialNo: serialNoDisplay.textContent,
-                deptCode: deptCode,
-                processCode: selectedProcess,
-                checkboxStates: checkBoxStates,
-                originalStates: originalStates,
-                checkboxPositions: checkBoxes.reduce((acc, box, index) => {
-                    acc[index] = {
-                        x: box.x,
-                        y: box.y,
-                        width: box.width,
-                        height: box.height
-                    };
-                    return acc;
-                }, {}),
-                empNo: document.getElementById('employeeName').textContent.split(' ')[0]
-            };
-
-            fetch('/save_checkbox_states', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(checkboxData)
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.error) {
-                    throw new Error(data.error);
-                }
-                checkboxSaveSuccess = true;
-                endDebugTimer('체크시트 저장');
-                startDebugTimer('이미지 저장');
-                
-                // 이미지 저장 로직
-                const baseImageCanvas = document.getElementById('baseImageCanvas');
-                const drawingCanvas = document.getElementById('drawingCanvas');
-                const mergedCanvas = document.createElement('canvas');
-                mergedCanvas.width = baseImageCanvas.width;
-                mergedCanvas.height = baseImageCanvas.height;
-                const mergedCtx = mergedCanvas.getContext('2d', { willReadFrequently: true });
-                mergedCtx.drawImage(baseImageCanvas, 0, 0);
-                mergedCtx.drawImage(drawingCanvas, 0, 0);
-
-                mergedCanvas.toBlob(function(blob) {
-                    const formData = new FormData();
-                    formData.append('image', blob, 'checked_image.png');
-                    formData.append('serialNo', serialNoDisplay.textContent);
-                    formData.append('processCode', selectedProcess);
-                    formData.append('deptCode', document.getElementById('deptInfo').textContent.split(' ')[0]);
-                    formData.append('empNo', document.getElementById('employeeName').textContent.split(' ')[0]);
-                    formData.append('indexNo', indexNoDisplay.textContent);
-                    formData.append('result', result);
-
-                    fetch('/save_checked_image', {
-                        method: 'POST',
-                        body: formData
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        loadingSpinner.style.display = 'none'; // 로딩 스피너 숨김
-                        if (data.success) {
-                            showMessage(data.message, 'success', currentSerialNo);
-                            isCheckSheetModified = false;
-                        } else {
-                            let errorMsg = data.message;
-                            if (!data.db_saved && !data.file_saved) {
-                                errorMsg = '체크시트 저장에 실패했습니다.';
-                            } else if (!data.db_saved) {
-                                errorMsg = '데이터베이스 저장에 실패했습니다.';
-                            } else if (!data.file_saved) {
-                                errorMsg = '이미지 파일 저장에 실패했습니다.';
-                            }
-                            showMessage(errorMsg, 'error');
-                        }
-                    })
-                    .catch(error => {
-                        loadingSpinner.style.display = 'none'; // 로딩 스피너 숨김
-                        console.error('Error:', error);
-                        showMessage('체크시트 저장 중 오류가 발생했습니다.', 'error');
-                    });
-                });
-            })
-            .catch(error => {
-                endDebugTimer('체크시트 저장');
-                console.error('Error:', error);
-                loadingSpinner.style.display = 'none'; // 로딩 스피너 숨김
-                showMessage('체크박스 데이터 저장 중 오류가 발생했습니다.', 'error');
-            });
+            // 일반적인 경우 (단일 페이지) - 새로 만든 함수 호출
+            proceedWithSaving(selectedProcess, currentSerialNo, deptCode);
         }
 
         // 페이지가 로드되면 바코드 입력 필드에 자동으로 포커스를 맞춥니다.
         window.onload = function() {
             document.getElementById('barcodeInput').focus();
+            initStickyHeader();
         };
+        
+        // Sticky header 초기화 함수
+        function initStickyHeader() {
+            const productInfoContainer = document.getElementById('productInfoContainer');
+            const stickyPlaceholder = document.querySelector('.sticky-placeholder');
+            let isImageLarge = false;
+            let containerTop = 0;
+            
+            // 이미지 크기 체크 함수 - 전역으로 노출
+            function checkImageSize() {
+                const baseCanvas = document.getElementById('baseImageCanvas');
+                const canvasContainer = document.getElementById('canvasContainer');
+                
+                if (!baseCanvas || !canvasContainer || canvasContainer.style.display === 'none') {
+                    isImageLarge = false;
+                    productInfoContainer.classList.add('no-sticky');
+                    return;
+                }
+                
+                // 이미지 높이가 화면 높이의 80% 이상이면 sticky 활성화
+                const imageHeight = baseCanvas.height;
+                const viewportHeight = window.innerHeight;
+                isImageLarge = imageHeight > viewportHeight * 0.8;
+                
+                if (!isImageLarge) {
+                    productInfoContainer.classList.add('no-sticky');
+                    productInfoContainer.classList.remove('sticky');
+                } else {
+                    productInfoContainer.classList.remove('no-sticky');
+                    updateStickyState();
+                }
+            }
+            
+            // Sticky 상태 업데이트
+            function updateStickyState() {
+                if (!productInfoContainer || productInfoContainer.style.display === 'none' || !isImageLarge) {
+                    return;
+                }
+                
+                // container의 원래 위치 저장
+                if (!productInfoContainer.classList.contains('sticky')) {
+                    const rect = productInfoContainer.getBoundingClientRect();
+                    containerTop = rect.top + window.pageYOffset;
+                }
+                
+                const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                
+                // 스크롤 위치가 원래 위치를 지나면 sticky 적용
+                if (scrollTop > containerTop && isImageLarge) {
+                    if (!productInfoContainer.classList.contains('sticky')) {
+                        productInfoContainer.classList.add('sticky');
+                        // placeholder 높이 설정
+                        if (stickyPlaceholder) {
+                            stickyPlaceholder.style.height = productInfoContainer.offsetHeight + 'px';
+                        }
+                    }
+                } else {
+                    productInfoContainer.classList.remove('sticky');
+                    if (stickyPlaceholder) {
+                        stickyPlaceholder.style.height = '0';
+                    }
+                }
+            }
+            
+            // 스크롤 이벤트 리스너
+            let ticking = false;
+            function requestTick() {
+                if (!ticking) {
+                    window.requestAnimationFrame(function() {
+                        updateStickyState();
+                        ticking = false;
+                    });
+                    ticking = true;
+                }
+            }
+            
+            window.addEventListener('scroll', requestTick);
+            
+            // 리사이즈 이벤트 리스너
+            window.addEventListener('resize', function() {
+                checkImageSize();
+                updateStickyState();
+            });
+            
+            // MutationObserver로 이미지 로드 감지
+            const observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    if (mutation.type === 'attributes' && 
+                        (mutation.attributeName === 'style' || mutation.attributeName === 'width' || mutation.attributeName === 'height')) {
+                        setTimeout(checkImageSize, 100);
+                    }
+                });
+            });
+            
+            const baseCanvas = document.getElementById('baseImageCanvas');
+            const canvasContainer = document.getElementById('canvasContainer');
+            
+            if (baseCanvas) {
+                observer.observe(baseCanvas, { attributes: true });
+            }
+            
+            if (canvasContainer) {
+                observer.observe(canvasContainer, { attributes: true });
+            }
+            
+            // productInfoContainer 표시 상태 변경 감지
+            if (productInfoContainer) {
+                observer.observe(productInfoContainer, { attributes: true, attributeFilter: ['style'] });
+            }
+            
+            // 전역으로 checkImageSize 함수 노출
+            window.checkImageSizeForSticky = checkImageSize;
+        }
 
         // 문서 전체에 대해 키 다운 이벤트를 캡쳐하고, 이벤트가 발생할 때마다
         // 바코드 입력 필드로 포커스를 옮기고 입력을 리다이렉트합니다.
@@ -1597,6 +1722,178 @@
                     clearAllDisplays();  // 화면 초기화
                     processNewBarcode(barcode);
                 }
+            });
+        }
+        
+        // 3186 공정 미체크 항목 확인 모달 표시 함수
+        function showUncheckedConfirmModal(selectedProcess, currentSerialNo, deptCode) {
+            const modal = document.getElementById('uncheckedConfirmModal');
+            const saveBtn = document.getElementById('uncheckedSaveBtn');
+            const cancelBtn = document.getElementById('uncheckedCancelBtn');
+            
+            modal.style.display = 'block';
+            modal.dataset.selectedProcess = selectedProcess;
+            modal.dataset.currentSerialNo = currentSerialNo;
+            modal.dataset.deptCode = deptCode;
+            
+            // 저장 버튼 클릭 이벤트
+            saveBtn.onclick = function() {
+                modal.style.display = 'none';
+                loadingSpinner.style.display = 'block';
+                
+                const selectedProcess = modal.dataset.selectedProcess;
+                const currentSerialNo = modal.dataset.currentSerialNo;
+                const deptCode = modal.dataset.deptCode;
+                
+                // 저장 로직 계속 진행
+                continueSaveCheckSheet(selectedProcess, currentSerialNo, deptCode);
+            };
+            
+            // 취소 버튼 클릭 이벤트
+            cancelBtn.onclick = function() {
+                modal.style.display = 'none';
+                loadingSpinner.style.display = 'none';
+            };
+            
+            // 모달 외부 클릭으로 닫기
+            window.onclick = function(event) {
+                if (event.target == modal) {
+                    modal.style.display = 'none';
+                    loadingSpinner.style.display = 'none';
+                }
+            };
+            
+            // ESC 키로 모달 닫기
+            document.addEventListener('keydown', function handleEsc(event) {
+                if (event.key === 'Escape' && modal.style.display === 'block') {
+                    modal.style.display = 'none';
+                    loadingSpinner.style.display = 'none';
+                    document.removeEventListener('keydown', handleEsc);
+                }
+            });
+        }
+        
+        // 저장 로직 계속 진행 함수
+        function continueSaveCheckSheet(selectedProcess, currentSerialNo, deptCode) {
+            // JUXTA 공정 11인 경우만 두 페이지 모두 저장
+            if (deptCode === '3186' && originalProcessCode && originalProcessCode === '11') {
+                saveBothPages(currentSerialNo, deptCode);
+                return;
+            }
+            
+            // 기존 저장 로직 실행
+            proceedWithSaving(selectedProcess, currentSerialNo, deptCode);
+        }
+        
+        // 기존 저장 로직을 별도 함수로 분리
+        function proceedWithSaving(selectedProcess, currentSerialNo, deptCode) {
+            // 일반적인 경우 (단일 페이지)
+            let anyCrossed = false;
+            let checkboxSaveSuccess = false;
+            let imageSaveSuccess = false;
+
+            // 체크박스 상태 확인
+            checkBoxes.forEach((box, index) => {
+                if (checkBoxStates[index] === 'crossed') {
+                    anyCrossed = true;
+                }
+                if(checkBoxStates[index] === 'default_n') {
+                    anyCrossed = true;
+                }
+            });
+
+            let result = anyCrossed ? 'NG' : 'OK';
+
+            // 체크박스 상태와 위치를 서버로 전송
+            const checkboxData = {
+                indexNo: indexNoDisplay.textContent,
+                serialNo: serialNoDisplay.textContent,
+                deptCode: deptCode,
+                processCode: selectedProcess,
+                checkboxStates: checkBoxStates,
+                originalStates: originalStates,
+                checkboxPositions: checkBoxes.reduce((acc, box, index) => {
+                    acc[index] = {
+                        x: box.x,
+                        y: box.y,
+                        width: box.width,
+                        height: box.height
+                    };
+                    return acc;
+                }, {}),
+                empNo: document.getElementById('employeeName').textContent.split(' ')[0]
+            };
+
+            fetch('/save_checkbox_states', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(checkboxData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                checkboxSaveSuccess = true;
+                endDebugTimer('체크시트 저장');
+                startDebugTimer('이미지 저장');
+                
+                // 이미지 저장 로직
+                const baseImageCanvas = document.getElementById('baseImageCanvas');
+                const drawingCanvas = document.getElementById('drawingCanvas');
+                const mergedCanvas = document.createElement('canvas');
+                mergedCanvas.width = baseImageCanvas.width;
+                mergedCanvas.height = baseImageCanvas.height;
+                const mergedCtx = mergedCanvas.getContext('2d', { willReadFrequently: true });
+                mergedCtx.drawImage(baseImageCanvas, 0, 0);
+                mergedCtx.drawImage(drawingCanvas, 0, 0);
+
+                mergedCanvas.toBlob(function(blob) {
+                    const formData = new FormData();
+                    formData.append('image', blob, 'checked_image.png');
+                    formData.append('serialNo', serialNoDisplay.textContent);
+                    formData.append('processCode', selectedProcess);
+                    formData.append('deptCode', document.getElementById('deptInfo').textContent.split(' ')[0]);
+                    formData.append('empNo', document.getElementById('employeeName').textContent.split(' ')[0]);
+                    formData.append('indexNo', indexNoDisplay.textContent);
+                    formData.append('result', result);
+
+                    fetch('/save_checked_image', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        loadingSpinner.style.display = 'none'; // 로딩 스피너 숨김
+                        if (data.success) {
+                            showMessage(data.message, 'success', currentSerialNo);
+                            isCheckSheetModified = false;
+                        } else {
+                            let errorMsg = data.message;
+                            if (!data.db_saved && !data.file_saved) {
+                                errorMsg = '체크시트 저장에 실패했습니다.';
+                            } else if (!data.db_saved) {
+                                errorMsg = '데이터베이스 저장에 실패했습니다.';
+                            } else if (!data.file_saved) {
+                                errorMsg = '이미지 파일 저장에 실패했습니다.';
+                            }
+                            showMessage(errorMsg, 'error');
+                        }
+                    })
+                    .catch(error => {
+                        loadingSpinner.style.display = 'none'; // 로딩 스피너 숨김
+                        console.error('Error:', error);
+                        showMessage('체크시트 저장 중 오류가 발생했습니다.', 'error');
+                    });
+                });
+            })
+            .catch(error => {
+                endDebugTimer('체크시트 저장');
+                console.error('Error:', error);
+                loadingSpinner.style.display = 'none'; // 로딩 스피너 숨김
+                showMessage('체크박스 데이터 저장 중 오류가 발생했습니다.', 'error');
             });
         }
         
@@ -2241,6 +2538,11 @@
                 baseCtx.drawImage(image, 0, 0);
                 drawingCtx.drawImage(image, 0, 0);
                 console.log('캔버스에 이미지 그리기 완료');
+                
+                // Sticky header 체크 - 이미지 로드 완료 후 실행
+                if (typeof window.checkImageSizeForSticky === 'function') {
+                    setTimeout(window.checkImageSizeForSticky, 100);
+                }
 
                 // 이미지 로드 후 해당 캔버스로 스크롤 이동
                 document.getElementById('baseImageCanvas').scrollIntoView({ behavior: 'smooth' });
