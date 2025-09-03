@@ -140,6 +140,21 @@
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.3), 0 6px 12px rgba(102, 126, 234, 0.4);
         }
         
+        .custom-confirm-exit {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ff8a80 100%);
+            color: white;
+        }
+        
+        .custom-confirm-exit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(255, 107, 107, 0.4);
+        }
+        
+        .custom-confirm-exit:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.3), 0 6px 12px rgba(255, 107, 107, 0.4);
+        }
+        
         /* 전체 페이지 스타일 설정 */
         body, input, button, select {
             font-size: 20px;
@@ -464,6 +479,7 @@
             <div class="custom-confirm-buttons">
                 <button class="custom-confirm-save" id="confirmSaveBtn">저장</button>
                 <button class="custom-confirm-cancel" id="confirmCancelBtn">취소</button>
+                <button class="custom-confirm-exit" id="confirmExitBtn">나가기</button>
             </div>
         </div>
     </div>
@@ -1657,6 +1673,7 @@
             const modal = document.getElementById('customConfirmModal');
             const saveBtn = document.getElementById('confirmSaveBtn');
             const cancelBtn = document.getElementById('confirmCancelBtn');
+            const exitBtn = document.getElementById('confirmExitBtn');
             
             modal.style.display = 'block';
             
@@ -1694,18 +1711,23 @@
                 modal.style.display = 'none';
             };
             
-            // 모달 외부 클릭 시 초기화 처리
+            // 나가기 버튼 클릭 이벤트 - 초기화 처리
+            exitBtn.onclick = function() {
+                modal.style.display = 'none';
+                // 현재 체크시트를 저장하지 않고 새 바코드 처리
+                // 체크시트 수정 상태 초기화
+                isCheckSheetModified = false;
+                checkBoxStates = {};
+                checkboxPositions = {};
+                
+                clearAllDisplays();  // 화면 초기화
+                processNewBarcode(barcode);
+            };
+            
+            // 모달 외부 클릭 시 모달만 닫기
             window.onclick = function(event) {
                 if (event.target == modal) {
                     modal.style.display = 'none';
-                    // 현재 체크시트를 저장하지 않고 새 바코드 처리
-                    // 체크시트 수정 상태 초기화
-                    isCheckSheetModified = false;
-                    checkBoxStates = {};
-                    checkboxPositions = {};
-                    
-                    clearAllDisplays();  // 화면 초기화
-                    processNewBarcode(barcode);
                 }
             };
             
