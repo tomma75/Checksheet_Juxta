@@ -1484,9 +1484,8 @@
                 }
             }
             
-            // JUXTA 공정 11인 경우 기존 로직대로 처리 (04번 먼저 불러오기 주석처리)
+            // JUXTA 공정 11인 경우만 두 페이지 모두 저장 (10은 기존 로직 유지) - 주석 처리됨
             /*
-            // 기존 코드 주석처리 - 3186이면서 11일 경우 두 페이지 모두 저장하는 로직
             if (deptCode === '3186' && originalProcessCode && originalProcessCode === '11') {
                 // 현재 페이지 상태 저장
                 saveCurrentPageState();
@@ -1800,9 +1799,8 @@
         
         // 저장 로직 계속 진행 함수
         function continueSaveCheckSheet(selectedProcess, currentSerialNo, deptCode) {
-            // JUXTA 공정 11인 경우 기존 로직대로 처리 (04번 먼저 불러오기 주석처리)
+            // JUXTA 공정 11인 경우만 두 페이지 모두 저장 - 주석 처리됨
             /*
-            // 기존 코드 주석처리 - 3186이면서 11일 경우 두 페이지 모두 저장하는 로직
             if (deptCode === '3186' && originalProcessCode && originalProcessCode === '11') {
                 saveBothPages(currentSerialNo, deptCode);
                 return;
@@ -2205,9 +2203,8 @@
                     const selectedProcess = processSelect.options[selectedIndex].value;
                     const deptCode = document.getElementById('deptInfo').textContent.split(' ')[0];
 
-                    // JUXTA (dept 3186) 공정 11인 경우 기존 로직대로 처리 (04번 먼저 불러오기 주석처리)
-                    /* 
-                    // 기존 코드 주석처리 - 3186이면서 11일 경우 04번(SET공정)을 먼저 불러오는 로직
+                    // JUXTA (dept 3186) 공정 11인 경우만 특별 처리 (10은 기존 로직 유지) - 주석 처리됨
+                    /*
                     if (deptCode === '3186' && selectedProcess === '11') {
                         // VJ77 모델이 아닌 경우에만 페이지 네비게이션 활성화
                         if (data.MODEL !== 'VJ77') {
@@ -2288,14 +2285,9 @@
                             } else {
                                 checkBoxStates = {};
                                 checkBoxes.forEach((_, index) => {
-                                    // JUXTA(3186) 부서는 모든 체크박스를 default_n으로 설정
-                                    if (deptCode === '3186') {
+                                    checkBoxStates[index] = 'default';
+                                    if (isInteriorAllYellow(checkBoxes[index])) {
                                         checkBoxStates[index] = 'default_n';
-                                    } else {
-                                        checkBoxStates[index] = 'default';
-                                        if (isInteriorAllYellow(checkBoxes[index])) {
-                                            checkBoxStates[index] = 'default_n';
-                                        }
                                     }
                                     originalStates[index] = checkBoxStates[index];
                                 });
@@ -2305,12 +2297,11 @@
                         })
                         .catch(error => {
                             console.error('Error:', error);
-                    */
-                    
-                    // 3186이면서 11인 경우에도 기존 로직대로 처리 (11번만 불러오기)
-                    // 기존 조건(3186이면서 11)을 제거하여 모든 경우에 대해 기본 로직 수행
-                    if (deptCode === '3186' && selectedProcess === '11') {
-                            // 페이지 네비게이션 숨기기
+                            loadingSpinner.style.display = 'none';
+                        });
+                        } else {
+                            // VJ77 모델인 경우 - 페이지 네비게이션 숨기고 해당 공정만 로드
+                            console.log('MODEL이 VJ77, 페이지 네비게이션 비활성화');
                             document.getElementById('pageNavigation').style.display = 'none';
                             
                             // 페이지 상태 초기화
@@ -2321,7 +2312,7 @@
                             page1CheckBoxStates = {};
                             page2CheckBoxStates = {};
                             
-                            // 선택된 공정 11번 이미지 바로 로드
+                            // 선택된 공정(10 또는 11) 이미지 바로 로드
                             const uploadImageUrl = `/upload_image/${data.Index_No}_${deptCode}_${data.Serial_No}_${selectedProcess}_${selectedIndex}`;
                             
                             fetch(uploadImageUrl, {
@@ -2354,8 +2345,12 @@
                                 console.error('Error:', error);
                                 loadingSpinner.style.display = 'none';
                             });
+                        }
+                    }
+                    */
                     
-                    } else if (deptCode === '3186' && selectedProcess === '10') {
+                    // 기본 처리 로직으로 통합 (10번과 11번 공정 모두 기본 로직으로 처리)
+                    if (deptCode === '3186' && (selectedProcess === '10' || selectedProcess === '11')) {
                         // JUXTA 공정 10인 경우 - 기존 로직 그대로 유지 (페이지 네비게이션 없이 단일 페이지)
                         document.getElementById('pageNavigation').style.display = 'none';
                         originalProcessCode = null;
@@ -2401,20 +2396,15 @@
                             } else {
                                 checkBoxStates = {};
                                 checkBoxes.forEach((_, index) => {
-                                    // JUXTA(3186) 부서는 모든 체크박스를 default_n으로 설정
-                                    if (deptCode === '3186') {
-                                        checkBoxStates[index] = 'default_n';
-                                    } else {
-                                        checkBoxStates[index] = 'default';
-                                        if (checkBoxStates[index] === 'default') {
-                                            if (isInteriorAllYellow(checkBoxes[index])) {
-                                                checkBoxStates[index] = 'default_n';
-                                                let originalStates = {};
-                                            }
-                                            checkBoxStates[index] = checkBoxStates[index];
+                                    checkBoxStates[index] = 'default';
+                                    if (checkBoxStates[index] === 'default') {
+                                        if (isInteriorAllYellow(checkBoxes[index])) {
+                                            checkBoxStates[index] = 'default_n';
+                                            let originalStates = {};
                                         }
+                                        checkBoxStates[index] = checkBoxStates[index];
+                                        originalStates[index] = checkBoxStates[index];
                                     }
-                                    originalStates[index] = checkBoxStates[index];
                                     startDebugTimer(`체크박스 ${index} 상태: ${checkBoxStates[index]}`);
                                 });
                             }
@@ -2469,20 +2459,15 @@
                             } else {
                                 checkBoxStates = {};
                                 checkBoxes.forEach((_, index) => {
-                                    // JUXTA(3186) 부서는 모든 체크박스를 default_n으로 설정
-                                    if (deptCode === '3186') {
-                                        checkBoxStates[index] = 'default_n';
-                                    } else {
-                                        checkBoxStates[index] = 'default';
-                                        if (checkBoxStates[index] === 'default') {
-                                            if (isInteriorAllYellow(checkBoxes[index])) {
-                                                checkBoxStates[index] = 'default_n';  // 내부가 전부 노란색이면 default_n
-                                                let originalStates = {};
-                                            }
-                                            checkBoxStates[index] = checkBoxStates[index];
+                                    checkBoxStates[index] = 'default';
+                                    if (checkBoxStates[index] === 'default') {
+                                        if (isInteriorAllYellow(checkBoxes[index])) {
+                                            checkBoxStates[index] = 'default_n';  // 내부가 전부 노란색이면 default_n
+                                            let originalStates = {};
                                         }
+                                        checkBoxStates[index] = checkBoxStates[index];
+                                        originalStates[index] = checkBoxStates[index];  // 원래 상태 저장
                                     }
-                                    originalStates[index] = checkBoxStates[index];  // 원래 상태 저장
                                     startDebugTimer(`체크박스 ${index} 상태: ${checkBoxStates[index]}`);
                                 });
                             }
