@@ -228,13 +228,6 @@ class RouteHandler:
                 db_success = True
                 
                 if db_success and file_success:
-                    # 04번 공정은 병합 작업 건너뛰기 (11번에서 처리)
-                    if process_code == '04' and deptCode == '3186':
-                        return jsonify({
-                            'success': True,
-                            'message': '04번 공정 체크시트가 성공적으로 저장되었습니다.'
-                        })
-                    
                     # 모든 공정이 완료되었는지 확인 (부품SET 제외)
                     if self.is_all_process_completed(indexNo, deptCode, serial_no):
                         # Merged 폴더 경로 설정
