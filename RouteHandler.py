@@ -396,52 +396,30 @@ class RouteHandler:
         # 파일 경로 결정
         file_path = None
         
-        # JUXTA (3186) 11번 프로세스일 때 04번 프로세스 특별 처리
-        # 체크박스 상태와 관계없이 항상 _0.png 사용
+        # JUXTA (3186) 04번 프로세스 처리
+        # 이미 체크된 이미지가 있으면 그것을 사용, 없으면 Process 폴더에서 가져옴
         if dept == '3186' and process == '04':
-            # 04번 프로세스는 시리얼번호_0.png를 사용
-            process_0_filename = f'{serial}_0.png'
-            process_0_file_path = os.path.join(self.app.config['UPLOAD_FOLDER'], dept, 'Process', serial, process_0_filename)
-            network_process_0_path = os.path.join(self.app.config['NETWORK_PATH'], dept, 'Process', serial, process_0_filename)
-            
-            # Process/시리얼번호/시리얼번호_0.png 파일이 있는지 확인
-            if os.path.exists(process_0_file_path) or os.path.exists(network_process_0_path):
-                source_path = process_0_file_path if os.path.exists(process_0_file_path) else network_process_0_path
-                
-                # Checked 폴더에 시리얼번호_04.png로 복사
-                checked_dir = os.path.join(self.app.config['UPLOAD_FOLDER'], dept, 'Checked', serial)
-                os.makedirs(checked_dir, exist_ok=True)
-                
-                # shutil.copy2 대신 PIL을 사용하여 이미지를 저장
-                try:
-                    temp_image = Image.open(source_path)
-                    temp_image.save(checked_file_path)
-                    logging.info(f"Saved {source_path} to {checked_file_path} for process 04 using PIL")
-                except Exception as e:
-                    logging.error(f"Failed to save image using PIL: {e}")
-                    # PIL 실패 시 파일 읽기/쓰기로 시도
-                    try:
-                        with open(source_path, 'rb') as src:
-                            data = src.read()
-                        with open(checked_file_path, 'wb') as dst:
-                            dst.write(data)
-                        logging.info(f"Copied {source_path} to {checked_file_path} for process 04 using file operations")
-                    except Exception as e2:
-                        logging.error(f"Failed to copy file: {e2}")
-                        # 실패해도 원본 파일 사용
-                        file_path = source_path
-                        logging.info(f"Using source file directly: {source_path}")
-                
-                # 복사가 성공했거나 실패했어도 file_path가 설정됨
-                # file_path가 아직 설정되지 않았으면 checked_file_path 사용
-                if file_path is None:
-                    file_path = checked_file_path
+            # 먼저 Checked 폴더에 이미 체크된 이미지가 있는지 확인
+            if os.path.exists(checked_file_path) or os.path.exists(network_checked_path):
+                # 이미 체크된 이미지가 있으면 그것을 사용
+                file_path = checked_file_path if os.path.exists(checked_file_path) else network_checked_path
+                logging.info(f"Using existing checked image for process 04: {file_path}")
             else:
-                # 0번 이미지도 없으면 일반 프로세스 파일 경로 사용
-                if os.path.exists(process_file_path):
-                    file_path = process_file_path
-                elif os.path.exists(network_process_path):
-                    file_path = network_process_path
+                # 체크된 이미지가 없으면 Process 폴더에서 원본 이미지 사용
+                process_0_filename = f'{serial}_0.png'
+                process_0_file_path = os.path.join(self.app.config['UPLOAD_FOLDER'], dept, 'Process', serial, process_0_filename)
+                network_process_0_path = os.path.join(self.app.config['NETWORK_PATH'], dept, 'Process', serial, process_0_filename)
+                
+                if os.path.exists(process_0_file_path):
+                    file_path = process_0_file_path
+                elif os.path.exists(network_process_0_path):
+                    file_path = network_process_0_path
+                else:
+                    # Process 폴더에도 없으면 일반 프로세스 파일 경로 사용
+                    if os.path.exists(process_file_path):
+                        file_path = process_file_path
+                    elif os.path.exists(network_process_path):
+                        file_path = network_process_path
         elif is_checked_image:
             if os.path.exists(checked_file_path):
                 file_path = checked_file_path
