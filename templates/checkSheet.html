@@ -1230,31 +1230,7 @@
                     }
                 }
                 
-                // 두 번째 페이지가 있는 경우 (공정 11)
-                if (originalProcessCode === '11') {
-                    // 현재 페이지 상태 저장
-                    saveCurrentPageState();
-                    
-                    // page1CheckBoxStates 확인 (04번 페이지)
-                    if (page1CheckBoxStates) {
-                        for (let index in page1CheckBoxStates) {
-                            if (page1CheckBoxStates[index] === 'default' || !page1CheckBoxStates[index]) {
-                                hasUncheckedItems = true;
-                                break;
-                            }
-                        }
-                    }
-                    
-                    // page2CheckBoxStates 확인 (11번 페이지)
-                    if (page2CheckBoxStates) {
-                        for (let index in page2CheckBoxStates) {
-                            if (page2CheckBoxStates[index] === 'default' || !page2CheckBoxStates[index]) {
-                                hasUncheckedItems = true;
-                                break;
-                            }
-                        }
-                    }
-                }
+                // 11번 공정도 단일 페이지로 처리 (04번 공정과 별도로 저장)
                 
                 // 미체크 항목이 있으면 모달 표시
                 if (hasUncheckedItems) {
@@ -1263,19 +1239,7 @@
                     return;
                 }
             }
-            
-            // JUXTA 공정 11인 경우만 두 페이지 모두 저장 (10은 기존 로직 유지) - 주석 처리됨
-            /*
-            if (deptCode === '3186' && originalProcessCode && originalProcessCode === '11') {
-                // 현재 페이지 상태 저장
-                saveCurrentPageState();
-                
-                // 두 페이지 모두 저장하는 함수
-                saveBothPages(currentSerialNo, deptCode);
-                return;
-            }
-            */
-            
+
             // 일반적인 경우 (단일 페이지) - 새로 만든 함수 호출
             proceedWithSaving(selectedProcess, currentSerialNo, deptCode);
         }
@@ -1579,14 +1543,7 @@
         
         // 저장 로직 계속 진행 함수
         function continueSaveCheckSheet(selectedProcess, currentSerialNo, deptCode) {
-            // JUXTA 공정 11인 경우만 두 페이지 모두 저장 - 주석 처리됨
-            /*
-            if (deptCode === '3186' && originalProcessCode && originalProcessCode === '11') {
-                saveBothPages(currentSerialNo, deptCode);
-                return;
-            }
-            */
-            
+           
             // 기존 저장 로직 실행
             proceedWithSaving(selectedProcess, currentSerialNo, deptCode);
         }
@@ -1983,9 +1940,9 @@
                     const selectedProcess = processSelect.options[selectedIndex].value;
                     const deptCode = document.getElementById('deptInfo').textContent.split(' ')[0];
                     
-                    // 기본 처리 로직으로 통합 (10번과 11번 공정 모두 기본 로직으로 처리)
-                    if (deptCode === '3186' && (selectedProcess === '10' || selectedProcess === '11')) {
-                        // JUXTA 공정 10인 경우 - 기존 로직 그대로 유지 (페이지 네비게이션 없이 단일 페이지)
+                    // 기본 처리 로직으로 통합 (04, 10, 11번 공정 모두 독립적으로 처리)
+                    if (deptCode === '3186' && (selectedProcess === '04' || selectedProcess === '10' || selectedProcess === '11')) {
+                        // JUXTA 공정 - 모든 공정을 독립적으로 처리 (페이지 네비게이션 없이 단일 페이지)
                         document.getElementById('pageNavigation').style.display = 'none';
                         originalProcessCode = null;
                         currentPage = 1;
