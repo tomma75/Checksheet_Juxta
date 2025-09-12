@@ -1563,6 +1563,10 @@
                 if(checkBoxStates[index] === 'default_n') {
                     anyCrossed = true;
                 }
+                // 3186(JUXTA)인 경우 default 상태도 NG로 처리
+                if(deptCode === '3186' && checkBoxStates[index] === 'default') {
+                    anyCrossed = true;
+                }
             });
 
             let result = anyCrossed ? 'NG' : 'OK';
