@@ -623,12 +623,18 @@ class ImageProcessor:
         - serial_1.pdf → split_image_by_horizontal_lines
         """
         if dept in ['3165', 'UTA']:
-            pdf_path = os.path.join(base_folder_ori, dept, 'Master', f"{serial}.png")
-            if not os.path.exists(pdf_path):
-                raise FileNotFoundError(f"PDF가 존재하지 않습니다: {pdf_path}")
-
-            # PDF → PIL 이미지 리스트
-            images = convert_from_path(pdf_path, dpi=150)
+            # 먼저 PNG 파일이 이미 있는지 확인
+            png_path = os.path.join(base_folder_ori, dept, 'Master', f"{serial}.png")
+            pdf_path = os.path.join(base_folder_ori, dept, 'Master', f"{serial}.pdf")
+            
+            if os.path.exists(png_path):
+                # PNG 파일이 이미 있으면 직접 사용
+                images = [Image.open(png_path)]
+            elif os.path.exists(pdf_path):
+                # PDF 파일만 있으면 변환
+                images = convert_from_path(pdf_path, dpi=150)
+            else:
+                raise FileNotFoundError(f"PNG 또는 PDF 파일이 존재하지 않습니다: {serial}")
 
             # 결과 저장 경로 리스트
             saved_paths = []
@@ -642,7 +648,7 @@ class ImageProcessor:
                 page_jpg_path = os.path.join(base_folder, dept, 'Master', f"{serial}.png")
                 pil_img.save(page_jpg_path, 'png')
                 # split
-                splitted = ImageProcessor.split_image_by_horizontal_lines(page_jpg_path, dept = dept)
+                splitted = ImageProcessor.split_image_by_horizontal_lines(page_jpg_path, serial, page_index, dept=dept)
                 saved_paths.extend(splitted)
                 page_index += 1
 
