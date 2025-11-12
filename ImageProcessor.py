@@ -344,7 +344,7 @@ class ImageProcessor:
         margin_width = right_margin - left_margin
         min_split_thickness = max(min_group_thickness, int(margin_width * 0.02))  # 마진 
         print(f"마진 폭: {margin_width}px, 최소 분할 두께: {min_split_thickness}px")
-        if len(detected_lines) == 0 or (dept in ['3186', 'JUXTA'] and (start_index == 0 and model != 'VJ77')):
+        if len(detected_lines) == 0 or (dept in ['3186', 'JUXTA'] and (start_index == 0 and model != 'VJ77')) or (dept == '3188' and start_index > 0):
             
             # 전체 이미지를 좌우 마진으로만 크롭
             if left_margin < right_margin:
@@ -389,7 +389,7 @@ class ImageProcessor:
         split_rows = []
         for group in groups:
             group_thickness = len(group)
-            if group_thickness >= 20 and group_thickness <= 40:
+            if group_thickness >= 20 and group_thickness <= 70:
                 # 추가 검사: 해당 그룹 영역의 좌우 마진 계산
                 group_start = min(group)
                 group_end = max(group)
@@ -434,6 +434,7 @@ class ImageProcessor:
     
         # 이미지 분할 및 저장
         saved_files = []
+        print(f"DEBUG: dept={dept}, model={model}, start_index={start_index}")
         for i in range(len(split_points) - 1):
             y_start = split_points[i]
             y_end = split_points[i + 1]
@@ -456,6 +457,9 @@ class ImageProcessor:
                         file_index = start_index + i - 2
                     elif dept in ['3186', 'JUXTA'] and i==1 and model == 'VJ77' and start_index == 0:
                         file_index = start_index + i - 1
+                    elif dept == '3188':
+                        # 3188 공정은 순차적으로 저장
+                        file_index = start_index + i
                     else:
                         file_index = start_index + i
                     output_filename = f"{base_serial}_{file_index}.png"
@@ -613,6 +617,88 @@ class ImageProcessor:
         print(f"[JUXTA] 체크시트 병합 완료: {output_path}")
 
     @staticmethod
+    def merge_checksheet_images_newsc(left_images, right_image, output_path):
+        """
+        NEW SC/3188 전용 병합 함수
+        - 왼쪽: 여러 이미지를 세로로 합침 (0.png, 06.png, 2.png)
+        - 오른쪽: 단일 이미지 (09.png)
+        - 최종: 좌우로 배치
+        """
+        if not left_images or not right_image:
+            print("병합할 이미지가 부족합니다.")
+            return
+        
+        try:
+            # 왼쪽 이미지들 로드 및 세로 병합
+            left_cv_images = []
+            for path in left_images:
+                img = cv2.imread(path, cv2.IMREAD_COLOR)
+                if img is not None:
+                    left_cv_images.append(img)
+                else:
+                    print(f"이미지 로드 실패: {path}")
+            
+            if not left_cv_images:
+                print("왼쪽 이미지를 로드할 수 없습니다.")
+                return
+            
+            # 왼쪽 이미지들 너비 통일
+            widths = [img.shape[1] for img in left_cv_images]
+            max_width = max(widths)
+            
+            resized_left_list = []
+            for img in left_cv_images:
+                h, w, c = img.shape
+                if w != max_width:
+                    scale_factor = max_width / float(w)
+                    new_h = int(h * scale_factor)
+                    if new_h > h:
+                        img_rz = cv2.resize(img, (max_width, new_h), interpolation=cv2.INTER_CUBIC)
+                    else:
+                        img_rz = cv2.resize(img, (max_width, new_h), interpolation=cv2.INTER_AREA)
+                    resized_left_list.append(img_rz)
+                else:
+                    resized_left_list.append(img)
+            
+            # 왼쪽 이미지들을 세로로 병합
+            merged_left = np.concatenate(resized_left_list, axis=0)
+            
+            # 오른쪽 이미지 로드
+            img_right = cv2.imread(right_image, cv2.IMREAD_COLOR)
+            if img_right is None:
+                print(f"오른쪽 이미지 로드 실패: {right_image}")
+                return
+            
+            # 오른쪽 이미지를 왼쪽 병합 이미지의 높이에 맞춰 조정
+            h_left, w_left, _ = merged_left.shape
+            h_right, w_right, _ = img_right.shape
+            
+            if h_right != h_left:
+                scale_r = h_left / float(h_right)
+                new_w_right = int(w_right * scale_r)
+                if h_left < h_right:
+                    img_right_resized = cv2.resize(img_right, (new_w_right, h_left), interpolation=cv2.INTER_AREA)
+                else:
+                    img_right_resized = cv2.resize(img_right, (new_w_right, h_left), interpolation=cv2.INTER_CUBIC)
+            else:
+                img_right_resized = img_right
+            
+            # 좌우로 병합
+            merged = np.concatenate((merged_left, img_right_resized), axis=1)
+            
+            # 저장
+            ext = os.path.splitext(output_path)[1].lower()
+            if ext in [".jpg", ".jpeg"]:
+                cv2.imwrite(output_path, merged, [cv2.IMWRITE_JPEG_QUALITY, 95])
+            else:
+                cv2.imwrite(output_path, merged)
+            
+            print(f"[NEW SC] 체크시트 병합 완료: {output_path}")
+            
+        except Exception as e:
+            print(f"[NEW SC] 병합 중 오류 발생: {e}")
+
+    @staticmethod
     def convert_pdf_to_process_images(dept, process, serial, base_folder, model=None, base_folder_ori=None):
         """
         UTA:
@@ -621,6 +707,9 @@ class ImageProcessor:
         - PDF 2개 존재, set공정=04(serial_0.pdf), 나머지공정(serial_1.pdf)
         - serial_0.pdf 그대로 출력
         - serial_1.pdf → split_image_by_horizontal_lines
+        NEW SC:
+        - serial_0.pdf → split, 1번항목만 저장
+        - serial_1.pdf → 원본 그대로 사용
         """
         if dept in ['3165', 'UTA']:
             # 먼저 PNG 파일이 이미 있는지 확인
@@ -697,7 +786,53 @@ class ImageProcessor:
                 saved_paths.extend(splitted)
 
             return saved_paths
+        # 2) NEWSC 처리
+        elif dept in ['3188', 'NEW SC']:
+            saved_paths = []
+        
+            # 첫 번째 PDF 처리 - 분할
+            pdf_path = os.path.join(base_folder_ori, dept, 'Master', f"{serial}_0.pdf")
+            if not os.path.exists(pdf_path):
+                raise FileNotFoundError(f"PDF가 존재하지 않습니다: {pdf_path}")
+            # PDF → PIL 이미지 변환
+            images = convert_from_path(pdf_path, dpi=180)
+            if images:
+                temp_jpg_path =  os.path.join(base_folder, dept, 'Master', f"{serial}_0.png")
+                # 이미지 저장
+                images[0].save(temp_jpg_path, 'PNG')
+                # 첫 번째 PDF는 분할하여 0, 1, 2.png 등으로 저장
+                splitted = ImageProcessor.split_image_by_horizontal_lines(
+                    temp_jpg_path,
+                    base_serial=serial,
+                    start_index=0,
+                    dept=dept,
+                    model=model)
+                saved_paths.extend(splitted)
+
+            # 두 번째 PDF 처리 - 분할하지 않고 그대로 사용
+            pdf_path = os.path.join(base_folder_ori, dept, 'Master', f"{serial}_1.pdf")
+            if not os.path.exists(pdf_path):
+                raise FileNotFoundError(f"PDF가 존재하지 않습니다: {pdf_path}")
+            # PDF → PIL 이미지 변환
+            images = convert_from_path(pdf_path, dpi=180)
+            if images:
+                temp_jpg_path = os.path.join(base_folder, dept, 'Master', f"{serial}_1.png")
+                images[0].save(temp_jpg_path, 'PNG')
+                # 첫 번째 PDF의 분할 개수를 파악하여 다음 번호로 저장
+                next_index = len(saved_paths)  # 첫 번째 PDF에서 생성된 파일 개수
+                # 두 번째 PDF는 분할하지 않고 그대로 사용 (start_index를 다음 번호로 설정)
+                splitted = ImageProcessor.split_image_by_horizontal_lines(
+                    temp_jpg_path,
+                    base_serial=serial,
+                    start_index=next_index,  # 첫 번째 PDF 분할 개수만큼 시작 인덱스 설정
+                    dept=dept,
+                    model=model
+                )
+                saved_paths.extend(splitted)
+
+            return saved_paths
 
         else:
             raise ValueError(f"지원하지 않는 부서코드: {dept}")
+
         

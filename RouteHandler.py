@@ -263,7 +263,6 @@ class RouteHandler:
                                     serial_no,
                                     f'{serial_no}_04.png'
                                 )
-                                
                                 # Process 폴더의 _0.png 경로
                                 process_0_path = os.path.join(
                                     self.app.config['UPLOAD_FOLDER'],
@@ -285,7 +284,76 @@ class RouteHandler:
                                     logging.warning(f"Neither checked 04 nor process 0 image found for {serial_no}")
                             # 이미지 합치기 실행
                             ImageProcessor.merge_checksheet_images_juxta(image_files, merged_image_path, target_width=800)
-                        
+                        elif deptCode in ['3188','NEW SC']:
+                            # Process 폴더와 Checked 폴더에서 이미지 수집
+                            process_folder = os.path.join(self.app.config['UPLOAD_FOLDER'], deptCode, 'Process', serial_no)
+                            checked_folder = os.path.join(self.app.config['UPLOAD_FOLDER'], deptCode, 'Checked', serial_no)
+                            
+                            # 3188의 특별한 병합 규칙:
+                            # 좌: serial_0.png(process), serial_06.png(checked), serial_2.png(process)
+                            # 우: serial_09.png(checked)
+                            
+                            left_images = []  # 왼쪽에 들어갈 이미지들 (순서대로)
+                            right_image = None  # 오른쪽에 들어갈 이미지
+                            
+                            # 0번 이미지 (Process 폴더)
+                            img_0 = os.path.join(process_folder, f"{serial_no}_0.png")
+                            if os.path.exists(img_0):
+                                left_images.append(img_0)
+                            else:
+                                logging.warning(f"0번 이미지를 찾을 수 없습니다: {img_0}")
+                            
+                            # 06 공정 이미지 (Checked 폴더)
+                            img_06 = os.path.join(checked_folder, f"{serial_no}_06.png")
+                            if os.path.exists(img_06):
+                                left_images.append(img_06)
+                            else:
+                                # Checked에 없으면 1번 이미지로 대체 (06 공정은 1번 인덱스 사용)
+                                img_1 = os.path.join(checked_folder, f"{serial_no}_1.png")
+                                if os.path.exists(img_1):
+                                    left_images.append(img_1)
+                                else:
+                                    # Checked에 없으면 Process에서 찾기
+                                    img_1_process = os.path.join(process_folder, f"{serial_no}_1.png")
+                                    if os.path.exists(img_1_process):
+                                        left_images.append(img_1_process)
+                                    else:
+                                        logging.warning(f"06 공정 이미지를 찾을 수 없습니다")
+                            
+                            # 2번 이미지 (Process 폴더)
+                            img_2 = os.path.join(process_folder, f"{serial_no}_2.png")
+                            if os.path.exists(img_2):
+                                left_images.append(img_2)
+                            else:
+                                logging.warning(f"2번 이미지를 찾을 수 없습니다: {img_2}")
+                            
+                            # 09 공정 이미지 (Checked 폴더)
+                            img_09 = os.path.join(checked_folder, f"{serial_no}_09.png")
+                            if os.path.exists(img_09):
+                                right_image = img_09
+                            else:
+                                # Checked에 없으면 3번 이미지로 대체 (09 공정은 3번 인덱스 사용)
+                                img_3 = os.path.join(checked_folder, f"{serial_no}_3.png")
+                                if os.path.exists(img_3):
+                                    right_image = img_3
+                                else:
+                                    # Checked에 없으면 Process에서 찾기
+                                    img_3_process = os.path.join(process_folder, f"{serial_no}_3.png")
+                                    if os.path.exists(img_3_process):
+                                        right_image = img_3_process
+                                    else:
+                                        logging.warning(f"09 공정 이미지를 찾을 수 없습니다")
+                            
+                            # NEW SC 전용 병합 함수 사용
+                            if left_images and right_image:
+                                ImageProcessor.merge_checksheet_images_newsc(left_images, right_image, merged_image_path)
+                                logging.info(f"NEW SC merged images for {serial_no}: Left={[os.path.basename(img) for img in left_images]}, Right={os.path.basename(right_image)}")
+                            elif left_images:
+                                # 오른쪽 이미지가 없는 경우 왼쪽 이미지들만 세로로 합치기
+                                ImageProcessor.merge_checksheet_images_uta(left_images, merged_image_path, target_width=800)
+                                logging.info(f"NEW SC merged only left images for {serial_no}")
+                            else:
+                                logging.error(f"No valid images found to merge for {serial_no}")
                     return jsonify({
                         'success': True,
                         'message': '체크시트가 성공적으로 저장되었습니다.'
@@ -342,15 +410,32 @@ class RouteHandler:
         pen_cursor_url = url_for('static', filename='icon/pen-tool.png')
         return render_template('checkSheet.html', employee_name=employee_name, dept_info=dept_info, pen_cursor_url=pen_cursor_url)
 
+    def _find_file_path(self, *paths):
+        """여러 경로 중 첫 번째로 존재하는 파일 경로를 반환"""
+        for path in paths:
+            if os.path.exists(path):
+                return path
+        return None
+    
     @login_required
     def upload_image(self, serial_process):
         parts = serial_process.split('_')
         indexNo, dept, serial, process = parts[:4]
         index = int(parts[-1])
-        if index != 0:
-            index = int(parts[-1]) - 1
-        if parts[1] == '3186':
-            index = int(parts[-1])
+        
+        # 부서별 이미지 인덱스 매핑
+        if dept == '3188':
+            if process == '06':  # 첫 번째 공정 -> 1번 이미지
+                index = 1
+            elif process == '09':  # 두 번째 공정 -> 3번 이미지
+                index = 3
+        elif dept == '3186':
+            # index는 이미 위에서 계산됨
+            pass
+        else:
+            # 기존 로직 (3165 등)
+            if index != 0:
+                index = index - 1
         # 체크박스 상태 확인을 위한 DB 조회
         connection = self.db_manager_2.connect()
         cursor = connection.cursor()
@@ -421,29 +506,19 @@ class RouteHandler:
                     elif os.path.exists(network_process_path):
                         file_path = network_process_path
         elif is_checked_image:
-            if os.path.exists(checked_file_path):
-                file_path = checked_file_path
-            elif os.path.exists(network_checked_path):
-                file_path = network_checked_path
-            else:
-                if os.path.exists(process_file_path):
-                    file_path = process_file_path
-                elif os.path.exists(network_process_path):
-                    file_path = network_process_path
-                else:
-                    return jsonify({'error': 'Checked image not found'}), 404
+            # 체크된 이미지 우선, 없으면 Process 이미지 사용
+            file_path = self._find_file_path(checked_file_path, network_checked_path, 
+                                            process_file_path, network_process_path)
+            if not file_path:
+                return jsonify({'error': 'Checked image not found'}), 404
         else:
-            if os.path.exists(process_file_path):
-                file_path = process_file_path
-            elif os.path.exists(network_process_path):
-                file_path = network_process_path
-            else:
-                file_path = None
+            # Process 이미지 사용
+            file_path = self._find_file_path(process_file_path, network_process_path)
         
         # file_path가 여전히 None인 경우 Master PDF 처리
         if file_path is None:
             # index가 0이고 Process 파일이 없는 경우 Master PDF 확인
-            if dept == '3186':
+            if dept in ['3186', '3188']:
                 master_pdf_path = os.path.join(self.app.config['UPLOAD_FOLDER'], dept, 'Master', f'{serial}_0.pdf')
                 network_master_path = os.path.join(self.app.config['NETWORK_PATH'], dept, 'Master', f'{serial}_0.pdf')
             else:
@@ -461,7 +536,7 @@ class RouteHandler:
 
             # Master PDF를 이미지로 변환
             images = convert_from_path(master_path, dpi=150)
-            if dept == '3186':
+            if dept in ['3186', '3188']:
                 master_jpg_path = os.path.join(self.app.config['UPLOAD_FOLDER'], dept, 'Master', f'{serial}_0.png')
                 images[0].save(master_jpg_path, 'PNG')
             else:
@@ -908,6 +983,7 @@ class RouteHandler:
         dept_code = data.get('deptCode')
         
         # 공정 순서 정의
+        # ymfk02 - PRBS0010참조
         dept_process_map = {
             '3165': {  # UTA
                 'order': ['08', '06', '11', '15'],
@@ -916,6 +992,10 @@ class RouteHandler:
             '3186': {  # JUXTA
                 'order': ['04', '07', '10', '11'],
                 'skip':  ['04','07']        # 이전 공정은 이전 공정 체크 안 함
+            },
+            '3188': {  # NEWSC
+                'order' : ['06', '09'],
+                'skip' : ['06']
             }
         }
 
@@ -1011,6 +1091,8 @@ class RouteHandler:
                 required_processes = ['06','11','15']
             elif deptCode == '3186':
                 required_processes = ['07','10','11']
+            elif deptCode == '3188' :
+                required_processes = ['06', '09']
             else:
                 # 그 외 부서코드는 처리 대상 외
                 print(f"알 수 없는 부서 코드: {deptCode}, 공정 완료 체크 로직 없음.")

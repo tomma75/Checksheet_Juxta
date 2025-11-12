@@ -257,6 +257,48 @@
         #eraserButton.active i {
             color: #0056b3;
         }
+        
+        /* 텍스트 버튼 스타일 */
+        #textButton {
+            position: fixed;
+            top: 20px;
+            right: 80px; /* 지우개 버튼 왼쪽에 위치 */
+            width: 50px;
+            height: 50px;
+            background-color: white;
+            border: 2px solid #333;
+            border-radius: 8px;
+            cursor: pointer;
+            display: none; /* 초기에는 숨김 */
+            z-index: 1000;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            font-family: Arial, sans-serif;
+            font-size: 20px;
+            font-weight: bold;
+            text-decoration: underline;
+        }
+        #textButton:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+        #textButton.active {
+            background-color: #ddd;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.3);
+            color: #0056b3;
+        }
+        
+        /* 텍스트 입력 필드 스타일 */
+        #textInput {
+            position: absolute;
+            display: none;
+            border: 1px solid #333;
+            padding: 2px;
+            font-size: 14px;
+            background-color: white;
+            z-index: 1001;
+            min-width: 100px;
+        }
         /* 사이드바 스타일 설정 */
         .sidebar {
             height: 100vh;
@@ -529,6 +571,10 @@
                 <option value="07">JUXTA 조립</option>
                 <option value="10">JUXTA 2자검사</option>
                 <option value="11">JUXTA 포장</option>
+            {% elif "NEW SC" in dept_info %}
+                <!-- NEWSC 전용 공정 -->
+                <option value="06">조립</option>
+                <option value="09">2자검사/포장</option>
             {% else %}
                 <!-- 기존 UTA 공정 -->
                 <option value="08">부품SET</option>
@@ -594,6 +640,55 @@
         let page2CheckBoxes = []; // 11번 체크박스 위치 정보
         let currentProductInfo = null; // 현재 제품 정보 저장
         let originalProcessCode = null; // 원래 선택된 공정 코드 (10 or 11)
+        
+        // 로딩 상태 관리를 위한 전역 변수
+        let isLoading = false;
+        
+        // 로딩 시작 함수
+        function showLoadingSpinner() {
+            isLoading = true;
+            document.getElementById('loadingSpinner').style.display = 'block';
+            
+            // processSelect와 checkCompleteButton 비활성화
+            const processSelect = document.getElementById('processSelect');
+            const checkCompleteButton = document.getElementById('checkCompleteButton');
+            
+            if (processSelect) {
+                processSelect.disabled = true;
+                processSelect.style.opacity = '0.6';
+                processSelect.style.cursor = 'not-allowed';
+            }
+            
+            if (checkCompleteButton) {
+                checkCompleteButton.disabled = true;
+                checkCompleteButton.style.opacity = '0.6';
+                checkCompleteButton.style.cursor = 'not-allowed';
+            }
+        }
+        
+        // 로딩 종료 함수
+        function hideLoadingSpinner() {
+            isLoading = false;
+            document.getElementById('loadingSpinner').style.display = 'none';
+            
+            // 1초 지연 후 processSelect와 checkCompleteButton 활성화
+            setTimeout(() => {
+                const processSelect = document.getElementById('processSelect');
+                const checkCompleteButton = document.getElementById('checkCompleteButton');
+                
+                if (processSelect) {
+                    processSelect.disabled = false;
+                    processSelect.style.opacity = '1';
+                    processSelect.style.cursor = 'default';
+                }
+                
+                if (checkCompleteButton) {
+                    checkCompleteButton.disabled = false;
+                    checkCompleteButton.style.opacity = '1';
+                    checkCompleteButton.style.cursor = 'pointer';
+                }
+            }, 1000);
+        }
         
         // 지우개 모드 토글 함수 - 전역 함수로 선언
         function toggleEraserMode() {
@@ -753,7 +848,7 @@
                 const uploadImageUrl = `/upload_image/${currentProductInfo.Index_No}_${deptCode}_${currentProductInfo.Serial_No}_${processCode}_${selectedIndex}`;
                 console.log('새 이미지 로드:', processCode, uploadImageUrl);
                 
-                loadingSpinner.style.display = 'block';
+                showLoadingSpinner();
                 
                 fetch(uploadImageUrl, {
                     method: 'GET',
@@ -794,11 +889,11 @@
                     }
                     
                     redrawCheckboxes();
-                    loadingSpinner.style.display = 'none';
+                    hideLoadingSpinner();
                 })
                 .catch(error => {
                     console.error('이미지 로드 오류:', error);
-                    loadingSpinner.style.display = 'none';
+                    hideLoadingSpinner();
                 });
             }
         }
@@ -1203,7 +1298,7 @@
             }
 
             const selectedProcess = document.getElementById('processSelect').value;
-            loadingSpinner.style.display = 'block'; // 로딩 스피너 표시
+            showLoadingSpinner(); // 로딩 스피너 표시 및 버튼 비활성화
 
             // 이전 공정 체크 로직 제거 및 직접 체크시트 저장 및 완료 처리
             saveCheckSheet(selectedProcess);
@@ -1235,7 +1330,7 @@
                 // 미체크 항목이 있으면 모달 표시
                 if (hasUncheckedItems) {
                     showUncheckedConfirmModal(selectedProcess, currentSerialNo, deptCode);
-                    loadingSpinner.style.display = 'none'; // 로딩 스피너 숨김
+                    hideLoadingSpinner(); // 로딩 스피너 숨김
                     return;
                 }
             }
@@ -1507,7 +1602,7 @@
             // 저장 버튼 클릭 이벤트
             saveBtn.onclick = function() {
                 modal.style.display = 'none';
-                loadingSpinner.style.display = 'block';
+                showLoadingSpinner();
                 
                 const selectedProcess = modal.dataset.selectedProcess;
                 const currentSerialNo = modal.dataset.currentSerialNo;
@@ -1520,14 +1615,14 @@
             // 취소 버튼 클릭 이벤트
             cancelBtn.onclick = function() {
                 modal.style.display = 'none';
-                loadingSpinner.style.display = 'none';
+                hideLoadingSpinner();
             };
             
             // 모달 외부 클릭으로 닫기
             window.onclick = function(event) {
                 if (event.target == modal) {
                     modal.style.display = 'none';
-                    loadingSpinner.style.display = 'none';
+                    hideLoadingSpinner();
                 }
             };
             
@@ -1535,7 +1630,7 @@
             document.addEventListener('keydown', function handleEsc(event) {
                 if (event.key === 'Escape' && modal.style.display === 'block') {
                     modal.style.display = 'none';
-                    loadingSpinner.style.display = 'none';
+                    hideLoadingSpinner();
                     document.removeEventListener('keydown', handleEsc);
                 }
             });
@@ -1633,7 +1728,7 @@
                     })
                     .then(response => response.json())
                     .then(data => {
-                        loadingSpinner.style.display = 'none'; // 로딩 스피너 숨김
+                        hideLoadingSpinner(); // 로딩 스피너 숨김
                         if (data.success) {
                             showMessage(data.message, 'success', currentSerialNo);
                             isCheckSheetModified = false;
@@ -1650,7 +1745,7 @@
                         }
                     })
                     .catch(error => {
-                        loadingSpinner.style.display = 'none'; // 로딩 스피너 숨김
+                        hideLoadingSpinner(); // 로딩 스피너 숨김
                         console.error('Error:', error);
                         showMessage('체크시트 저장 중 오류가 발생했습니다.', 'error');
                     });
@@ -1659,7 +1754,7 @@
             .catch(error => {
                 endDebugTimer('체크시트 저장');
                 console.error('Error:', error);
-                loadingSpinner.style.display = 'none'; // 로딩 스피너 숨김
+                hideLoadingSpinner(); // 로딩 스피너 숨김 및 버튼 활성화
                 showMessage('체크박스 데이터 저장 중 오류가 발생했습니다.', 'error');
             });
         }
@@ -1678,7 +1773,8 @@
             // 부서 코드(deptCode)에 따라 스킵할 공정(processCode) 목록을 정의
             const skipMap = {
                 '3165': ['08', '06'],  // UTA 라인 → 08, 06은 이전 공정 체크 스킵
-                '3186': ['04', '07']         // JUXTA 라인 → 04, 07은 이전 공정 체크 스킵
+                '3186': ['04', '07'],         // JUXTA 라인 → 04, 07은 이전 공정 체크 스킵
+                '3188' : ['06'] // NEWSC 라인 → 스킵공정 없음
             };
 
             const skipProcesses = skipMap[deptCode] || [];
@@ -1689,7 +1785,7 @@
             startDebugTimer('제품 정보 조회');
             const selectedProcess = document.getElementById('processSelect').value;
             const deptCode = document.getElementById('deptInfo').textContent.split(' ')[0];
-            loadingSpinner.style.display = 'block'; // 로딩 스피너 표시
+            showLoadingSpinner(); // 로딩 스피너 표시 및 버튼 비활성화
             // DCS_HISTORY 테이블 체크
             fetch('/check_index_in_dcs_history', {
                 method: 'POST',
@@ -1731,7 +1827,7 @@
                                     fetchProductInfoAndImage(barcode, productInfo);
                                     insert_dcs_history(barcode, productInfo);
                                 } else {
-                                    loadingSpinner.style.display = 'none'; // 로딩 스피너 숨김
+                                    hideLoadingSpinner(); // 로딩 스피너 숨김
                                     showMessage('이전 공정이 완료되지 않았습니다. 이전 공정을 먼저 완료해주세요.', 'error');
                                     document.getElementById('canvasContainer').style.display = 'none';
                                     barcodeInput.value = '';
@@ -1742,7 +1838,7 @@
                     } else {
                         // DATA_ST가 'A'가 아닌 경우
                         clearAllDisplays();
-                        loadingSpinner.style.display = 'none'; // 로딩 스피너 숨김
+                        hideLoadingSpinner(); // 로딩 스피너 숨김
                         showMessage(`이미 REV UP된 제품입니다. REV UP된 바코드를 입력해주세요.`, 'error');
                         return null; // Promise 체인 종료
                     }
@@ -1761,7 +1857,7 @@
                     .then(tdscData => {
                         console.log('Received product info:', tdscData);
                         if (tdscData.error) {
-                            loadingSpinner.style.display = 'none'; // 로딩 스피너 숨김
+                            hideLoadingSpinner(); // 로딩 스피너 숨김
                             showMessage('제품 정보를 찾을 수 없습니다.', 'error');
                             throw new Error(tdscData.error);
                         }
@@ -1797,7 +1893,7 @@
                                     .then(response => response.json())
                                     .then(updateResult => {
                                         if (updateResult.error) {
-                                            loadingSpinner.style.display = 'none'; // 로딩 스피너 숨김
+                                            hideLoadingSpinner(); // 로딩 스피너 숨김
                                             throw new Error(updateResult.error);
                                         }
                                         if (shouldSkipPreviousProcess(deptCode,selectedProcess)) {
@@ -1821,7 +1917,7 @@
                                                     fetchProductInfoAndImage(barcode, tdscData);
                                                     insert_dcs_history(barcode, tdscData);
                                                 } else {
-                                                    loadingSpinner.style.display = 'none'; // 로딩 스피너 숨김
+                                                    hideLoadingSpinner(); // 로딩 스피너 숨김
                                                     showMessage('이전 공정이 완료되지 않았습니다. 이전 공정을 먼저 완료해주세요.', 'error');
                                                     document.getElementById('canvasContainer').style.display = 'none';
                                                     barcodeInput.value = '';
@@ -1834,7 +1930,7 @@
                                 } else {
                                     // DATA_ST가 'A'가 아닌 경우
                                     clearAllDisplays();
-                                    loadingSpinner.style.display = 'none'; // 로딩 스피너 숨김
+                                    hideLoadingSpinner(); // 로딩 스피너 숨김
                                     showMessage(`이미 REV UP된 제품입니다. 바코드 ${dcsData.data.indexNo}를 입력해주세요.`, 'error');
                                     throw new Error('REV UP 제품');
                                 }
@@ -1860,7 +1956,7 @@
                                             fetchProductInfoAndImage(barcode, tdscData);
                                             insert_dcs_history(barcode, tdscData);
                                         } else {
-                                            loadingSpinner.style.display = 'none'; // 로딩 스피너 숨김
+                                            hideLoadingSpinner(); // 로딩 스피너 숨김
                                             showMessage('이전 공정이 완료되지 않았습니다. 이전 공정을 먼저 완료해주세요.', 'error');
                                             document.getElementById('canvasContainer').style.display = 'none';
                                             barcodeInput.value = '';
@@ -1883,7 +1979,7 @@
             .catch(error => {
                 if (error.message !== 'REV UP 제품') {
                     console.error('Error:', error);
-                    loadingSpinner.style.display = 'none'; // 로딩 스피너 숨김
+                    hideLoadingSpinner(); // 로딩 스피너 숨김
                     showMessage('제품 정보 조회 중 오류가 발생했습니다.', 'error');
                 }
             });
@@ -1927,7 +2023,7 @@
         }
         // 제품 정보와 이미지를 가져오는 함수를 분리
         function fetchProductInfoAndImage(barcode, productInfo = null) {
-            loadingSpinner.style.display = 'block'; // 로딩 스피너 표시
+            showLoadingSpinner(); // 로딩 스피너 표시 및 버튼 비활성화
             startDebugTimer('이미지 로드');
             
             const loadImageWithProductInfo = (data) => {
@@ -1965,7 +2061,7 @@
                         })
                         .then(response => {
                             if (!response.ok) {
-                                loadingSpinner.style.display = 'none';
+                                hideLoadingSpinner();
                                 showMessage('이미지를 서버에서 가져오는데 실패했습니다.', 'error');
                                 throw new Error('이미지를 서버에서 가져오는데 실패했습니다.');
                             }
@@ -1975,11 +2071,11 @@
                             if (imageData.image_url) {
                                 is_checked_image = imageData.is_checked_image;
                                 loadImage(imageData.image_url);
-                                loadingSpinner.style.display = 'none';
+                                hideLoadingSpinner();
                                 checkBoxes = imageData.checkboxes || [];
                                 return fetch(`/get_checkbox_states?indexNo=${encodeURIComponent(data.Index_No)}&serialNo=${encodeURIComponent(data.Serial_No)}&processCode=${encodeURIComponent(selectedProcess)}&deptCode=${encodeURIComponent(deptCode)}`);
                             } else {
-                                loadingSpinner.style.display = 'none';
+                                hideLoadingSpinner();
                                 showMessage('이미지 URL이 없습니다.', 'error');
                                 throw new Error('이미지 URL이 없습니다.');
                             }
@@ -2028,7 +2124,7 @@
                         })
                         .then(response => {
                             if (!response.ok) {
-                                loadingSpinner.style.display = 'none'; // 로딩 스피너 숨김
+                                hideLoadingSpinner(); // 로딩 스피너 숨김
                                 showMessage('이미지를 서버에서 가져오는데 실패했습니다.', 'error');
                                 throw new Error('이미지를 서버에서 가져오는데 실패했습니다.');
                             }
@@ -2038,11 +2134,11 @@
                             if (imageData.image_url) {
                                 is_checked_image = imageData.is_checked_image;
                                 loadImage(imageData.image_url);
-                                loadingSpinner.style.display = 'none'; // 로딩 스피너 숨김
+                                hideLoadingSpinner(); // 로딩 스피너 숨김
                                 checkBoxes = imageData.checkboxes || [];
                                 return fetch(`/get_checkbox_states?indexNo=${encodeURIComponent(data.Index_No)}&serialNo=${encodeURIComponent(data.Serial_No)}&processCode=${encodeURIComponent(selectedProcess)}&deptCode=${encodeURIComponent(deptCode)}`);
                             } else {
-                                loadingSpinner.style.display = 'none'; // 로딩 스피너 숨김
+                                hideLoadingSpinner(); // 로딩 스피너 숨김
                                 showMessage('이미지 URL이 없습니다.', 'error');
                                 throw new Error('이미지 URL이 없습니다.');
                             }
