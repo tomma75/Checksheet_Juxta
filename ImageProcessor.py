@@ -389,7 +389,7 @@ class ImageProcessor:
         split_rows = []
         for group in groups:
             group_thickness = len(group)
-            if group_thickness >= 20 and group_thickness <= 70:
+            if group_thickness >= 20 and group_thickness <= 40:
                 # 추가 검사: 해당 그룹 영역의 좌우 마진 계산
                 group_start = min(group)
                 group_end = max(group)

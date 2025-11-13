@@ -1087,7 +1087,7 @@
                 };
                 const selectedProcess = document.getElementById('processSelect').value;
                 // 가장 가까운 체크박스 찾기
-                const closestCheckboxIndex = findClosestCheckbox(clickPosition, checkBoxes, 50);
+                const closestCheckboxIndex = findClosestCheckbox(clickPosition, checkBoxes, 30);
                 if (closestCheckboxIndex !== -1) {
                     const clickedCheckbox = checkBoxes[closestCheckboxIndex];
                     const centerX = clickedCheckbox.x + clickedCheckbox.width / 2;
