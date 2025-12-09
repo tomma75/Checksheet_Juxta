@@ -1,7 +1,7 @@
 from flask import render_template, request, jsonify, url_for, send_from_directory, redirect, session, send_file
 import logging
 from werkzeug.utils import secure_filename, safe_join
-from datetime import datetime
+from datetime import datetime, time
 import os
 from pdf2image import convert_from_path
 from PIL import Image
@@ -428,7 +428,7 @@ class RouteHandler:
             if process == '06':  # 첫 번째 공정 -> 1번 이미지
                 index = 1
             elif process == '09':  # 두 번째 공정 -> 3번 이미지
-                index = 3
+                index = 4
         elif dept == '3186':
             # index는 이미 위에서 계산됨
             pass
@@ -480,7 +480,8 @@ class RouteHandler:
 
         # 파일 경로 결정
         file_path = None
-        
+        print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@000000@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
+        print(f"@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@{dept},{process}@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
         # JUXTA (3186) 04번 프로세스 처리
         # 이미 체크된 이미지가 있으면 그것을 사용, 없으면 Process 폴더에서 가져옴
         if dept == '3186' and process == '04':
@@ -514,7 +515,12 @@ class RouteHandler:
         else:
             # Process 이미지 사용
             file_path = self._find_file_path(process_file_path, network_process_path)
-        
+        print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@111111@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
+        print(f"@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@{file_path}@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
+        def safe_sleep(seconds):
+            """import 충돌 방지 sleep 헬퍼"""
+            import time
+            time.sleep(seconds)
         # file_path가 여전히 None인 경우 Master PDF 처리
         if file_path is None:
             # index가 0이고 Process 파일이 없는 경우 Master PDF 확인
@@ -524,15 +530,20 @@ class RouteHandler:
             else:
                 master_pdf_path = os.path.join(self.app.config['UPLOAD_FOLDER'], dept, 'Master', f'{serial}.pdf')
                 network_master_path = os.path.join(self.app.config['NETWORK_PATH'], dept, 'Master', f'{serial}.pdf')
-            
-            if os.path.exists(master_pdf_path):
-                master_path = master_pdf_path
-                base_folder_ori = self.app.config['UPLOAD_FOLDER']
-            elif os.path.exists(network_master_path):
-                master_path = network_master_path
-                base_folder_ori = self.app.config['NETWORK_PATH']
-            else:
-                return jsonify({'error': 'Requested master PDF does not exist.'}), 404
+            for attempt in range(3):
+                if os.path.exists(master_pdf_path):
+                    master_path = master_pdf_path
+                    base_folder_ori = self.app.config['UPLOAD_FOLDER']
+                    break
+                elif os.path.exists(network_master_path):
+                    master_path = network_master_path
+                    base_folder_ori = self.app.config['NETWORK_PATH']
+                    break
+                if attempt < 4:
+                    print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@RRRRRRR@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
+                    safe_sleep(2)
+                else:
+                    return jsonify({'error': 'Requested master PDF does not exist.'}), 404
 
             # Master PDF를 이미지로 변환
             images = convert_from_path(master_path, dpi=150)
