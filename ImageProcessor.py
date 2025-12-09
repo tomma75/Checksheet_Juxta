@@ -344,7 +344,7 @@ class ImageProcessor:
         margin_width = right_margin - left_margin
         min_split_thickness = max(min_group_thickness, int(margin_width * 0.02))  # 마진 
         print(f"마진 폭: {margin_width}px, 최소 분할 두께: {min_split_thickness}px")
-        if len(detected_lines) == 0 or (dept in ['3186', 'JUXTA'] and (start_index == 0 and model != 'VJ77')) or (dept == '3188' and start_index > 0):
+        if len(detected_lines) == 0 or (dept in ['3186', 'JUXTA'] and (start_index == 0 and model != 'VJ77')):
             
             # 전체 이미지를 좌우 마진으로만 크롭
             if left_margin < right_margin:
