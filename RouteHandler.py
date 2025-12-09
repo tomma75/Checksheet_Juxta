@@ -480,8 +480,6 @@ class RouteHandler:
 
         # 파일 경로 결정
         file_path = None
-        print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@000000@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
-        print(f"@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@{dept},{process}@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
         # JUXTA (3186) 04번 프로세스 처리
         # 이미 체크된 이미지가 있으면 그것을 사용, 없으면 Process 폴더에서 가져옴
         if dept == '3186' and process == '04':
@@ -515,8 +513,6 @@ class RouteHandler:
         else:
             # Process 이미지 사용
             file_path = self._find_file_path(process_file_path, network_process_path)
-        print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@111111@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
-        print(f"@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@{file_path}@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
         def safe_sleep(seconds):
             """import 충돌 방지 sleep 헬퍼"""
             import time
@@ -540,7 +536,6 @@ class RouteHandler:
                     base_folder_ori = self.app.config['NETWORK_PATH']
                     break
                 if attempt < 4:
-                    print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@RRRRRRR@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
                     safe_sleep(2)
                 else:
                     return jsonify({'error': 'Requested master PDF does not exist.'}), 404
