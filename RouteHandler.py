@@ -526,7 +526,7 @@ class RouteHandler:
             else:
                 master_pdf_path = os.path.join(self.app.config['UPLOAD_FOLDER'], dept, 'Master', f'{serial}.pdf')
                 network_master_path = os.path.join(self.app.config['NETWORK_PATH'], dept, 'Master', f'{serial}.pdf')
-            for attempt in range(3):
+            for attempt in range(5):
                 if os.path.exists(master_pdf_path):
                     master_path = master_pdf_path
                     base_folder_ori = self.app.config['UPLOAD_FOLDER']
@@ -535,7 +535,7 @@ class RouteHandler:
                     master_path = network_master_path
                     base_folder_ori = self.app.config['NETWORK_PATH']
                     break
-                if attempt < 4:
+                if attempt < 6:
                     safe_sleep(2)
                 else:
                     return jsonify({'error': 'Requested master PDF does not exist.'}), 404
