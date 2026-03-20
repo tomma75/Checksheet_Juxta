@@ -1,6 +1,5 @@
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.events import EVENT_JOB_EXECUTED, EVENT_JOB_ERROR
-from flask import current_app
 import pytz
 import os
 import shutil
@@ -121,8 +120,16 @@ class SchedulerManager:
         try:
             with self.db_manager_2.connect() as connection:
                 with connection.cursor() as cursor:
-                    select_sql = """
-                    SELECT --LIKP.VBELN AS Delivery_Document,
+                    # 처음 실행(previous_serials 없음): 20241101부터, 이후: 90일 전부터
+                    if not self._previous_serials:
+                        start_date = '20241101'
+                        self.logger.info("첫 실행: 20241101부터 조회")
+                    else:
+                        start_date = (datetime.now() - timedelta(days=90)).strftime('%Y%m%d')
+                        self.logger.info(f"정기 실행: {start_date}부터 조회")
+
+                    select_sql = f"""
+                    SELECT DISTINCT
                     LIKP.WADAT AS Actual_Goods_Issue_Date,
                     LIPS.POSNR AS Delivery_Item,
                     LIPS.MATNR AS Material,
@@ -140,19 +147,14 @@ class SchedulerManager:
                     AND LIPS.VGBEL = VBAP.VBELN
                     AND LIKP.WADAT IS NOT NULL
                     AND VBAP.VBELN = TDSJ201.ORDER_NO
-                    AND LPAD (VBAP.POSNR, 6, '0') = TDSJ201.ITEM_NO
-                    AND (
-                        LIPS.MATNR LIKE 'UT%'
-                        OR LIPS.MATNR LIKE 'UP%'
-                        OR LIPS.MATNR LIKE 'UM%'
-                    )
-                    AND LIKP.WADAT BETWEEN '20241101' AND TO_CHAR(SYSDATE, 'YYYYMMDD')
+                    AND LPAD (VBAP.POSNR, 6, '0') = TDSJ201.ITEM_NO--5679224
+                    AND LIKP.WADAT BETWEEN '{start_date}' AND TO_CHAR(SYSDATE, 'YYYYMMDD')
                     """
                     cursor.execute(select_sql)
                     results = cursor.fetchall()
-                    
-                    # Serial 번호 리스트 추출 및 None 제거
-                    current_serials = set(row[9] for row in results if row[9] is not None)
+
+                    # Serial 번호 리스트 추출 (DISTINCT로 이미 중복 제거됨)
+                    current_serials = set(row[0] for row in results)
                     
                     # 새로운 시리얼 번호만 추출 (이전에 처리하지 않은 것들)
                     new_serials = current_serials - self._previous_serials
@@ -172,8 +174,10 @@ class SchedulerManager:
         """Flask 앱 컨텍스트 내에서 작업을 실행하는 래퍼 함수"""
         with self.app.app_context():
             try:
-                self.cleanup_processed_files()
+                # 1순위: 2일 이상 된 파일을 네트워크로 이동
                 self.move_old_files()
+                # 2순위: 출하된 시리얼의 Checked/Process/Master 삭제
+                self.cleanup_processed_files()
             except Exception as e:
                 self.logger.error(f"스케줄러 작업 중 예외 발생: {str(e)}")
 
@@ -235,40 +239,22 @@ class SchedulerManager:
                         self.logger.info(f"시리얼 {serial_no}의 PNG 파일이 Merged 폴더에 없어 삭제를 건너뜁니다.")
                         continue
 
-                    # PNG 파일이 있는 경우에만 Checked와 Process 폴더 삭제
-                    # 로컬 Checked 폴더 삭제
-                    local_checked_path = os.path.join(dept_path, 'Checked', serial_no)
-                    if os.path.exists(local_checked_path):
-                        shutil.rmtree(local_checked_path)
-                        self.logger.info(f"로컬 Checked 폴더 삭제: {local_checked_path}")
-                        
-                    # 로컬 Process 폴더 삭제
-                    local_process_path = os.path.join(dept_path, 'Process', serial_no)
-                    if os.path.exists(local_process_path):
-                        shutil.rmtree(local_process_path)
-                        self.logger.info(f"로컬 Process 폴더 삭제: {local_process_path}")
-                        
-                    # 서버 Checked 폴더 삭제
-                    network_checked_path = os.path.join(
-                        network_path,
-                        dept_code,
-                        'Checked',
-                        serial_no
-                    )
-                    if os.path.exists(network_checked_path):
-                        shutil.rmtree(network_checked_path)
-                        self.logger.info(f"서버 Checked 폴더 삭제: {network_checked_path}")
-                        
-                    # 서버 Process 폴더 삭제
-                    network_process_path = os.path.join(
-                        network_path,
-                        dept_code,
-                        'Process',
-                        serial_no
-                    )
-                    if os.path.exists(network_process_path):
-                        shutil.rmtree(network_process_path)
-                        self.logger.info(f"서버 Process 폴더 삭제: {network_process_path}")
+                    # PNG 파일이 있는 경우에만 Checked, Process, Master 폴더 삭제 (Merged 제외)
+                    # 삭제 대상 폴더 목록
+                    target_folders = ['Checked', 'Process', 'Master']
+
+                    for folder_name in target_folders:
+                        # 로컬(200) 폴더 삭제
+                        local_folder_path = os.path.join(dept_path, folder_name, serial_no)
+                        if os.path.exists(local_folder_path):
+                            shutil.rmtree(local_folder_path)
+                            self.logger.info(f"로컬 {folder_name} 폴더 삭제: {local_folder_path}")
+
+                        # 네트워크(198) 폴더 삭제
+                        network_folder_path = os.path.join(network_path, dept_code, folder_name, serial_no)
+                        if os.path.exists(network_folder_path):
+                            shutil.rmtree(network_folder_path)
+                            self.logger.info(f"서버 {folder_name} 폴더 삭제: {network_folder_path}")
                             
             self.logger.info(f"파일 정리 작업이 완료되었습니다. 시간: {datetime.now()}")
             print("파일 정리 작업 완료")
