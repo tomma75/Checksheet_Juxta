@@ -535,7 +535,7 @@ class RouteHandler:
                     master_path = network_master_path
                     base_folder_ori = self.app.config['NETWORK_PATH']
                     break
-                if attempt < 6:
+                if attempt < 16:
                     safe_sleep(2)
                 else:
                     return jsonify({'error': 'Requested master PDF does not exist.'}), 404
