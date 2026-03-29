@@ -178,6 +178,8 @@ class SchedulerManager:
                 self.move_old_files()
                 # 2순위: 출하된 시리얼의 Checked/Process/Master 삭제
                 self.cleanup_processed_files()
+                # 3순위: 파일이 없는 빈 폴더 정리 (로컬 + 네트워크)
+                self.cleanup_empty_folders()
             except Exception as e:
                 self.logger.error(f"스케줄러 작업 중 예외 발생: {str(e)}")
 
@@ -319,6 +321,41 @@ class SchedulerManager:
             
         except Exception as e:
             self.logger.error(f"파일 이동 작업 중 오류 발생: {str(e)}")
+
+    def cleanup_empty_folders(self):
+        """파일이 없는 빈 폴더를 삭제하는 함수 (로컬 및 네트워크)"""
+        try:
+            self.logger.info("빈 폴더 정리 작업을 시작합니다...")
+
+            # 로컬(UPLOAD_FOLDER)과 네트워크(NETWORK_PATH) 모두 정리
+            base_paths = [
+                ('로컬', self.app.config.get('UPLOAD_FOLDER')),
+                ('네트워크(198)', self.app.config.get('NETWORK_PATH'))
+            ]
+
+            total_removed = 0
+            for label, base_path in base_paths:
+                if not base_path or not os.path.exists(base_path):
+                    self.logger.warning(f"{label} 경로가 없거나 접근 불가: {base_path}")
+                    continue
+
+                # 하위 디렉토리부터 역순으로 순회하여 빈 폴더 삭제
+                for root, dirs, files in os.walk(base_path, topdown=False):
+                    # base_path 자체는 삭제하지 않음
+                    if root == base_path:
+                        continue
+                    try:
+                        if not os.listdir(root):
+                            os.rmdir(root)
+                            total_removed += 1
+                            self.logger.info(f"[{label}] 빈 폴더 삭제: {root}")
+                    except Exception as e:
+                        self.logger.error(f"[{label}] 빈 폴더 삭제 중 오류 ({root}): {str(e)}")
+
+            self.logger.info(f"빈 폴더 정리 완료: 총 {total_removed}개 삭제")
+
+        except Exception as e:
+            self.logger.error(f"빈 폴더 정리 작업 중 오류 발생: {str(e)}")
 
     def shutdown(self):
         """스케줄러 종료 시 현재 시리얼 목록을 저장합니다."""
