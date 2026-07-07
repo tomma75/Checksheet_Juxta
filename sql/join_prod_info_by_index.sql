@@ -27,6 +27,8 @@ JOIN
                AND b.CANCEL_D IS NULL
 LEFT JOIN
     PDSD0010 c ON a.PROD_NO = c.PROD_NO
-WHERE 
+WHERE
     a.INDEX_NO = '{index_no}'
     AND a.INDEX_NO_SFIX = '{index_no_sfix}'
+ORDER BY a.ENTRY_D DESC
+FETCH FIRST 1 ROW ONLY
